@@ -54,7 +54,7 @@ content_class: smaller
 ###SDK
 Download and install:
 
-- Python 2.7 ([http://www.python.org/getit/releases/2.7/]())
+- Python 2.7 ([http://www.python.org/getit/releases/2.7/]()) 
 - GAE Python SDK ([https://developers.google.com/appengine/downloads]())
 
 
