@@ -92,11 +92,74 @@ URL: https://code.google.com/p/io-2012-slides
     <article class="smaller"><ul>
 <li><a href="">https://developers.google.com/appengine/</a></li>
 <li>Platform for development of <strong>scalable</strong> cloud-based web apps</li>
-<li>PaaS - SDK for Python / Java / Go </li>
+<li>PaaS - SDK for Python / Java / Go <ul>
+<li>Runs on Google infrastructure</li>
+</ul>
+</li>
 <li>Management console and Google Accounts authentication</li>
 <li>Can be integrated with Google Apps (domain name, gmail, ...)</li>
 <li>Free / paid option (paid = pre-paid 'credit', works until depleted)</li>
 </ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Quotas</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="">https://developers.google.com/appengine/docs/quotas</a></li>
+<li>Safety (daily, per minute), <a href="https://developers.google.com/appengine/docs/billing">billable</a>, fixed</li>
+</ul>
+<table>
+  <tbody><tr>
+    <th width="30%">Resource</th>
+    <th>Free Default Daily Limit</th>
+    <th>Billing Enabled Default Limit</th>
+  </tr>
+  <tr>
+    <td>Blobstore Stored Data</td>
+    <td>First 5 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>no maximum</td>
+  </tr>
+  <tr>
+    <td>Code & Static Data Storage <br />(includes all versions)</td>
+    <td>First 1 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>$0.13 per GB per month</td>
+  </tr>
+  <tr>
+    <td>Stored Data <br />(billable)</td>
+    <td>1 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>1 GB free; no maximum</td>
+  </tr>
+  <tr>
+    <td>Number of Indexes</td>
+    <td>200 <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>200</td>
+  </tr>
+  <tr>
+    <td>Read/Write Operations</td>
+    <td>50,000</td>
+    <td>Unlimited</td>
+  </tr>
+  <tr>
+    <td>Outgoing Bandwidth <br />(billable, includes HTTPS)</td>
+    <td>1 GB<br />56 MB/minute</td>
+    <td>1 GB free; 14,400 GB maximum<br />10 GB/minute</td>
+  </tr>
+  <tr>
+    <td>Incoming Bandwidth (includes HTTPS)</td>
+    <td>1 GB; 14,400 GB maximum<br />56 MB/minute</td>
+    <td>None</td>
+  </tr>
+
+</tbody></table></article>
  
 </slide>
 
@@ -120,7 +183,7 @@ URL: https://code.google.com/p/io-2012-slides
 <h3>SDK</h3>
 <p>Download and install:</p>
 <ul>
-<li>Python 2.7 (<a href="">http://www.python.org/getit/releases/2.7/</a>)</li>
+<li>Python 2.7 (<a href="">http://www.python.org/getit/releases/2.7/</a>) </li>
 <li>GAE Python SDK (<a href="">https://developers.google.com/appengine/downloads</a>)</li>
 </ul></article>
  

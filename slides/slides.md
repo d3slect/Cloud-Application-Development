@@ -34,9 +34,67 @@ content_class: smaller
 - [https://developers.google.com/appengine/]()
 - Platform for development of **scalable** cloud-based web apps
 - PaaS - SDK for Python / Java / Go 
+	- Runs on Google infrastructure
 - Management console and Google Accounts authentication
 - Can be integrated with Google Apps (domain name, gmail, ...)
 - Free / paid option (paid = pre-paid 'credit', works until depleted)
+
+---
+
+title: Quotas
+content_class: smaller
+
+- [https://developers.google.com/appengine/docs/quotas]()
+- Safety (daily, per minute), [billable](https://developers.google.com/appengine/docs/billing), fixed
+
+<table>
+  <tbody><tr>
+    <th width="30%">Resource</th>
+    <th>Free Default Daily Limit</th>
+    <th>Billing Enabled Default Limit</th>
+  </tr>
+  <tr>
+    <td>Blobstore Stored Data</td>
+    <td>First 5 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>no maximum</td>
+  </tr>
+  <tr>
+    <td>Code & Static Data Storage <br />(includes all versions)</td>
+    <td>First 1 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>$0.13 per GB per month</td>
+  </tr>
+  <tr>
+    <td>Stored Data <br />(billable)</td>
+    <td>1 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>1 GB free; no maximum</td>
+  </tr>
+  <tr>
+    <td>Number of Indexes</td>
+    <td>200 <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>200</td>
+  </tr>
+  <tr>
+    <td>Read/Write Operations</td>
+    <td>50,000</td>
+    <td>Unlimited</td>
+  </tr>
+  <tr>
+    <td>Outgoing Bandwidth <br />(billable, includes HTTPS)</td>
+    <td>1 GB<br />56 MB/minute</td>
+    <td>1 GB free; 14,400 GB maximum<br />10 GB/minute</td>
+  </tr>
+  <tr>
+    <td>Incoming Bandwidth (includes HTTPS)</td>
+    <td>1 GB; 14,400 GB maximum<br />56 MB/minute</td>
+    <td>None</td>
+  </tr>
+
+</tbody></table>
+
 
 ---
 
