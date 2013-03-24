@@ -451,6 +451,10 @@ b, strong {
   font-weight: 600;
 }
 
+i, em {
+  font-style: italic;
+}
+
 /* line 302, ../scss/default.scss */
 a {
   color: #2a7cdf;

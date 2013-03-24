@@ -27,11 +27,18 @@ class: segue dark nobackground
 
 ---
 
-title: App Engine Introduction
+title: What is Cloud Computing?
+
+[Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
+
+---
+
+title: What is (isn't) Google App Engine?
 
 - [https://developers.google.com/appengine/]()
-- Platform for development of **scalable** cloud-based web apps
-	- Motto: **Solutions that do not scale cannot be done at all!**
+- [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
+- Platform for development of scalable cloud-based web apps
+	- Motto: *Solutions that do not scale cannot be done at all!*
 - PaaS - SDK for Python / Java / Go 
 	- Runs on Google infrastructure
 - Integrated with Google services
@@ -128,23 +135,24 @@ class: segue dark nobackground
 title: Dev Tools
 content_class: smaller
 
-#SDK:
+#SDK 
 
-- Python 2.7 ([http://www.python.org/getit/releases/2.7/]()) 
-- GAE Python SDK ([https://developers.google.com/appengine/downloads]())
-- Add the `bin` directories to PATH ([todo]()).
+- [Installation tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
+- Python 2.7 ([link](http://www.python.org/getit/releases/2.7/)) 
+- GAE Python SDK ([link](https://developers.google.com/appengine/downloads))
+- Make sure that the python and GAE SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
 
-#File types you will encounter:
+#File types you will encounter
 
-- Python sources (.py)
-- YAML configuraiton files (.yaml)
-- Web sources (.html, .css, ...)
+- Python sources (`.py`)
+- YAML configuraiton files (`.yaml`)
+- Web sources (`.html`, `.css`, ...)
 
-#Recommended tools:
+#Recommended tools
 
 - Your favorite text editor (vim, ...)
-- IDLE: default Python editor ([todo]())
-- Aptana studio: Eclispe-based IDE ([todo]())
+- IDLE: default Python editor ([link](http://docs.python.org/2/library/idle.html))
+- Aptana Studio: Eclispe-based IDE ([link](http://www.aptana.com/))
 - ...
 
 ---
@@ -152,7 +160,8 @@ content_class: smaller
 title: Hello World
 content_class: smaller
 
-[Getting started guide](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
+- [Getting started guide on GAE docs](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
+- [Getting started guide on Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
 
 - Create a skeleton of a new Google Appengine app
 	- Use the *Google App Engine Launcher* ([todo]())
