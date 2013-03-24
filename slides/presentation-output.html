@@ -49,13 +49,11 @@ URL: https://code.google.com/p/io-2012-slides
       <h2>Agenda</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><h3>Schedule</h3>
+    <article ><p><a href="">https://github.com/keznikl/Cloud-Application-Development</a></p>
+<h1>Schedule</h1>
 <ul>
 <li><strong>Lab 1</strong> Intro, SDK, Hello World</li>
-<li><strong>Lab 2</strong> Selection of features<ul>
-<li>datastore, tasks, blobs, ... </li>
-</ul>
-</li>
+<li><strong>Lab 2</strong> Selection of features (datastore, tasks, blobs, ...)</li>
 <li><strong>Lab 3</strong> Homework<ul>
 <li>preferably Python (easier to use)</li>
 <li>individually or in small groups</li>
@@ -64,12 +62,11 @@ URL: https://code.google.com/p/io-2012-slides
 <li><strong>Lab 4</strong> Homework cont.</li>
 <li><strong>Lab 5</strong> Summary and (maybe) map-reduce</li>
 </ul>
-<h3>Requirements</h3>
+<h1>Requirements</h1>
 <ul>
 <li>Google Account</li>
 <li>Python (basics of OOP, copy/paste) </li>
-</ul>
-<p><a href="">https://github.com/keznikl/Cloud-Application-Development</a></p></article>
+</ul></article>
  
 </slide>
 
@@ -89,17 +86,52 @@ URL: https://code.google.com/p/io-2012-slides
       <h2>App Engine Introduction</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><ul>
+    <article ><ul>
 <li><a href="">https://developers.google.com/appengine/</a></li>
-<li>Platform for development of <strong>scalable</strong> cloud-based web apps</li>
+<li>Platform for development of <strong>scalable</strong> cloud-based web apps<ul>
+<li>Motto: <strong>Solutions that do not scale cannot be done at all!</strong></li>
+</ul>
+</li>
 <li>PaaS - SDK for Python / Java / Go <ul>
 <li>Runs on Google infrastructure</li>
 </ul>
 </li>
+<li>Integrated with Google services<ul>
 <li>Management console and Google Accounts authentication</li>
-<li>Can be integrated with Google Apps (domain name, gmail, ...)</li>
-<li>Free / paid option (paid = pre-paid 'credit', works until depleted)</li>
+<li>Can be integrated with Google Apps (domain name, ...)</li>
+<li>Access to API of Youtube and other google services</li>
+</ul>
+</li>
+<li>Free / paid option <ul>
+<li>paid = pre-paid 'credit', works until depleted</li>
+</ul>
+</li>
 </ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>What can App Engine do?</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><ul>
+<li>Handle HTTP requests (<a href="">todo</a>)</li>
+<li>Store data<ul>
+<li>Focus on non-relational (entity-based) storage (<a href="">todo</a>)</li>
+<li>relational (<a href="">todo</a>) and blob (<a href="">todo</a>) storage also available</li>
+</ul>
+</li>
+<li>Process data asynchronously on background (<a href="">todo</a>)</li>
+<li>Cache processed results for quick access (<a href="">todo</a>)</li>
+<li>Render HTML from templates (<a href="">todo</a>)</li>
+<li>Push data to clients (<a href="">todo</a>)</li>
+<li>Download URL content (<a href="">todo</a>)</li>
+<li>Send e-mails (<a href="">todo</a>)</li>
+<li>and much more...</li>
+</ul>
+<h1>It does everything in such a way that it scales!</h1></article>
  
 </slide>
 
@@ -168,9 +200,37 @@ a total limit.</td>
     <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
     <hgroup class="auto-fadein">
       <h2>Hello World</h2>
-      <h3>Following Google's Tutorial</h3>
+      <h3>Following the Google's Tutorial</h3>
     </hgroup>
   
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Dev Tools</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><h1>SDK:</h1>
+<ul>
+<li>Python 2.7 (<a href="">http://www.python.org/getit/releases/2.7/</a>) </li>
+<li>GAE Python SDK (<a href="">https://developers.google.com/appengine/downloads</a>)</li>
+<li>Add the <code>bin</code> directories to PATH (<a href="">todo</a>).</li>
+</ul>
+<h1>File types you will encounter:</h1>
+<ul>
+<li>Python sources (.py)</li>
+<li>YAML configuraiton files (.yaml)</li>
+<li>Web sources (.html, .css, ...)</li>
+</ul>
+<h1>Recommended tools:</h1>
+<ul>
+<li>Your favorite text editor (vim, ...)</li>
+<li>IDLE: default Python editor (<a href="">todo</a>)</li>
+<li>Aptana studio: Eclispe-based IDE (<a href="">todo</a>)</li>
+<li>...</li>
+</ul></article>
+ 
 </slide>
 
 <slide  >
@@ -180,12 +240,33 @@ a total limit.</td>
       <h3></h3>
     </hgroup>
     <article class="smaller"><p><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">Getting started guide</a></p>
-<h3>SDK</h3>
-<p>Download and install:</p>
 <ul>
-<li>Python 2.7 (<a href="">http://www.python.org/getit/releases/2.7/</a>) </li>
-<li>GAE Python SDK (<a href="">https://developers.google.com/appengine/downloads</a>)</li>
-</ul></article>
+<li>Create a skeleton of a new Google Appengine app<ul>
+<li>Use the <em>Google App Engine Launcher</em> (<a href="">todo</a>)</li>
+</ul>
+</li>
+<li>Implement the main request handler</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+import webapp2
+
+class MainPage(webapp2.<b>RequestHandler</b>):
+  def <b>get</b>(self):
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.<b>response.write</b>('Hello, webapp2 World!')
+
+app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+</pre>
+
+<ul>
+<li>Run the development server:<ul>
+<li>Use the <em>Google App Engine Launcher</em> (<a href="">todo</a>), or:</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="cmd">
+python dev_appserver.py &lt;path_to_your_app&gt;
+</pre></article>
  
 </slide>
 

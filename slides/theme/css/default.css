@@ -467,6 +467,10 @@ h1, h2, h3 {
   font-weight: 600;
 }
 
+h1 {
+  line-height: 40px;
+}
+
 /* line 316, ../scss/default.scss */
 h2 {
   font-size: 45px;

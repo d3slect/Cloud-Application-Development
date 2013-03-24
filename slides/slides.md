@@ -1,24 +1,23 @@
 title: Agenda
 class: big
-content_class: smaller
 
-###Schedule
+[https://github.com/keznikl/Cloud-Application-Development]()
+
+#Schedule
 
 - **Lab 1** Intro, SDK, Hello World
-- **Lab 2** Selection of features
-	- datastore, tasks, blobs, ... 
+- **Lab 2** Selection of features (datastore, tasks, blobs, ...)
 - **Lab 3** Homework
 	- preferably Python (easier to use)
 	- individually or in small groups
 - **Lab 4** Homework cont.
 - **Lab 5** Summary and (maybe) map-reduce
 
-###Requirements
+#Requirements
 
 - Google Account
 - Python (basics of OOP, copy/paste) 
 
-[https://github.com/keznikl/Cloud-Application-Development]()
 
 ---
 
@@ -29,15 +28,37 @@ class: segue dark nobackground
 ---
 
 title: App Engine Introduction
-content_class: smaller
 
 - [https://developers.google.com/appengine/]()
 - Platform for development of **scalable** cloud-based web apps
+	- Motto: **Solutions that do not scale cannot be done at all!**
 - PaaS - SDK for Python / Java / Go 
 	- Runs on Google infrastructure
-- Management console and Google Accounts authentication
-- Can be integrated with Google Apps (domain name, gmail, ...)
-- Free / paid option (paid = pre-paid 'credit', works until depleted)
+- Integrated with Google services
+	- Management console and Google Accounts authentication
+	- Can be integrated with Google Apps (domain name, ...)
+	- Access to API of Youtube and other google services
+- Free / paid option 
+	- paid = pre-paid 'credit', works until depleted
+
+---
+
+title: What can App Engine do?
+
+
+- Handle HTTP requests ([todo]())
+- Store data
+	- Focus on non-relational (entity-based) storage ([todo]())
+	- relational ([todo]()) and blob ([todo]()) storage also available
+- Process data asynchronously on background ([todo]())
+- Cache processed results for quick access ([todo]())
+- Render HTML from templates ([todo]())
+- Push data to clients ([todo]())
+- Download URL content ([todo]())
+- Send e-mails ([todo]())
+- and much more...
+
+#It does everything in such a way that it scales!
 
 ---
 
@@ -99,8 +120,32 @@ a total limit.</td>
 ---
 
 title: Hello World
-subtitle: Following Google's Tutorial
+subtitle: Following the Google's Tutorial
 class: segue dark nobackground
+
+---
+
+title: Dev Tools
+content_class: smaller
+
+#SDK:
+
+- Python 2.7 ([http://www.python.org/getit/releases/2.7/]()) 
+- GAE Python SDK ([https://developers.google.com/appengine/downloads]())
+- Add the `bin` directories to PATH ([todo]()).
+
+#File types you will encounter:
+
+- Python sources (.py)
+- YAML configuraiton files (.yaml)
+- Web sources (.html, .css, ...)
+
+#Recommended tools:
+
+- Your favorite text editor (vim, ...)
+- IDLE: default Python editor ([todo]())
+- Aptana studio: Eclispe-based IDE ([todo]())
+- ...
 
 ---
 
@@ -109,12 +154,27 @@ content_class: smaller
 
 [Getting started guide](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
 
-###SDK
-Download and install:
+- Create a skeleton of a new Google Appengine app
+	- Use the *Google App Engine Launcher* ([todo]())
+- Implement the main request handler
 
-- Python 2.7 ([http://www.python.org/getit/releases/2.7/]()) 
-- GAE Python SDK ([https://developers.google.com/appengine/downloads]())
+<pre class="prettyprint" data-lang="python">
+import webapp2
 
+class MainPage(webapp2.<b>RequestHandler</b>):
+  def <b>get</b>(self):
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.<b>response.write</b>('Hello, webapp2 World!')
+
+app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+</pre>
+
+- Run the development server:
+	- Use the *Google App Engine Launcher* ([todo]()), or:
+
+<pre class="prettyprint" data-lang="cmd">
+python dev_appserver.py &lt;path_to_your_app&gt;
+</pre>
 
 ---
 
