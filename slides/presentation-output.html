@@ -261,16 +261,17 @@ a total limit.</td>
     </hgroup>
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">Getting started guide on GAE docs</a></li>
-<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted">Getting started guide on Google Training</a>
+<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted">Getting started tutorial on Google Training</a>
 <p></p></li>
 <li>Create a skeleton of a new Google Appengine app<ul>
 <li>Choose an ID, e.g., <code>helloworld</code></li>
 <li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#creating">tutorial</a>)</li>
 </ul>
 </li>
-<li>You should get the following structure<ul>
+<li>You should get the following structure (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#hello">tutorial</a>)<ul>
 <li><code>app.yaml</code> - configuration of the app</li>
-<li><code>helloworld.py</code> - implementation of the req. handler</li>
+<li><code>main.py</code> - implementation of the req. handler</li>
+<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/hello-world">github</a></li>
 </ul>
 </li>
 <li>Test the app<ul>
@@ -301,7 +302,7 @@ threadsafe: true
 
 <b>handlers:
 - url: /.*
-  script: helloworld.app</b>
+  script: main.app</b>
 
 ...
 </pre>
@@ -318,7 +319,7 @@ threadsafe: true
       <h2>Handling Request</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><p>Request handler is a specific Python object in a specific module referred in the <code>app.yaml</code> file; e.g., <code>app</code> in <code>helloworld.py</code></p>
+    <article class="smaller"><p>Request handler is a specific Python object in a specific module referred in the <code>app.yaml</code> file; e.g., <code>app</code> in <code>main.py</code></p>
 <pre class="prettyprint" data-lang="python">
 import webapp2
 

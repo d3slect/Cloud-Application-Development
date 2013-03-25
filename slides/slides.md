@@ -142,8 +142,8 @@ content_class: smaller
 #SDK 
 
 - [Installation tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
-- Python 2.7 ([link](http://www.python.org/getit/releases/2.7/)) 
-- GAE Python SDK ([link](https://developers.google.com/appengine/downloads))
+- Python 2.7 ([link](http://www.python.org/getit/releases/2.7.3/)) 
+- GAE Python SDK ([link](https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python))
 - Make sure that the python and GAE SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
 
 #File types you will encounter
@@ -165,7 +165,7 @@ title: Hello World
 content_class: smaller
 
 - [Getting started guide on GAE docs](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
-- [Getting started guide on Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
+- [Getting started tutorial on Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
 <p></p>
 - Create a skeleton of a new Google Appengine app
 	- Choose an ID, e.g., `helloworld`
@@ -173,7 +173,7 @@ content_class: smaller
 - You should get the following structure ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#hello))
 	- `app.yaml` - configuration of the app
 	- `main.py` - implementation of the req. handler
-	- the sources are also available [here]()
+	- complete sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/hello-world)
 - Test the app
 	- Run the development server and visit <http://localhost:8080/>
 	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#startdev)), or:
