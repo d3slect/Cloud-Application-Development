@@ -43,7 +43,7 @@ URL: https://code.google.com/p/io-2012-slides
 </slide>
 
 
-<slide class="big" >
+<slide  >
   
     <hgroup>
       <h2>Agenda</h2>
@@ -86,19 +86,23 @@ URL: https://code.google.com/p/io-2012-slides
       <h2>What is Cloud Computing?</h2>
       <h3></h3>
     </hgroup>
-    <article ><p><a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </p></article>
+    <article class="smaller"><ul>
+<li>Further reading<ul>
+<li><a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
+</ul>
+</li>
+</ul></article>
  
 </slide>
 
 <slide  >
   
     <hgroup>
-      <h2>What is (isn't) Google App Engine?</h2>
+      <h2>What is Google App Engine?</h2>
       <h3></h3>
     </hgroup>
-    <article ><ul>
-<li><a href="">https://developers.google.com/appengine/</a></li>
-<li><a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
+    <article class="smaller"><p><a href="https://developers.google.com/appengine/">https://developers.google.com/appengine/</a></p>
+<ul>
 <li>Platform for development of scalable cloud-based web apps<ul>
 <li>Motto: <em>Solutions that do not scale cannot be done at all!</em></li>
 </ul>
@@ -117,6 +121,10 @@ URL: https://code.google.com/p/io-2012-slides
 <li>paid = pre-paid 'credit', works until depleted</li>
 </ul>
 </li>
+<li>Further reading<ul>
+<li><a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
@@ -127,7 +135,7 @@ URL: https://code.google.com/p/io-2012-slides
       <h2>What can App Engine do?</h2>
       <h3></h3>
     </hgroup>
-    <article ><ul>
+    <article class="smaller"><ul>
 <li>Handle HTTP requests (<a href="">todo</a>)</li>
 <li>Store data<ul>
 <li>Focus on non-relational (entity-based) storage (<a href="">todo</a>)</li>
@@ -140,7 +148,7 @@ URL: https://code.google.com/p/io-2012-slides
 <li>Push data to clients (<a href="">todo</a>)</li>
 <li>Download URL content (<a href="">todo</a>)</li>
 <li>Send e-mails (<a href="">todo</a>)</li>
-<li>and much more...</li>
+<li>and much more... (<a href="https://developers.google.com/appengine/docs/python/apis">link</a>)</li>
 </ul>
 <h1>It does everything in such a way that it scales!</h1></article>
  
@@ -253,37 +261,77 @@ a total limit.</td>
     </hgroup>
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">Getting started guide on GAE docs</a></li>
-<li>
-<p><a href="https://developers.google.com/appengine/training/intro/gettingstarted">Getting started guide on Google Training</a></p>
-</li>
-<li>
-<p>Create a skeleton of a new Google Appengine app</p>
-<ul>
-<li>Use the <em>Google App Engine Launcher</em> (<a href="">todo</a>)</li>
+<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted">Getting started guide on Google Training</a>
+<p></p></li>
+<li>Create a skeleton of a new Google Appengine app<ul>
+<li>Choose an ID, e.g., <code>helloworld</code></li>
+<li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#creating">tutorial</a>)</li>
 </ul>
 </li>
-<li>Implement the main request handler</li>
+<li>You should get the following structure<ul>
+<li><code>app.yaml</code> - configuration of the app</li>
+<li><code>helloworld.py</code> - implementation of the req. handler</li>
 </ul>
-<pre class="prettyprint" data-lang="python">
-import webapp2
-
-class MainPage(webapp2.<b>RequestHandler</b>):
-  def <b>get</b>(self):
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.<b>response.write</b>('Hello, webapp2 World!')
-
-app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
-</pre>
-
-<ul>
-<li>Run the development server:<ul>
-<li>Use the <em>Google App Engine Launcher</em> (<a href="">todo</a>), or:</li>
+</li>
+<li>Test the app<ul>
+<li>Run the development server and visit <a href="http://localhost:8080/">http://localhost:8080/</a></li>
+<li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#startdev">tutorial</a>), or:</li>
 </ul>
 </li>
 </ul>
 <pre class="prettyprint" data-lang="cmd">
-python dev_appserver.py &lt;path_to_your_app&gt;
+python google_appengine/dev_appserver.py helloworld/
 </pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>App Configuration</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p>The configuraiton of a GAE app is in the <code>app.yaml</code> file</p>
+<pre class="prettyprint" data-lang="YAML">
+<b>application: helloworld
+version: 1
+runtime: python</b>27
+api_version: 1
+threadsafe: true
+
+<b>handlers:
+- url: /.*
+  script: helloworld.app</b>
+
+...
+</pre>
+
+<ul>
+<li>See the <a href="https://developers.google.com/appengine/docs/python/config/appconfig">official docs</a> for further details on app configuration.</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Handling Request</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p>Request handler is a specific Python object in a specific module referred in the <code>app.yaml</code> file; e.g., <code>app</code> in <code>helloworld.py</code></p>
+<pre class="prettyprint" data-lang="python">
+import webapp2
+
+class MainHandler(webapp2.<b>RequestHandler</b>):
+    def <b>get</b>(self):
+        self.<b>response.write</b>('Hello world!')
+
+app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
+</pre>
+
+<ul>
+<li><a href="https://developers.google.com/appengine/docs/python/tools/webapp2">webapp2 framework</a></li>
+</ul></article>
  
 </slide>
 

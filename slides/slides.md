@@ -1,5 +1,4 @@
 title: Agenda
-class: big
 
 [https://github.com/keznikl/Cloud-Application-Development]()
 
@@ -28,15 +27,18 @@ class: segue dark nobackground
 ---
 
 title: What is Cloud Computing?
+content_class: smaller
 
-[Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
+- Further reading
+	- [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
 
 ---
 
-title: What is (isn't) Google App Engine?
+title: What is Google App Engine?
+content_class: smaller
 
-- [https://developers.google.com/appengine/]()
-- [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
+<https://developers.google.com/appengine/>
+
 - Platform for development of scalable cloud-based web apps
 	- Motto: *Solutions that do not scale cannot be done at all!*
 - PaaS - SDK for Python / Java / Go 
@@ -47,11 +49,13 @@ title: What is (isn't) Google App Engine?
 	- Access to API of Youtube and other google services
 - Free / paid option 
 	- paid = pre-paid 'credit', works until depleted
+- Further reading
+	- [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
 
 ---
 
 title: What can App Engine do?
-
+content_class: smaller
 
 - Handle HTTP requests ([todo]())
 - Store data
@@ -63,7 +67,7 @@ title: What can App Engine do?
 - Push data to clients ([todo]())
 - Download URL content ([todo]())
 - Send e-mails ([todo]())
-- and much more...
+- and much more... ([link](https://developers.google.com/appengine/docs/python/apis))
 
 #It does everything in such a way that it scales!
 
@@ -162,28 +166,65 @@ content_class: smaller
 
 - [Getting started guide on GAE docs](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
 - [Getting started guide on Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
-
+<p></p>
 - Create a skeleton of a new Google Appengine app
-	- Use the *Google App Engine Launcher* ([todo]())
-- Implement the main request handler
+	- Choose an ID, e.g., `helloworld`
+	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#creating))
+- You should get the following structure ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#hello))
+	- `app.yaml` - configuration of the app
+	- `main.py` - implementation of the req. handler
+	- the sources are also available [here]()
+- Test the app
+	- Run the development server and visit <http://localhost:8080/>
+	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#startdev)), or:
+
+<pre class="prettyprint" data-lang="cmd">
+python google_appengine/dev_appserver.py helloworld/
+</pre>
+
+---
+
+title: App Configuration
+content_class: smaller
+
+The configuraiton of a GAE app is in the `app.yaml` file
+
+<pre class="prettyprint" data-lang="YAML">
+<b>application: helloworld
+version: 1
+runtime: python</b>27
+api_version: 1
+threadsafe: true
+
+<b>handlers:
+- url: /.*
+  script: main.app</b>
+
+...
+</pre>
+
+
+- See the [official docs](https://developers.google.com/appengine/docs/python/config/appconfig) for further details on app configuration.
+
+
+---
+
+title: Handling Request
+content_class: smaller
+
+Request handler is a specific Python object in a specific module referred in the `app.yaml` file; e.g., `app` in `main.py`
 
 <pre class="prettyprint" data-lang="python">
 import webapp2
 
-class MainPage(webapp2.<b>RequestHandler</b>):
-  def <b>get</b>(self):
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.<b>response.write</b>('Hello, webapp2 World!')
+class MainHandler(webapp2.<b>RequestHandler</b>):
+    def <b>get</b>(self):
+        self.<b>response.write</b>('Hello world!')
 
-app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 </pre>
 
-- Run the development server:
-	- Use the *Google App Engine Launcher* ([todo]()), or:
-
-<pre class="prettyprint" data-lang="cmd">
-python dev_appserver.py &lt;path_to_your_app&gt;
-</pre>
+- [webapp2 framework](https://developers.google.com/appengine/docs/python/tools/webapp2)
 
 ---
 
