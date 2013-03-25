@@ -46,7 +46,7 @@ content_class: smaller
 - Integrated with Google services
 	- Management console and Google Accounts authentication
 	- Can be integrated with Google Apps (domain name, ...)
-	- Access to API of Youtube and other google services
+	- Access to API of Youtube and other Google services
 - Free / paid option 
 	- paid = pre-paid 'credit', works until depleted
 - Further reading
@@ -57,16 +57,16 @@ content_class: smaller
 title: What can App Engine do?
 content_class: smaller
 
-- Handle HTTP requests ([todo]())
+- Handle HTTP requests ([link](https://developers.google.com/appengine/docs/python/runtime#Requests))
 - Store data
-	- Focus on non-relational (entity-based) storage ([todo]())
-	- relational ([todo]()) and blob ([todo]()) storage also available
-- Process data asynchronously on background ([todo]())
-- Cache processed results for quick access ([todo]())
-- Render HTML from templates ([todo]())
-- Push data to clients ([todo]())
-- Download URL content ([todo]())
-- Send e-mails ([todo]())
+	- Focus on non-relational (entity-based) storage ([link](https://developers.google.com/appengine/docs/python/datastore/overview))
+	- relational ([link](https://developers.google.com/cloud-sql/)) and blob ([link](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
+- Process data asynchronously on background ([link](https://developers.google.com/appengine/docs/python/taskqueue/))
+- Cache processed results for quick access ([link](https://developers.google.com/appengine/docs/python/memcache/))
+- Render HTML from templates ([link](https://developers.google.com/appengine/docs/python/tools/webapp2))
+- Push data to clients ([link](https://developers.google.com/appengine/docs/python/channel/))
+- Download URL content ([link](https://developers.google.com/appengine/docs/python/urlfetch/))
+- Send e-mails ([link](https://developers.google.com/appengine/docs/python/mail/))
 - and much more... ([link](https://developers.google.com/appengine/docs/python/apis))
 
 #It does everything in such a way that it scales!
@@ -164,8 +164,8 @@ content_class: smaller
 title: Hello World
 content_class: smaller
 
-- [Getting started guide on GAE docs](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
-- [Getting started tutorial on Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
+- [Getting started guide at GAE docs](https://developers.google.com/appengine/docs/python/gettingstartedpython27/helloworld)
+- [Getting started tutorial at Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
 <p></p>
 - Create a skeleton of a new Google Appengine app
 	- Choose an ID, e.g., `helloworld`
@@ -225,6 +225,23 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 </pre>
 
 - [webapp2 framework](https://developers.google.com/appengine/docs/python/tools/webapp2)
+
+---
+
+title: Guestbook app
+subtitle: Following (again) the Google's Tutorial
+class: segue dark nobackground
+
+---
+
+title: Guestbook app features
+content_class: smaller
+
+- Users to post and read text messages
+- Google Accounts for authentication
+- Datastore for storage of persistent data
+- Jinja2 templating engine for HTML rendering
+- 
 
 ---
 
