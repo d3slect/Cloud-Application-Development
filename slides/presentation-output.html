@@ -113,7 +113,7 @@ URL: https://code.google.com/p/io-2012-slides
 </li>
 <li>Integrated with Google services<ul>
 <li>Management console and Google Accounts authentication</li>
-<li>Can be integrated with Google Apps (domain name, ...)</li>
+<li>Can be integrated with Google Apps (own domain name, ...)</li>
 <li>Access to API of Youtube and other Google services</li>
 </ul>
 </li>
@@ -308,7 +308,10 @@ threadsafe: true
 </pre>
 
 <ul>
+<li>Further reading<ul>
 <li>See the <a href="https://developers.google.com/appengine/docs/python/config/appconfig">official docs</a> for further details on app configuration.</li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
@@ -316,7 +319,7 @@ threadsafe: true
 <slide  >
   
     <hgroup>
-      <h2>Handling Request</h2>
+      <h2>Handling Requests</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><p>Request handler is a specific Python object in a specific module referred in the <code>app.yaml</code> file; e.g., <code>app</code> in <code>main.py</code></p>
@@ -331,7 +334,92 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 </pre>
 
 <ul>
+<li>Further reading<ul>
 <li><a href="https://developers.google.com/appengine/docs/python/tools/webapp2">webapp2 framework</a></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Uploading the App to Google</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><em>"Feed the Big Brother"</em></p>
+<ul>
+<li>Create the app in the GAE Administration Console (todo)<ul>
+<li>Choose the same ID you've selected before</li>
+</ul>
+</li>
+<li>Upload the app (todo)<ul>
+<li>You need to fill in your Google Account information</li>
+<li>You can upload different versions for the same app ID and select which one is used as the default (link)</li>
+<li>Use the <em>Google App Engine Launcher</em> (tutorial), or:</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="cmd">
+python google_appengine/appcfg.py update helloworld/
+</pre>
+
+<ul>
+<li>Test the uploaded version<ul>
+<li>Default domain <code>&lt;app ID&gt;.appspot.com</code></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Monitoring and Management</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>SDK Console (link)<ul>
+<li>Basic infromation about the app in the development environment</li>
+<li>Service usage overview (Datastore Viewer, Task Queues), Interactive Console </li>
+</ul>
+</li>
+<li>Administrator Console (link)<ul>
+<li>All 'possible' infromation about the app in the production environment</li>
+<li>Service usage overview (again)</li>
+<li>Resource usage, quotas (link)</li>
+<li>Version management (link)</li>
+<li>TODO</li>
+</ul>
+</li>
+<li>Try out and explore!</li>
+</ul></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Guestbook app</h2>
+      <h3>Following (again) the Google's Tutorial</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Guestbook app features</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Users to post and read text messages</li>
+<li>Google Accounts for authentication</li>
+<li>Datastore for storage of persistent data</li>
+<li>Jinja2 templating engine for HTML rendering</li>
 </ul></article>
  
 </slide>

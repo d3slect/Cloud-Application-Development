@@ -45,7 +45,7 @@ content_class: smaller
 	- Runs on Google infrastructure
 - Integrated with Google services
 	- Management console and Google Accounts authentication
-	- Can be integrated with Google Apps (domain name, ...)
+	- Can be integrated with Google Apps (own domain name, ...)
 	- Access to API of Youtube and other Google services
 - Free / paid option 
 	- paid = pre-paid 'credit', works until depleted
@@ -203,13 +203,13 @@ threadsafe: true
 ...
 </pre>
 
-
-- See the [official docs](https://developers.google.com/appengine/docs/python/config/appconfig) for further details on app configuration.
+- Further reading
+	- See the [official docs](https://developers.google.com/appengine/docs/python/config/appconfig) for further details on app configuration.
 
 
 ---
 
-title: Handling Request
+title: Handling Requests
 content_class: smaller
 
 Request handler is a specific Python object in a specific module referred in the `app.yaml` file; e.g., `app` in `main.py`
@@ -224,7 +224,46 @@ class MainHandler(webapp2.<b>RequestHandler</b>):
 app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 </pre>
 
-- [webapp2 framework](https://developers.google.com/appengine/docs/python/tools/webapp2)
+- Further reading
+	- [webapp2 framework](https://developers.google.com/appengine/docs/python/tools/webapp2)
+
+---
+
+title: Uploading the App to Google
+content_class: smaller
+
+*"Feed the Big Brother"*
+
+- Create the app in the GAE Administration Console (todo)
+	- Choose the same ID you've selected before
+- Upload the app (todo)
+	- You need to fill in your Google Account information
+	- You can upload different versions for the same app ID and select which one is used as the default (link)
+	- Use the *Google App Engine Launcher* (tutorial), or:
+	
+<pre class="prettyprint" data-lang="cmd">
+python google_appengine/appcfg.py update helloworld/
+</pre>
+
+- Test the uploaded version
+	- Default domain `<app ID>.appspot.com`
+
+---
+
+title: Monitoring and Management 
+content_class: smaller
+
+- SDK Console (link)
+	- Basic infromation about the app in the development environment
+	- Service usage overview (Datastore Viewer, Task Queues), Interactive Console 
+- Administrator Console (link)
+	- All 'possible' infromation about the app in the production environment
+	- Service usage overview (again)
+	- Resource usage, quotas (link)
+	- Version management (link)
+	- TODO
+- Try out and explore!
+
 
 ---
 
@@ -241,7 +280,7 @@ content_class: smaller
 - Google Accounts for authentication
 - Datastore for storage of persistent data
 - Jinja2 templating engine for HTML rendering
-- 
+
 
 ---
 
