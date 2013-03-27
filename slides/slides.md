@@ -21,7 +21,7 @@ title: Agenda
 ---
 
 title: Introduction
-subtitle: What is (not) Google App Engine
+subtitle: What is (isn't) Google App Engine
 class: segue dark nobackground
 
 ---
@@ -30,7 +30,7 @@ title: What is Cloud Computing?
 content_class: smaller
 
 - Further reading
-	- [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
+	- *"What is Cloud Computing?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
 
 ---
 
@@ -50,24 +50,24 @@ content_class: smaller
 - Free / paid option 
 	- paid = pre-paid 'credit', works until depleted
 - Further reading
-	- [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
+	- *"What is (isn't) Google App Engine?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
 
 ---
 
 title: What can App Engine do?
 content_class: smaller
 
-- Handle HTTP requests ([link](https://developers.google.com/appengine/docs/python/runtime#Requests))
+- Handle HTTP requests ([docs](https://developers.google.com/appengine/docs/python/runtime#Requests))
 - Store data
-	- Focus on non-relational (entity-based) storage ([link](https://developers.google.com/appengine/docs/python/datastore/overview))
-	- relational ([link](https://developers.google.com/cloud-sql/)) and blob ([link](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
-- Process data asynchronously on background ([link](https://developers.google.com/appengine/docs/python/taskqueue/))
-- Cache processed results for quick access ([link](https://developers.google.com/appengine/docs/python/memcache/))
-- Render HTML from templates ([link](https://developers.google.com/appengine/docs/python/tools/webapp2))
-- Push data to clients ([link](https://developers.google.com/appengine/docs/python/channel/))
-- Download URL content ([link](https://developers.google.com/appengine/docs/python/urlfetch/))
-- Send e-mails ([link](https://developers.google.com/appengine/docs/python/mail/))
-- and much more... ([link](https://developers.google.com/appengine/docs/python/apis))
+	- Focus on non-relational (entity-based) storage ([docs](https://developers.google.com/appengine/docs/python/datastore/overview))
+	- relational ([docs](https://developers.google.com/cloud-sql/)) and blob ([docs](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
+- Process data asynchronously on background ([docs](https://developers.google.com/appengine/docs/python/taskqueue/))
+- Cache processed results for quick access ([docs](https://developers.google.com/appengine/docs/python/memcache/))
+- Render HTML from templates ([docs](https://developers.google.com/appengine/docs/python/tools/webapp2))
+- Push data to clients ([docs](https://developers.google.com/appengine/docs/python/channel/))
+- Download URL content ([docs](https://developers.google.com/appengine/docs/python/urlfetch/))
+- Send e-mails ([docs](https://developers.google.com/appengine/docs/python/mail/))
+- and much more... ([docs](https://developers.google.com/appengine/docs/python/apis))
 
 #It does everything in such a way that it scales!
 
@@ -204,7 +204,7 @@ threadsafe: true
 </pre>
 
 - Further reading
-	- See the [official docs](https://developers.google.com/appengine/docs/python/config/appconfig) for further details on app configuration.
+	-  Application configuration [docs](https://developers.google.com/appengine/docs/python/config/appconfig
 
 
 ---
@@ -225,7 +225,7 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 </pre>
 
 - Further reading
-	- [webapp2 framework](https://developers.google.com/appengine/docs/python/tools/webapp2)
+	- webapp2 framework [docs](https://developers.google.com/appengine/docs/python/tools/webapp2)
 
 ---
 
@@ -236,9 +236,9 @@ content_class: smaller
 
 - Create the app in the GAE Administration Console ([link](https://appengine.google.com/))
 	- Choose the same ID you've selected before
-- Upload the app ([link](https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading), [link](https://developers.google.com/appengine/docs/python/tools/uploadinganapp))
+- Upload the app ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading), [docs](https://developers.google.com/appengine/docs/python/tools/uploadinganapp))
 	- You need to fill in your Google Account information
-	- You can upload different versions for the same app ID and select which one is used as the default ([link](https://developers.google.com/appengine/docs/adminconsole/index))
+	- You can upload different versions for the same app ID and select which one is used as the default ([docs](https://developers.google.com/appengine/docs/adminconsole/index))
 	- Use the *Google App Engine Launcher* "Deploy" button ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#upload)), or:
 	
 <pre class="prettyprint" data-lang="cmd">
@@ -253,11 +253,13 @@ python google_appengine/appcfg.py update helloworld/
 title: Monitoring and Management 
 content_class: smaller
 
-- Development Console ([link](https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console))
+- Development Console ([docs](https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console))
+	- Runs on <http://localhost:8000/>
+	- "SDK Console" button in the *Google App Engine Launcher*
 	- Basic infromation about the app in the *development* environment
-	- Service usage/state overview (Datastore Viewer, Task Queues), Interactive Console 
-	- SDK Console button in the *Google App Engine Launcher*
-- Administrator Console ([link](https://developers.google.com/appengine/docs/adminconsole/?hl=en), [link](http://appengine.google.com))
+	- Service usage/state overview (Datastore Viewer, Task Queues)
+	- Interactive Console 
+- Administrator Console ([docs](https://developers.google.com/appengine/docs/adminconsole/?hl=en), [link](http://appengine.google.com))
 	- All the 'possible' infromation about the app in the *production* environment
 	- Service usage/state overview (again)
 	- Resource usage, quotas (Main >> Quota Details)

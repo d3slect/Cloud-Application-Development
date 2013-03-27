@@ -1,7 +1,7 @@
 var SLIDE_CONFIG = {
   // Slide settings
   settings: {
-    title: 'Google AppEngine',
+    title: 'Google App Engine',
     subtitle: 'NSWI152: Cloud Application Development',
     eventTitle: 'Lab 1',
     useBuilds: true, // Default: true. False will turn off slide animation builds.

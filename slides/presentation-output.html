@@ -75,7 +75,7 @@ URL: https://code.google.com/p/io-2012-slides
     <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
     <hgroup class="auto-fadein">
       <h2>Introduction</h2>
-      <h3>What is (not) Google App Engine</h3>
+      <h3>What is (isn't) Google App Engine</h3>
     </hgroup>
   
 </slide>
@@ -88,7 +88,7 @@ URL: https://code.google.com/p/io-2012-slides
     </hgroup>
     <article class="smaller"><ul>
 <li>Further reading<ul>
-<li><a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
+<li><em>"What is Cloud Computing?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
 </ul>
 </li>
 </ul></article>
@@ -122,7 +122,7 @@ URL: https://code.google.com/p/io-2012-slides
 </ul>
 </li>
 <li>Further reading<ul>
-<li><a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
+<li><em>"What is (isn't) Google App Engine?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
 </ul>
 </li>
 </ul></article>
@@ -136,19 +136,19 @@ URL: https://code.google.com/p/io-2012-slides
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Handle HTTP requests (<a href="https://developers.google.com/appengine/docs/python/runtime#Requests">link</a>)</li>
+<li>Handle HTTP requests (<a href="https://developers.google.com/appengine/docs/python/runtime#Requests">docs</a>)</li>
 <li>Store data<ul>
-<li>Focus on non-relational (entity-based) storage (<a href="https://developers.google.com/appengine/docs/python/datastore/overview">link</a>)</li>
-<li>relational (<a href="https://developers.google.com/cloud-sql/">link</a>) and blob (<a href="https://developers.google.com/appengine/docs/python/blobstore/overview">link</a>) storage also available</li>
+<li>Focus on non-relational (entity-based) storage (<a href="https://developers.google.com/appengine/docs/python/datastore/overview">docs</a>)</li>
+<li>relational (<a href="https://developers.google.com/cloud-sql/">docs</a>) and blob (<a href="https://developers.google.com/appengine/docs/python/blobstore/overview">docs</a>) storage also available</li>
 </ul>
 </li>
-<li>Process data asynchronously on background (<a href="https://developers.google.com/appengine/docs/python/taskqueue/">link</a>)</li>
-<li>Cache processed results for quick access (<a href="https://developers.google.com/appengine/docs/python/memcache/">link</a>)</li>
-<li>Render HTML from templates (<a href="https://developers.google.com/appengine/docs/python/tools/webapp2">link</a>)</li>
-<li>Push data to clients (<a href="https://developers.google.com/appengine/docs/python/channel/">link</a>)</li>
-<li>Download URL content (<a href="https://developers.google.com/appengine/docs/python/urlfetch/">link</a>)</li>
-<li>Send e-mails (<a href="https://developers.google.com/appengine/docs/python/mail/">link</a>)</li>
-<li>and much more... (<a href="https://developers.google.com/appengine/docs/python/apis">link</a>)</li>
+<li>Process data asynchronously on background (<a href="https://developers.google.com/appengine/docs/python/taskqueue/">docs</a>)</li>
+<li>Cache processed results for quick access (<a href="https://developers.google.com/appengine/docs/python/memcache/">docs</a>)</li>
+<li>Render HTML from templates (<a href="https://developers.google.com/appengine/docs/python/tools/webapp2">docs</a>)</li>
+<li>Push data to clients (<a href="https://developers.google.com/appengine/docs/python/channel/">docs</a>)</li>
+<li>Download URL content (<a href="https://developers.google.com/appengine/docs/python/urlfetch/">docs</a>)</li>
+<li>Send e-mails (<a href="https://developers.google.com/appengine/docs/python/mail/">docs</a>)</li>
+<li>and much more... (<a href="https://developers.google.com/appengine/docs/python/apis">docs</a>)</li>
 </ul>
 <h1>It does everything in such a way that it scales!</h1></article>
  
@@ -309,7 +309,7 @@ threadsafe: true
 
 <ul>
 <li>Further reading<ul>
-<li>See the <a href="https://developers.google.com/appengine/docs/python/config/appconfig">official docs</a> for further details on app configuration.</li>
+<li>Application configuration [docs](https://developers.google.com/appengine/docs/python/config/appconfig</li>
 </ul>
 </li>
 </ul></article>
@@ -335,7 +335,7 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 
 <ul>
 <li>Further reading<ul>
-<li><a href="https://developers.google.com/appengine/docs/python/tools/webapp2">webapp2 framework</a></li>
+<li>webapp2 framework <a href="https://developers.google.com/appengine/docs/python/tools/webapp2">docs</a></li>
 </ul>
 </li>
 </ul></article>
@@ -354,9 +354,9 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 <li>Choose the same ID you've selected before</li>
 </ul>
 </li>
-<li>Upload the app (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading">link</a>, <a href="https://developers.google.com/appengine/docs/python/tools/uploadinganapp">link</a>)<ul>
+<li>Upload the app (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading">tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/tools/uploadinganapp">docs</a>)<ul>
 <li>You need to fill in your Google Account information</li>
-<li>You can upload different versions for the same app ID and select which one is used as the default (<a href="https://developers.google.com/appengine/docs/adminconsole/index">link</a>)</li>
+<li>You can upload different versions for the same app ID and select which one is used as the default (<a href="https://developers.google.com/appengine/docs/adminconsole/index">docs</a>)</li>
 <li>Use the <em>Google App Engine Launcher</em> "Deploy" button (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#upload">tutorial</a>), or:</li>
 </ul>
 </li>
@@ -381,13 +381,15 @@ python google_appengine/appcfg.py update helloworld/
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Development Console (<a href="https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console">link</a>)<ul>
+<li>Development Console (<a href="https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console">docs</a>)<ul>
+<li>Runs on <a href="http://localhost:8000/">http://localhost:8000/</a></li>
+<li>"SDK Console" button in the <em>Google App Engine Launcher</em></li>
 <li>Basic infromation about the app in the <em>development</em> environment</li>
-<li>Service usage/state overview (Datastore Viewer, Task Queues), Interactive Console </li>
-<li>SDK Console button in the <em>Google App Engine Launcher</em></li>
+<li>Service usage/state overview (Datastore Viewer, Task Queues)</li>
+<li>Interactive Console </li>
 </ul>
 </li>
-<li>Administrator Console (<a href="https://developers.google.com/appengine/docs/adminconsole/?hl=en">link</a>, <a href="http://appengine.google.com">link</a>)<ul>
+<li>Administrator Console (<a href="https://developers.google.com/appengine/docs/adminconsole/?hl=en">docs</a>, <a href="http://appengine.google.com">link</a>)<ul>
 <li>All the 'possible' infromation about the app in the <em>production</em> environment</li>
 <li>Service usage/state overview (again)</li>
 <li>Resource usage, quotas (Main &gt;&gt; Quota Details)</li>
