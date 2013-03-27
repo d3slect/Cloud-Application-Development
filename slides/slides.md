@@ -173,7 +173,7 @@ content_class: smaller
 - You should get the following structure ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#hello))
 	- `app.yaml` - configuration of the app
 	- `main.py` - implementation of the req. handler
-	- complete sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/hello-world)
+	- complete sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/helloworld)
 - Test the app
 	- Run the development server and visit <http://localhost:8080/>
 	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#startdev)), or:
@@ -279,18 +279,41 @@ content_class: smaller
 
 <https://developers.google.com/appengine/docs/python/gettingstartedpython27/>
 
-- Google Accounts for authentication ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers))
-- Users post text messages via HTML forms ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms))
-- Datastore for storage of persistent data ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore))
-- Jinja2 templating engine for HTML rendering ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates))
-- Static CSS file ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles))
+- Google Accounts for authentication
+(
+[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers), 
+[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
+)
+- Users post text messages via HTML forms
+(
+[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
+[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
+)
+- Datastore for storage of persistent data
+(
+[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
+[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
+)
+- Jinja2 templating engine for HTML rendering
+(
+[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), 
+[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
+)
+- Static CSS file
+(
+[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
+[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
+)
+<p></p>
+- complete sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook)
 
 ---
 
 title: Using the Users Service
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers)
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers),
+sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
 - Users API ([docs](https://developers.google.com/appengine/docs/python/users/))
 	- Google authentication
 	- Access to basic Google user properties (nickname, email)
@@ -317,7 +340,9 @@ app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
 title: Handling Forms
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms), [webapp2 framework docs](http://webapp-improved.appspot.com/)
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
+[webapp2 framework docs](http://webapp-improved.appspot.com/),
+sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 
 <pre class="prettyprint" data-lang="python">
 <b>import webapp2</b>
@@ -350,7 +375,9 @@ app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
 title: Using the Datastore
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore), [Datastore docs](https://developers.google.com/appengine/docs/python/datastore/)
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
+[Datastore docs](https://developers.google.com/appengine/docs/python/datastore/),
+sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 
 #Modeling data
 
@@ -417,7 +444,9 @@ greetings.order("-date")
 title:Using Templates
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), [Jinja2 docs](http://jinja.pocoo.org/docs/)
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates),
+[Jinja2 docs](http://jinja.pocoo.org/docs/),
+sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
 
 <pre class="prettyprint" data-lang="yaml">
 libraries:
@@ -481,7 +510,9 @@ content_class: smaller
 title:Using Static Files
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles), [Python application configuration docs](https://developers.google.com/appengine/docs/python/config/appconfig)
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
+[Python application configuration docs](https://developers.google.com/appengine/docs/python/config/appconfig),
+sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 
 <pre class="prettyprint" data-lang="yaml">
 application: helloworld
@@ -516,9 +547,8 @@ content_class: smaller
 	- Discussion on the internals
 - Task queues
 	- Deferred tasks
-	- Advanced task use cases
-- Memcache
-- Blobstore
+	- Advanced background task usage
+- Overview of other services (Memcache, Blobstore, ...)
 - Best practices
 - Maybe more
 

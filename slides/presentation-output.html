@@ -271,7 +271,7 @@ a total limit.</td>
 <li>You should get the following structure (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#hello">tutorial</a>)<ul>
 <li><code>app.yaml</code> - configuration of the app</li>
 <li><code>main.py</code> - implementation of the req. handler</li>
-<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/hello-world">github</a></li>
+<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/helloworld">github</a></li>
 </ul>
 </li>
 <li>Test the app<ul>
@@ -418,11 +418,33 @@ python google_appengine/appcfg.py update helloworld/
     </hgroup>
     <article class="smaller"><p><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">https://developers.google.com/appengine/docs/python/gettingstartedpython27/</a></p>
 <ul>
-<li>Google Accounts for authentication (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">tutorial</a>)</li>
-<li>Users post text messages via HTML forms (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>)</li>
-<li>Datastore for storage of persistent data (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>)</li>
-<li>Jinja2 templating engine for HTML rendering (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>)</li>
-<li>Static CSS file (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">tutorial</a>)</li>
+<li>Google Accounts for authentication
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">tutorial</a>, 
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a>
+)</li>
+<li>Users post text messages via HTML forms
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>,
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a>
+)</li>
+<li>Datastore for storage of persistent data
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>,
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a>
+)</li>
+<li>Jinja2 templating engine for HTML rendering
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>, 
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a>
+)</li>
+<li>Static CSS file
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">tutorial</a>,
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a>
+)
+<p></p></li>
+<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook">github</a></li>
 </ul></article>
  
 </slide>
@@ -434,7 +456,8 @@ python google_appengine/appcfg.py update helloworld/
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">Tutorial</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">Tutorial</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a></li>
 <li>Users API (<a href="https://developers.google.com/appengine/docs/python/users/">docs</a>)<ul>
 <li>Google authentication</li>
 <li>Access to basic Google user properties (nickname, email)</li>
@@ -467,7 +490,9 @@ app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">Tutorial</a>, <a href="http://webapp-improved.appspot.com/">webapp2 framework docs</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">Tutorial</a>,
+<a href="http://webapp-improved.appspot.com/">webapp2 framework docs</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a></li>
 </ul>
 <pre class="prettyprint" data-lang="python">
 <b>import webapp2</b>
@@ -504,7 +529,9 @@ app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">Tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/datastore/">Datastore docs</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">Tutorial</a>,
+<a href="https://developers.google.com/appengine/docs/python/datastore/">Datastore docs</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a></li>
 </ul>
 <h1>Modeling data</h1>
 <pre class="prettyprint" data-lang="python">
@@ -577,7 +604,9 @@ greetings.order("-date")
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">Tutorial</a>, <a href="http://jinja.pocoo.org/docs/">Jinja2 docs</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">Tutorial</a>,
+<a href="http://jinja.pocoo.org/docs/">Jinja2 docs</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a></li>
 </ul>
 <pre class="prettyprint" data-lang="yaml">
 libraries:
@@ -646,7 +675,9 @@ class MainPage(webapp2.RequestHandler):
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">Tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/config/appconfig">Python application configuration docs</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">Tutorial</a>,
+<a href="https://developers.google.com/appengine/docs/python/config/appconfig">Python application configuration docs</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a></li>
 </ul>
 <pre class="prettyprint" data-lang="yaml">
 application: helloworld
@@ -686,11 +717,10 @@ libraries:
 </li>
 <li>Task queues<ul>
 <li>Deferred tasks</li>
-<li>Advanced task use cases</li>
+<li>Advanced background task usage</li>
 </ul>
 </li>
-<li>Memcache</li>
-<li>Blobstore</li>
+<li>Overview of other services (Memcache, Blobstore, ...)</li>
 <li>Best practices</li>
 <li>Maybe more</li>
 </ul></article>
