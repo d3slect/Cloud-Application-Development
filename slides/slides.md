@@ -57,17 +57,17 @@ content_class: smaller
 title: What can App Engine do?
 content_class: smaller
 
-- Handle HTTP requests ([docs](https://developers.google.com/appengine/docs/python/runtime#Requests))
+- Handle HTTP requests ([doc](https://developers.google.com/appengine/docs/python/runtime#Requests))
 - Store data
-	- Focus on non-relational (entity-based) storage ([docs](https://developers.google.com/appengine/docs/python/datastore/overview))
-	- relational ([docs](https://developers.google.com/cloud-sql/)) and blob ([docs](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
-- Process data asynchronously on background ([docs](https://developers.google.com/appengine/docs/python/taskqueue/))
-- Cache processed results for quick access ([docs](https://developers.google.com/appengine/docs/python/memcache/))
-- Render HTML from templates ([docs](https://developers.google.com/appengine/docs/python/tools/webapp2))
-- Push data to clients ([docs](https://developers.google.com/appengine/docs/python/channel/))
-- Download URL content ([docs](https://developers.google.com/appengine/docs/python/urlfetch/))
-- Send e-mails ([docs](https://developers.google.com/appengine/docs/python/mail/))
-- and much more... ([docs](https://developers.google.com/appengine/docs/python/apis))
+	- Focus on non-relational (entity-based) storage ([doc](https://developers.google.com/appengine/docs/python/datastore/overview))
+	- relational ([doc](https://developers.google.com/cloud-sql/)) and blob ([doc](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
+- Process data asynchronously on background ([doc](https://developers.google.com/appengine/docs/python/taskqueue/))
+- Cache processed results for quick access ([doc](https://developers.google.com/appengine/docs/python/memcache/))
+- Render HTML from templates ([doc](https://developers.google.com/appengine/docs/python/tools/webapp2))
+- Push data to clients ([doc](https://developers.google.com/appengine/docs/python/channel/))
+- Download URL content ([doc](https://developers.google.com/appengine/docs/python/urlfetch/))
+- Send e-mails ([doc](https://developers.google.com/appengine/docs/python/mail/))
+- and much more... ([doc](https://developers.google.com/appengine/docs/python/apis))
 
 #It does everything in such a way that it scales!
 
@@ -204,7 +204,7 @@ threadsafe: true
 </pre>
 
 - Further reading
-	-  Application configuration [docs](https://developers.google.com/appengine/docs/python/config/appconfig
+	-  Application configuration [doc](https://developers.google.com/appengine/docs/python/config/appconfig
 
 
 ---
@@ -225,7 +225,7 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 </pre>
 
 - Further reading
-	- webapp2 framework [docs](https://developers.google.com/appengine/docs/python/tools/webapp2)
+	- webapp2 framework [doc](https://developers.google.com/appengine/docs/python/tools/webapp2)
 
 ---
 
@@ -236,9 +236,9 @@ content_class: smaller
 
 - Create the app in the GAE Administration Console ([link](https://appengine.google.com/))
 	- Choose the same ID you've selected before
-- Upload the app ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading), [docs](https://developers.google.com/appengine/docs/python/tools/uploadinganapp))
+- Upload the app ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading), [doc](https://developers.google.com/appengine/docs/python/tools/uploadinganapp))
 	- You need to fill in your Google Account information
-	- You can upload different versions for the same app ID and select which one is used as the default ([docs](https://developers.google.com/appengine/docs/adminconsole/index))
+	- You can upload different versions for the same app ID and select which one is used as the default ([doc](https://developers.google.com/appengine/docs/adminconsole/index))
 	- Use the *Google App Engine Launcher* "Deploy" button ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#upload)), or:
 	
 <pre class="prettyprint" data-lang="cmd">
@@ -253,13 +253,13 @@ python google_appengine/appcfg.py update helloworld/
 title: Monitoring and Management 
 content_class: smaller
 
-- Development Console ([docs](https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console))
+- Development Console ([doc](https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console))
 	- Runs on <http://localhost:8000/>
 	- "SDK Console" button in the *Google App Engine Launcher*
 	- Basic infromation about the app in the *development* environment
 	- Service usage/state overview (Datastore Viewer, Task Queues)
 	- Interactive Console 
-- Administrator Console ([docs](https://developers.google.com/appengine/docs/adminconsole/?hl=en), [link](http://appengine.google.com))
+- Administrator Console ([doc](https://developers.google.com/appengine/docs/adminconsole/?hl=en), [link](http://appengine.google.com))
 	- All the 'possible' infromation about the app in the *production* environment
 	- Service usage/state overview (again)
 	- Resource usage, quotas (Main >> Quota Details)
@@ -316,7 +316,7 @@ content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers),
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
-- Users API ([docs](https://developers.google.com/appengine/docs/python/users/))
+- Users API ([doc](https://developers.google.com/appengine/docs/python/users/))
 	- Google authentication
 	- Access to basic Google user properties (nickname, email)
 
@@ -343,7 +343,7 @@ title: Handling Forms
 content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
-[webapp2 framework docs](http://webapp-improved.appspot.com/),
+webapp2 framework [doc](http://webapp-improved.appspot.com/),
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 
 <pre class="prettyprint" data-lang="python">
@@ -378,7 +378,7 @@ title: Using the Datastore
 content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
-[Datastore docs](https://developers.google.com/appengine/docs/python/datastore/),
+Datastore [doc](https://developers.google.com/appengine/docs/python/datastore/),
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 
 #Modeling data
@@ -415,7 +415,7 @@ content_class: smaller
 
 #Retrieving data
 
-- GQL ([docs](https://developers.google.com/appengine/docs/python/datastore/gqlreference))
+- GQL ([doc](https://developers.google.com/appengine/docs/python/datastore/gqlreference))
 
 <pre class="prettyprint" data-lang="python">
 greetings = db.GqlQuery("SELECT * "
@@ -432,7 +432,7 @@ greetings = Greeting.gql("WHERE ANCESTOR IS :1 ORDER BY date DESC LIMIT 10",
                           guestbook_key(guestbook_name))
 </pre>
 
-- Query API ([docs](https://developers.google.com/appengine/docs/python/datastore/queries))
+- Query API ([doc](https://developers.google.com/appengine/docs/python/datastore/queries))
 
 <pre class="prettyprint" data-lang="python">
 greetings = Greeting.all()
@@ -447,7 +447,7 @@ title:Using Templates
 content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates),
-[Jinja2 docs](http://jinja.pocoo.org/docs/),
+Jinja2 [doc](http://jinja.pocoo.org/docs/),
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
 
 <pre class="prettyprint" data-lang="yaml">
@@ -513,7 +513,7 @@ title:Using Static Files
 content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
-[Python application configuration docs](https://developers.google.com/appengine/docs/python/config/appconfig),
+Python application configuration [doc](https://developers.google.com/appengine/docs/python/config/appconfig),
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 
 <pre class="prettyprint" data-lang="yaml">
