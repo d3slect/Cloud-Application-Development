@@ -204,7 +204,7 @@ threadsafe: true
 </pre>
 
 - Further reading
-	-  Application configuration [doc](https://developers.google.com/appengine/docs/python/config/appconfig
+	-  Application configuration [doc](https://developers.google.com/appengine/docs/python/config/appconfig)
 
 
 ---
