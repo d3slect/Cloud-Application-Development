@@ -283,6 +283,7 @@ content_class: smaller
 - Users post text messages via HTML forms ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms))
 - Datastore for storage of persistent data ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore))
 - Jinja2 templating engine for HTML rendering ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates))
+- Static CSS file ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles))
 
 ---
 
@@ -413,89 +414,111 @@ greetings.order("-date")
 
 ---
 
-title: Slide Title
-subtitle: Subtitle
-class: image
+title:Using Templates
+content_class: smaller
 
-![Mobile vs desktop users](image.png)
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), [Jinja2 docs](http://jinja.pocoo.org/docs/)
 
----
+<pre class="prettyprint" data-lang="yaml">
+libraries:
+- name: jinja2
+  version: latest
+</pre>
 
-title: Slide Title
-subtitle: Subtitle
-class: image
+<pre class="prettyprint" data-lang="python">
+<b>import jinja2</b>
+import os
 
-![Mobile vs desktop users](image.png)
+<b>jinja_environment = jinja2.Environment</b>(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
----
-
-title: Segue Slide
-subtitle: Subtitle
-class: segue dark nobackground
-
----
-
-title: Agenda
-class: big
-build_lists: true
-
-Things we'll cover (list should build):
-
-- Bullet1
-- Bullet2
-- Bullet3
-
----
-
-title: Today
-class: nobackground fill
-
-![Many kinds of devices.](image.png)
-
-<footer class="source">source: place source info here</footer>
-
----
-
-title: Big Title Slide
-class: title-slide
-
----
-
-title: Code Example
-
-Media Queries are sweet:
-
-<pre class="prettyprint" data-lang="css">
-@media screen and (max-width: 640px) {
-  #sidebar { display: none; }
-}
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+        greetings = Greeting.all()...
+        ...
+        <b>template_values = {
+            'greetings': greetings,
+            'url': url,
+            'url_linktext': url_linktext,
+        }
+        template = jinja_environment.get_template('index.html')</b>
+        self.response.out.write(<b>template.render(template_values)</b>)
 </pre>
 
 ---
 
-title: Once more, with JavaScript
+title:Using Templates II.
+content_class: smaller
 
-<pre class="prettyprint" data-lang="javascript">
-function isSmall() {
-  return window.matchMedia("(min-device-width: ???)").matches;
-}
+`index.html`:
 
-function hasTouch() {
-  return Modernizr.touch;
-}
 
-function detectFormFactor() {
-  var device = DESKTOP;
-  if (hasTouch()) {
-    device = isSmall() ? PHONE : TABLET;
-  }
-  return device;
-}
+<pre class="prettyprint" data-lang="python">
+&lthtml>
+  &ltbody>
+    <b>{% for greeting in greetings %}</b>
+      <b>{% if greeting.author %}</b>
+        &ltb><b>{{ greeting.author }}</b>&lt/b> wrote:
+      <b>{% else %}</b>
+        An anonymous person wrote:
+      <b>{% endif %}</b>
+      &ltblockquote><b>{{ greeting.content|escape }}</b>&lt/blockquote>
+    <b>{% endfor %}</b>
+
+    &ltform action="/sign" method="post">
+      &ltdiv>&lttextarea name="content" rows="3" cols="60">&lt/textarea>&lt/div>
+      &ltdiv>&ltinput type="submit" value="Sign Guestbook">&lt/div>
+    &lt/form>
+
+    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>&lt/a>
+
+  &lt/body>
+&lt/html>
 </pre>
 
 ---
 
-title: Centered content
-content_class: flexbox vcenter
+title:Using Static Files
+content_class: smaller
 
-This content should be centered!
+- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles), [Python application configuration docs](https://developers.google.com/appengine/docs/python/config/appconfig)
+
+<pre class="prettyprint" data-lang="yaml">
+application: helloworld
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+<b>handlers:
+- url: /stylesheets
+  static_dir: stylesheets</b>
+
+- url: /.*
+  script: helloworld.app
+
+libraries:
+- name: jinja2
+  version: latest
+</pre>
+
+---
+
+title: Next Time
+subtitle: Advanced Topics in GAE Service APIs
+content_class: smaller
+
+- Datastore
+	- Tradeoffs of efficient queries
+	- Consistency guarantees, designing data for consistency
+	- Designing data structure for large scale
+	- Transactions
+	- Discussion on the internals
+- Task queues
+	- Deferred tasks
+	- Advanced task use cases
+- Memcache
+- Blobstore
+- Best practices
+- Maybe more
+

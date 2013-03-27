@@ -422,6 +422,7 @@ python google_appengine/appcfg.py update helloworld/
 <li>Users post text messages via HTML forms (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>)</li>
 <li>Datastore for storage of persistent data (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>)</li>
 <li>Jinja2 templating engine for HTML rendering (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>)</li>
+<li>Static CSS file (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">tutorial</a>)</li>
 </ul></article>
  
 </slide>
@@ -569,120 +570,130 @@ greetings.order("-date")
  
 </slide>
 
-<slide class="image" >
+<slide  >
   
     <hgroup>
-      <h2>Slide Title</h2>
-      <h3>Subtitle</h3>
-    </hgroup>
-    <article ><p><img alt="Mobile vs desktop users" src="image.png" /></p></article>
- 
-</slide>
-
-<slide class="image" >
-  
-    <hgroup>
-      <h2>Slide Title</h2>
-      <h3>Subtitle</h3>
-    </hgroup>
-    <article ><p><img alt="Mobile vs desktop users" src="image.png" /></p></article>
- 
-</slide>
-
-<slide class="segue dark nobackground" >
-  
-    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
-    <hgroup class="auto-fadein">
-      <h2>Segue Slide</h2>
-      <h3>Subtitle</h3>
-    </hgroup>
-  
-</slide>
-
-<slide class="big" >
-  
-    <hgroup>
-      <h2>Agenda</h2>
+      <h2>Using Templates</h2>
       <h3></h3>
     </hgroup>
-    <article ><p>Things we'll cover (list should build):</p>
-<ul class="build">
-<li>Bullet1</li>
-<li>Bullet2</li>
-<li>Bullet3</li>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">Tutorial</a>, <a href="http://jinja.pocoo.org/docs/">Jinja2 docs</a></li>
+</ul>
+<pre class="prettyprint" data-lang="yaml">
+libraries:
+- name: jinja2
+  version: latest
+</pre>
+
+<pre class="prettyprint" data-lang="python">
+<b>import jinja2</b>
+import os
+
+<b>jinja_environment = jinja2.Environment</b>(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+        greetings = Greeting.all()...
+        ...
+        <b>template_values = {
+            'greetings': greetings,
+            'url': url,
+            'url_linktext': url_linktext,
+        }
+        template = jinja_environment.get_template('index.html')</b>
+        self.response.out.write(<b>template.render(template_values)</b>)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using Templates II.</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><code>index.html</code>:</p>
+<pre class="prettyprint" data-lang="python">
+&lthtml>
+  &ltbody>
+    <b>{% for greeting in greetings %}</b>
+      <b>{% if greeting.author %}</b>
+        &ltb><b>{{ greeting.author }}</b>&lt/b> wrote:
+      <b>{% else %}</b>
+        An anonymous person wrote:
+      <b>{% endif %}</b>
+      &ltblockquote><b>{{ greeting.content|escape }}</b>&lt/blockquote>
+    <b>{% endfor %}</b>
+
+    &ltform action="/sign" method="post">
+      &ltdiv>&lttextarea name="content" rows="3" cols="60">&lt/textarea>&lt/div>
+      &ltdiv>&ltinput type="submit" value="Sign Guestbook">&lt/div>
+    &lt/form>
+
+    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>&lt/a>
+
+  &lt/body>
+&lt/html>
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using Static Files</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">Tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/config/appconfig">Python application configuration docs</a></li>
+</ul>
+<pre class="prettyprint" data-lang="yaml">
+application: helloworld
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+<b>handlers:
+- url: /stylesheets
+  static_dir: stylesheets</b>
+
+- url: /.*
+  script: helloworld.app
+
+libraries:
+- name: jinja2
+  version: latest
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Next Time</h2>
+      <h3>Advanced Topics in GAE Service APIs</h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Datastore<ul>
+<li>Tradeoffs of efficient queries</li>
+<li>Consistency guarantees, designing data for consistency</li>
+<li>Designing data structure for large scale</li>
+<li>Transactions</li>
+<li>Discussion on the internals</li>
+</ul>
+</li>
+<li>Task queues<ul>
+<li>Deferred tasks</li>
+<li>Advanced task use cases</li>
+</ul>
+</li>
+<li>Memcache</li>
+<li>Blobstore</li>
+<li>Best practices</li>
+<li>Maybe more</li>
 </ul></article>
- 
-</slide>
-
-<slide class="nobackground fill" >
-  
-    <hgroup>
-      <h2>Today</h2>
-      <h3></h3>
-    </hgroup>
-    <article ><p><img alt="Many kinds of devices." src="image.png" /></p>
-<footer class="source">source: place source info here</footer></article>
- 
-</slide>
-
-<slide class="title-slide" >
-  
-    <hgroup>
-      <h2>Big Title Slide</h2>
-      <h3></h3>
-    </hgroup>
-    <article ></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Code Example</h2>
-      <h3></h3>
-    </hgroup>
-    <article ><p>Media Queries are sweet:</p>
-<pre class="prettyprint" data-lang="css">
-@media screen and (max-width: 640px) {
-  #sidebar { display: none; }
-}
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Once more, with JavaScript</h2>
-      <h3></h3>
-    </hgroup>
-    <article ><pre class="prettyprint" data-lang="javascript">
-function isSmall() {
-  return window.matchMedia("(min-device-width: ???)").matches;
-}
-
-function hasTouch() {
-  return Modernizr.touch;
-}
-
-function detectFormFactor() {
-  var device = DESKTOP;
-  if (hasTouch()) {
-    device = isSmall() ? PHONE : TABLET;
-  }
-  return device;
-}
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Centered content</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="flexbox vcenter"><p>This content should be centered!</p></article>
  
 </slide>
 
