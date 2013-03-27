@@ -1,6 +1,6 @@
 title: Agenda
 
-[https://github.com/keznikl/Cloud-Application-Development]()
+<https://github.com/keznikl/Cloud-Application-Development>
 
 #Schedule
 
@@ -76,7 +76,7 @@ content_class: smaller
 title: Quotas
 content_class: smaller
 
-- [https://developers.google.com/appengine/docs/quotas]()
+- <https://developers.google.com/appengine/docs/quotas>
 - Safety (daily, per minute), [billable](https://developers.google.com/appengine/docs/billing), fixed
 
 <table>
