@@ -350,14 +350,14 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
     </hgroup>
     <article class="smaller"><p><em>"Feed the Big Brother"</em></p>
 <ul>
-<li>Create the app in the GAE Administration Console (todo)<ul>
+<li>Create the app in the GAE Administration Console (<a href="https://appengine.google.com/">link</a>)<ul>
 <li>Choose the same ID you've selected before</li>
 </ul>
 </li>
-<li>Upload the app (todo)<ul>
+<li>Upload the app (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading">link</a>, <a href="https://developers.google.com/appengine/docs/python/tools/uploadinganapp">link</a>)<ul>
 <li>You need to fill in your Google Account information</li>
-<li>You can upload different versions for the same app ID and select which one is used as the default (link)</li>
-<li>Use the <em>Google App Engine Launcher</em> (tutorial), or:</li>
+<li>You can upload different versions for the same app ID and select which one is used as the default (<a href="https://developers.google.com/appengine/docs/adminconsole/index">link</a>)</li>
+<li>Use the <em>Google App Engine Launcher</em> "Deploy" button (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#upload">tutorial</a>), or:</li>
 </ul>
 </li>
 </ul>
@@ -367,7 +367,7 @@ python google_appengine/appcfg.py update helloworld/
 
 <ul>
 <li>Test the uploaded version<ul>
-<li>Default domain <code>&lt;app ID&gt;.appspot.com</code></li>
+<li>Default domain <code>http://your_app_id.appspot.com/</code></li>
 </ul>
 </li>
 </ul></article>
@@ -381,17 +381,18 @@ python google_appengine/appcfg.py update helloworld/
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>SDK Console (link)<ul>
-<li>Basic infromation about the app in the development environment</li>
-<li>Service usage overview (Datastore Viewer, Task Queues), Interactive Console </li>
+<li>Development Console (<a href="https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console">link</a>)<ul>
+<li>Basic infromation about the app in the <em>development</em> environment</li>
+<li>Service usage/state overview (Datastore Viewer, Task Queues), Interactive Console </li>
+<li>SDK Console button in the <em>Google App Engine Launcher</em></li>
 </ul>
 </li>
-<li>Administrator Console (link)<ul>
-<li>All 'possible' infromation about the app in the production environment</li>
-<li>Service usage overview (again)</li>
-<li>Resource usage, quotas (link)</li>
-<li>Version management (link)</li>
-<li>TODO</li>
+<li>Administrator Console (<a href="https://developers.google.com/appengine/docs/adminconsole/?hl=en">link</a>, <a href="http://appengine.google.com">link</a>)<ul>
+<li>All the 'possible' infromation about the app in the <em>production</em> environment</li>
+<li>Service usage/state overview (again)</li>
+<li>Resource usage, quotas (Main &gt;&gt; Quota Details)</li>
+<li>Version management (Main &gt;&gt; Versions)</li>
+<li>...</li>
 </ul>
 </li>
 <li>Try out and explore!</li>
@@ -412,15 +413,159 @@ python google_appengine/appcfg.py update helloworld/
 <slide  >
   
     <hgroup>
-      <h2>Guestbook app features</h2>
+      <h2>Guestbook App</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">https://developers.google.com/appengine/docs/python/gettingstartedpython27/</a></p>
+<ul>
+<li>Google Accounts for authentication (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">tutorial</a>)</li>
+<li>Users post text messages via HTML forms (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>)</li>
+<li>Datastore for storage of persistent data (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>)</li>
+<li>Jinja2 templating engine for HTML rendering (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>)</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using the Users Service</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Users to post and read text messages</li>
-<li>Google Accounts for authentication</li>
-<li>Datastore for storage of persistent data</li>
-<li>Jinja2 templating engine for HTML rendering</li>
-</ul></article>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">Tutorial</a></li>
+<li>Users API (<a href="https://developers.google.com/appengine/docs/python/users/">docs</a>)<ul>
+<li>Google authentication</li>
+<li>Access to basic Google user properties (nickname, email)</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+import webapp2
+<b>from google.appengine.api import users</b>
+
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+        <b>user = users.get_current_user()</b>
+
+        <b>if user:</b>
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.out.write('Hello, ' + <b>user.nickname()</b>)
+        <b>else:</b>
+            self.redirect(<b>users.create_login_url(self.request.uri)</b>)
+
+app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Handling Forms</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">Tutorial</a>, <a href="http://webapp-improved.appspot.com/">webapp2 framework docs</a></li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+<b>import webapp2</b>
+
+class <b>MainPage</b>(webapp2.RequestHandler):
+    <b>def get(self):</b>
+        self.response.out.write("""
+          &lt;html>
+            &lt;body>
+              &lt;form <b>action="/sign"</b> method="post">
+                &lt;div>&lt;textarea name="content" rows="3" cols="60">&lt;/textarea>&lt;/div>
+                &lt;div>&lt;input type="submit" value="Sign Guestbook">&lt;/div>
+              &lt;/form>
+            &lt;/body>
+          &lt;/html>""")
+
+class <b>Guestbook</b>(webapp2.RequestHandler):
+    <b>def post(self):</b>
+        self.response.out.write('&lt;html>&lt;body>You wrote:&lt;pre>')
+        self.response.out.write(<b>self.request.get('content')</b>)
+        self.response.out.write('&lt;/pre>&lt;/body>&lt;/html>')
+
+app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
+                              <b>('/sign', Guestbook)</b>],
+                              debug=True)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using the Datastore</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">Tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/datastore/">Datastore docs</a></li>
+</ul>
+<h1>Modeling data</h1>
+<pre class="prettyprint" data-lang="python">
+from google.appengine.ext import db
+
+class Greeting(db.Model):
+    author = db.StringProperty()
+    content = db.StringProperty(multiline=True)
+    date = db.DateTimeProperty(auto_now_add=True)
+</pre>
+
+<h1>Storing data</h1>
+<pre class="prettyprint" data-lang="python">
+class Guestbook(webapp2.RequestHandler):
+    def post(self):
+      guestbook_name = self.request.get('guestbook_name')
+      <b>greeting = Greeting(parent=guestbook_key(guestbook_name))</b>
+
+      if users.get_current_user():
+        greeting.author = users.get_current_user().nickname()
+
+      greeting.content = self.request.get('content')
+      <b>greeting.put()</b>
+      self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using the Datastore II.</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><h1>Retrieving data</h1>
+<ul>
+<li>GQL (<a href="https://developers.google.com/appengine/docs/python/datastore/gqlreference">docs</a>)</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+greetings = db.GqlQuery("SELECT * "
+                        "FROM Greeting "
+                        "WHERE ANCESTOR IS :1 "
+                        "ORDER BY date DESC LIMIT 10",
+                         guestbook_key(guestbook_name))
+
+</pre>
+
+<pre class="prettyprint" data-lang="python">
+
+greetings = Greeting.gql("WHERE ANCESTOR IS :1 ORDER BY date DESC LIMIT 10",
+                          guestbook_key(guestbook_name))
+</pre>
+
+<ul>
+<li>Query API (<a href="https://developers.google.com/appengine/docs/python/datastore/queries">docs</a>)</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+greetings = Greeting.all()
+greetings.ancestor(guestbook_key(guestbook_name))
+greetings.filter("date >", datetime.datetime.now() + datetime.timedelta(days=-7))
+greetings.order("-date")
+</pre></article>
  
 </slide>
 
