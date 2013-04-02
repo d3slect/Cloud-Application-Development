@@ -3,7 +3,7 @@ var SLIDE_CONFIG = {
   settings: {
     title: 'Google App Engine',
     subtitle: 'NSWI152: Cloud Application Development',
-    eventTitle: 'Lab 1',
+    eventTitle: '',
     useBuilds: true, // Default: true. False will turn off slide animation builds.
     usePrettify: true, // Default: true
     enableSlideAreas: true, // Default: true. False turns off the click areas on either slide of the slides.

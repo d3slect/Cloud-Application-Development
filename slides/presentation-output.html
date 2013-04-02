@@ -46,7 +46,7 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
-      <h2>Agenda</h2>
+      <h2>Course Info</h2>
       <h3></h3>
     </hgroup>
     <article ><p><a href="https://github.com/keznikl/Cloud-Application-Development">https://github.com/keznikl/Cloud-Application-Development</a></p>
@@ -60,7 +60,7 @@ URL: https://code.google.com/p/io-2012-slides
 </ul>
 </li>
 <li><strong>Lab 4</strong> Homework cont.</li>
-<li><strong>Lab 5</strong> Summary and (maybe) map-reduce</li>
+<li><strong>Lab 5</strong> HW summary and advanced services (map-reduce, ...)</li>
 </ul>
 <h1>Requirements</h1>
 <ul>
@@ -86,7 +86,8 @@ URL: https://code.google.com/p/io-2012-slides
       <h2>What is Cloud Computing?</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><ul>
+    <article class="smaller"><p><img alt="Cloud Computing" src="images/cloud.png" /></p>
+<ul>
 <li>Further reading<ul>
 <li><em>"What is Cloud Computing?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
 </ul>
@@ -104,7 +105,8 @@ URL: https://code.google.com/p/io-2012-slides
     <article class="smaller"><p><a href="https://developers.google.com/appengine/">https://developers.google.com/appengine/</a></p>
 <ul>
 <li>Platform for development of scalable cloud-based web apps<ul>
-<li>Motto: <em>Solutions that do not scale cannot be done at all!</em></li>
+<li>Motto: <em>Solutions that do not scale cannot be created at all!</em></li>
+<li>Based entirely on HTTP request handling</li>
 </ul>
 </li>
 <li>PaaS - SDK for Python / Java / Go <ul>
@@ -118,7 +120,7 @@ URL: https://code.google.com/p/io-2012-slides
 </ul>
 </li>
 <li>Free / paid option <ul>
-<li>paid = pre-paid 'credit', works until depleted</li>
+<li>Maximum daily budget, works until depleted</li>
 </ul>
 </li>
 <li>Further reading<ul>
@@ -138,8 +140,8 @@ URL: https://code.google.com/p/io-2012-slides
     <article class="smaller"><ul>
 <li>Handle HTTP requests (<a href="https://developers.google.com/appengine/docs/python/runtime#Requests">doc</a>)</li>
 <li>Store data<ul>
-<li>Focus on non-relational (entity-based) storage (<a href="https://developers.google.com/appengine/docs/python/datastore/overview">doc</a>)</li>
-<li>relational (<a href="https://developers.google.com/cloud-sql/">doc</a>) and blob (<a href="https://developers.google.com/appengine/docs/python/blobstore/overview">doc</a>) storage also available</li>
+<li>Focus on Datastore &mdash; non-relational (entity-based) storage (<a href="https://developers.google.com/appengine/docs/python/datastore/overview">doc</a>)</li>
+<li>Relational (<a href="https://developers.google.com/cloud-sql/">doc</a>) and blob (<a href="https://developers.google.com/appengine/docs/python/blobstore/overview">doc</a>) storage also available</li>
 </ul>
 </li>
 <li>Process data asynchronously on background (<a href="https://developers.google.com/appengine/docs/python/taskqueue/">doc</a>)</li>
@@ -249,6 +251,32 @@ a total limit.</td>
 <li>IDLE: default Python editor (<a href="http://docs.python.org/2/library/idle.html">link</a>)</li>
 <li>Aptana Studio: Eclispe-based IDE (<a href="http://www.aptana.com/">link</a>)</li>
 <li>...</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Workflow</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Choose an application ID</li>
+<li>Implement the app <ul>
+<li>Configuration files</li>
+<li>Request handlers</li>
+<li>...</li>
+</ul>
+</li>
+<li>Test it via the development server of the SDK<ul>
+<li>Automatically detects changes in the code</li>
+</ul>
+</li>
+<li>Upload it to Google</li>
+<li>Monitor and manage the live app</li>
+<li>Download production data/logs</li>
+<li>Repeat</li>
 </ul></article>
  
 </slide>

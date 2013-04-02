@@ -1,4 +1,4 @@
-title: Agenda
+title: Course Info
 
 <https://github.com/keznikl/Cloud-Application-Development>
 
@@ -10,7 +10,7 @@ title: Agenda
 	- preferably Python (easier to use)
 	- individually or in small groups
 - **Lab 4** Homework cont.
-- **Lab 5** Summary and (maybe) map-reduce
+- **Lab 5** HW summary and advanced services (map-reduce, ...)
 
 #Requirements
 
@@ -29,6 +29,8 @@ class: segue dark nobackground
 title: What is Cloud Computing?
 content_class: smaller
 
+![Cloud Computing](images/cloud.png)
+
 - Further reading
 	- *"What is Cloud Computing?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
 
@@ -40,7 +42,8 @@ content_class: smaller
 <https://developers.google.com/appengine/>
 
 - Platform for development of scalable cloud-based web apps
-	- Motto: *Solutions that do not scale cannot be done at all!*
+	- Motto: *Solutions that do not scale cannot be created at all!*
+	- Based entirely on HTTP request handling
 - PaaS - SDK for Python / Java / Go 
 	- Runs on Google infrastructure
 - Integrated with Google services
@@ -48,7 +51,7 @@ content_class: smaller
 	- Can be integrated with Google Apps (own domain name, ...)
 	- Access to API of Youtube and other Google services
 - Free / paid option 
-	- paid = pre-paid 'credit', works until depleted
+	- Maximum daily budget, works until depleted
 - Further reading
 	- *"What is (isn't) Google App Engine?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
 
@@ -59,8 +62,8 @@ content_class: smaller
 
 - Handle HTTP requests ([doc](https://developers.google.com/appengine/docs/python/runtime#Requests))
 - Store data
-	- Focus on non-relational (entity-based) storage ([doc](https://developers.google.com/appengine/docs/python/datastore/overview))
-	- relational ([doc](https://developers.google.com/cloud-sql/)) and blob ([doc](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
+	- Focus on Datastore &mdash; non-relational (entity-based) storage ([doc](https://developers.google.com/appengine/docs/python/datastore/overview))
+	- Relational ([doc](https://developers.google.com/cloud-sql/)) and blob ([doc](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
 - Process data asynchronously on background ([doc](https://developers.google.com/appengine/docs/python/taskqueue/))
 - Cache processed results for quick access ([doc](https://developers.google.com/appengine/docs/python/memcache/))
 - Render HTML from templates ([doc](https://developers.google.com/appengine/docs/python/tools/webapp2))
@@ -158,6 +161,23 @@ content_class: smaller
 - IDLE: default Python editor ([link](http://docs.python.org/2/library/idle.html))
 - Aptana Studio: Eclispe-based IDE ([link](http://www.aptana.com/))
 - ...
+
+---
+
+title: Workflow
+content_class: smaller
+
+- Choose an application ID
+- Implement the app 
+	- Configuration files
+	- Request handlers
+	- ...
+- Test it via the development server of the SDK
+	- Automatically detects changes in the code
+- Upload it to Google
+- Monitor and manage the live app
+- Download production data/logs
+- Repeat
 
 ---
 
