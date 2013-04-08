@@ -409,8 +409,6 @@ title: Datastore Tips & Tricks
 subtitle: How to do things effectively
 class: segue dark nobackground
 
---
-
 ---
 
 title: Sharding Counters
@@ -418,9 +416,43 @@ content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/articles/sharding_counters), [Google IO 2008 talk](https://sites.google.com/site/io/building-scalable-web-applications-with-google-app-engine)
 - Main motivation:
-	- Writes are expensive (indexes, replication); reads are cheap (often local)
-	- Writes to a single entity (group) are limited to 1-5/s
-- 
+	- Writes to a single entity (group) are expensive and limited to 1-5/s
+		- Counters can be updated more than 5/s
+	- Distributed reads are very effective
+- Solution &mdash; break the counter into N different counters
+	- On increment choose a random shard and increment it
+	- When reading the counter value, read all shards and sum up their values
+- You can use [memcache](https://developers.google.com/appengine/docs/python/memcache/) to improve the performance
+
+---
+
+title: Sharding Counters II
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+import random
+from google.appengine.ext import ndb
+
+NUM_SHARDS = 20
+
+class SimpleCounterShard(ndb.Model):
+    count = ndb.IntegerProperty(default=0)
+
+def get_count():
+    total = 0
+    for counter in SimpleCounterShard.query():
+        total += counter.count
+    return total
+
+@ndb.transactional
+def increment():
+    shard_string_index = str(random.randint(0, NUM_SHARDS - 1))
+    counter = SimpleCounterShard.get_by_id(shard_string_index)
+    if counter is None:
+        counter = SimpleCounterShard(id=shard_string_index)
+    counter.count += 1
+    counter.put()
+</pre>
 
 ---
 

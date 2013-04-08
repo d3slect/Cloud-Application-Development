@@ -677,12 +677,53 @@ acc = q.get()
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/articles/sharding_counters">Tutorial</a>, <a href="https://sites.google.com/site/io/building-scalable-web-applications-with-google-app-engine">Google IO 2008 talk</a></li>
 <li>Main motivation:<ul>
-<li>Writes are expensive (indexes, replication); reads are cheap (often local)</li>
-<li>Writes to a single entity (group) are limited to 1-5/s</li>
+<li>Writes to a single entity (group) are expensive and limited to 1-5/s<ul>
+<li>Counters can be updated more than 5/s</li>
 </ul>
 </li>
-<li></li>
+<li>Distributed reads are very effective</li>
+</ul>
+</li>
+<li>Solution &mdash; break the counter into N different counters<ul>
+<li>On increment choose a random shard and increment it</li>
+<li>When reading the counter value, read all shards and sum up their values</li>
+</ul>
+</li>
+<li>You can use <a href="https://developers.google.com/appengine/docs/python/memcache/">memcache</a> to improve the performance</li>
 </ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Sharding Counters II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+import random
+from google.appengine.ext import ndb
+
+NUM_SHARDS = 20
+
+class SimpleCounterShard(ndb.Model):
+    count = ndb.IntegerProperty(default=0)
+
+def get_count():
+    total = 0
+    for counter in SimpleCounterShard.query():
+        total += counter.count
+    return total
+
+@ndb.transactional
+def increment():
+    shard_string_index = str(random.randint(0, NUM_SHARDS - 1))
+    counter = SimpleCounterShard.get_by_id(shard_string_index)
+    if counter is None:
+        counter = SimpleCounterShard(id=shard_string_index)
+    counter.count += 1
+    counter.put()
+</pre></article>
  
 </slide>
 
