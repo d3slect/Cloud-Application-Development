@@ -1,3 +1,10 @@
+
+title: Datastore
+subtitle: In-depth look	
+class: segue dark nobackground
+
+---
+
 title: Datastore Overview
 content_class: smaller
 
@@ -48,6 +55,9 @@ content_class: smaller
 - Entity group
 	- An entity and its descendants (transitive children)
 	- Unit of transactionality (later)
+	- Inside an enetity group max 1 write/s (in reality up to 5/s)
+		- Better to make small entity groups
+	- Root entities are in separate entity groups
 - Ancestor path
 	- Full path from the root entity to a given entity
 	- Kind-identifier pairs
@@ -290,6 +300,8 @@ content_class: smaller
 	- Can be made eventually consistent Datastore read policy
 	- `Employee.all()...run(read_policy=db.EVENTUAL_CONSISTENCY)`
 - Non-ancestor queries are always eventually consistent
+- *Facebook exercise:* users own posts are strongly consistent (for the purpose of administration), posts of other users are eventually consistent
+- Further reading: [Structuring Data for Strong Consistency](https://developers.google.com/appengine/docs/python/datastore/structuring_for_strong_consistency)
 
 ---
 
@@ -302,6 +314,7 @@ content_class: smaller
 	- Either all or none operations are applied
 - Defined on *a single entity group*
 	- Recall that each root entity belongs to a separate entity group
+	- Ancestor queries are always run in a transaction
 - Consistency Inside Transactions: Serializable 
 	- In a transaction, all reads reflect the current, consistent state of the Datastore at the time the transaction started.
 	- [Snapshot isolation](http://en.wikipedia.org/wiki/Snapshot_isolation)
@@ -314,9 +327,49 @@ title: Transactions II
 content_class: smaller
 
 - Consistency Outside Transactions cont.
-	- Queries can include entities, whose current data fail to meet the query constraints (the indexes are updated after the changed data are visible). 
+	- Queries can include entities, whose current data fail to meet the query constraints. 
 	- Queries and gets inside a Datastore transaction **do not see the results of previous writes** inside that transaction.
 		- If an entity is modified or deleted within a transaction, a query or get returns the original version of the entity as of the beginning of the transaction, or nothing if the entity did not exist then
+
+---
+
+title: Transactions &mdash; The Commit Process
+content_class: smaller
+
+- [Google IO 2012 Video](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
+- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
+- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
+- Synchronous commit (to a majority of replicas), asynchronous (2-phase) apply
+	- In the apply phase, the entity's data and the index rows are written to disk in parallel
+- Visibility to other transactions
+	- First apply milestone &mdash; entity changes visible
+	- Second apply milestone &mdash; index changes visible
+
+<center>![The Commit Process](images/transaction_iso.png)</center>
+
+---
+
+title: Transactions &mdash; The Return Value
+content_class: smaller
+
+- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
+- If the entity data fails to update in the commit phase, no changes are made. 
+- If the commit phase has succeeded but the apply phase failed
+	- The next time you execute a read or write or start a transaction on this entity group, the datastore will first roll forward and fully apply this committed but unapplied write
+	- The datastore continuously sweeps for partially applied jobs and rolls forward writes to indexes and entities that have not yet received the changes to the entity
+- If your app receives an exception when submitting a transaction, it does not always mean that the transaction failed.
+	- You can receive the following exceptions in cases where transactions have been committed and eventually will be applied successfully
+		 - `Timeout`, `TransactionFailedError`, or `InternalError`
+
+---
+
+title: Transactions &mdash; Concurrency
+content_class: smaller
+
+- When two or more transactions simultaneously attempt to modify entities in one or more common entity groups, only the first transaction to commit its changes can succeed; all the others will fail on commit.
+	- [Optimistic concurrency control](http://en.wikipedia.org/wiki/Optimistic_concurrency_control)
+	- **Tip:** *A transaction should happen as quickly as possible to reduce the likelihood that the entities used by the transaction will change, causing the transaction to fail.*
+- In HRD, the transaction is typically completely applied within a few hundred milliseconds after the commit returns.
 
 ---
 
@@ -352,25 +405,22 @@ acc = q.get()
 
 ---
 
-title: Transaction Concurrency
-content_class: smaller
+title: Datastore Tips & Tricks
+subtitle: How to do things effectively
+class: segue dark nobackground
 
-- When two or more transactions simultaneously attempt to modify entities in one or more common entity groups, only the first transaction to commit its changes can succeed; all the others will fail on commit.
-	- [Optimistic concurrency control](http://en.wikipedia.org/wiki/Optimistic_concurrency_control)
-	- **Tip:** *A transaction should happen as quickly as possible to reduce the likelihood that the entities used by the transaction will change, causing the transaction to fail.*
-- In HRD, the transaction is typically completely applied within a few hundred milliseconds after the commit returns.
-
-
+--
 
 ---
 
-title: Transaction Notes
+title: Sharding Counters
 content_class: smaller
 
-- An operation may fail when:
-	- Too many users try to modify an entity group simultaneously.
-	- The application reaches a resource limit.
-	- The Datastore encounters an internal error.
+- [Tutorial](https://developers.google.com/appengine/articles/sharding_counters), [Google IO 2008 talk](https://sites.google.com/site/io/building-scalable-web-applications-with-google-app-engine)
+- Main motivation:
+	- Writes are expensive (indexes, replication); reads are cheap (often local)
+	- Writes to a single entity (group) are limited to 1-5/s
+- 
 
 ---
 
@@ -389,5 +439,6 @@ content_class: smaller
 - [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
 - [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
 - [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
-- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html) Google IO2012 talk
-- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)  Google IO2012 talk
+- [Best practices for writing scalable applications](https://developers.google.com/appengine/articles/scaling/overview)
+- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html) Google IO 2012 talk
+- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)  Google IO 2012 talk
