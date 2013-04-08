@@ -39,7 +39,6 @@ content_class: smaller
 ---
 
 title: Entities II
-subtitle: Ancestors
 content_class: smaller
 
 - Parent property
@@ -276,14 +275,10 @@ content_class: smaller
 	- Exploding indexes slow down entity writes dramatically (and may cause the entity to exceed the index limit)
 - Exploding indexes can be manually avoided ([tutorial](https://developers.google.com/appengine/articles/indexselection))
 
-
-
-
 ---
 
 title: Data Consistency
 content_class: smaller
-
 
 - Two consistency levels ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Data_Consistency))
 	- [Strong consistency](http://en.wikipedia.org/wiki/Strong_consistency): queries guarantee the freshest results, but may take longer to complete
@@ -296,11 +291,103 @@ content_class: smaller
 	- `Employee.all()...run(read_policy=db.EVENTUAL_CONSISTENCY)`
 - Non-ancestor queries are always eventually consistent
 
+---
+
+title: Transactions
+content_class: smaller
+
+- <https://developers.google.com/appengine/docs/python/datastore/transactions>
+- [Transaction Isolation](https://developers.google.com/appengine/articles/transaction_isolation)
+- An operation or set of operations that is atomic
+	- Either all or none operations are applied
+- Defined on *a single entity group*
+	- Recall that each root entity belongs to a separate entity group
+- Consistency Inside Transactions: Serializable 
+	- In a transaction, all reads reflect the current, consistent state of the Datastore at the time the transaction started.
+	- [Snapshot isolation](http://en.wikipedia.org/wiki/Snapshot_isolation)
+- Consistency Outside Transactions: Read Committed
+	- Entities retrieved from the datastore by queries or gets will only see committed data.
 
 ---
 
-title: Furthe Details on Datastore
+title: Transactions II
 content_class: smaller
 
-- [https://developers.google.com/appengine/articles/datastore/overview]()
+- Consistency Outside Transactions cont.
+	- Queries can include entities, whose current data fail to meet the query constraints (the indexes are updated after the changed data are visible). 
+	- Queries and gets inside a Datastore transaction **do not see the results of previous writes** inside that transaction.
+		- If an entity is modified or deleted within a transaction, a query or get returns the original version of the entity as of the beginning of the transaction, or nothing if the entity did not exist then
 
+---
+
+title: Transactions API
+content_class: smaller
+
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import db
+
+class Accumulator(db.Model):
+    counter = db.IntegerProperty(default=0)
+
+<b>@db.transactional
+def increment_counter(key, amount)</b>:
+    obj = db.get(key)
+    obj.counter += amount
+    obj.put()
+
+q = db.GqlQuery("SELECT * FROM Accumulator")
+acc = q.get()
+
+<b>increment_counter(acc.key(), 5)</b>
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+...
+<b>def increment_counter(key, amount):</b>
+...
+
+<b>db.run_in_transaction(increment_counter, acc.key(), 5)</b>
+</pre>
+
+---
+
+title: Transaction Concurrency
+content_class: smaller
+
+- When two or more transactions simultaneously attempt to modify entities in one or more common entity groups, only the first transaction to commit its changes can succeed; all the others will fail on commit.
+	- [Optimistic concurrency control](http://en.wikipedia.org/wiki/Optimistic_concurrency_control)
+	- **Tip:** *A transaction should happen as quickly as possible to reduce the likelihood that the entities used by the transaction will change, causing the transaction to fail.*
+- In HRD, the transaction is typically completely applied within a few hundred milliseconds after the commit returns.
+
+
+
+---
+
+title: Transaction Notes
+content_class: smaller
+
+- An operation may fail when:
+	- Too many users try to modify an entity group simultaneously.
+	- The application reaches a resource limit.
+	- The Datastore encounters an internal error.
+
+---
+
+title: Modeling Entity Relationships
+content_class: smaller
+
+- <https://developers.google.com/appengine/articles/modeling>
+
+---
+
+title: Further Reading on Datastore
+content_class: smaller
+
+- [Mastering the datastore](https://developers.google.com/appengine/articles/datastore/overview)
+- [Handling datastore errores](https://developers.google.com/appengine/articles/handling_datastore_errors)
+- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
+- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
+- [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
+- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html) Google IO2012 talk
+- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)  Google IO2012 talk

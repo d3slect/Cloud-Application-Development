@@ -114,7 +114,7 @@ URL: https://code.google.com/p/io-2012-slides
   
     <hgroup>
       <h2>Entities II</h2>
-      <h3>Ancestors</h3>
+      <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
 <li>Parent property<ul>
@@ -494,11 +494,146 @@ memcache.set('person_cursor', person_cursor)
 <slide  >
   
     <hgroup>
-      <h2>Furthe Details on Datastore</h2>
+      <h2>Transactions</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="">https://developers.google.com/appengine/articles/datastore/overview</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/transactions">https://developers.google.com/appengine/docs/python/datastore/transactions</a></li>
+<li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation</a></li>
+<li>An operation or set of operations that is atomic<ul>
+<li>Either all or none operations are applied</li>
+</ul>
+</li>
+<li>Defined on <em>a single entity group</em><ul>
+<li>Recall that each root entity belongs to a separate entity group</li>
+</ul>
+</li>
+<li>Consistency Inside Transactions: Serializable <ul>
+<li>In a transaction, all reads reflect the current, consistent state of the Datastore at the time the transaction started.</li>
+<li><a href="http://en.wikipedia.org/wiki/Snapshot_isolation">Snapshot isolation</a></li>
+</ul>
+</li>
+<li>Consistency Outside Transactions: Read Committed<ul>
+<li>Entities retrieved from the datastore by queries or gets will only see committed data.</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Consistency Outside Transactions cont.<ul>
+<li>Queries can include entities, whose current data fail to meet the query constraints (the indexes are updated after the changed data are visible). </li>
+<li>Queries and gets inside a Datastore transaction <strong>do not see the results of previous writes</strong> inside that transaction.<ul>
+<li>If an entity is modified or deleted within a transaction, a query or get returns the original version of the entity as of the beginning of the transaction, or nothing if the entity did not exist then</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions API</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import db
+
+class Accumulator(db.Model):
+    counter = db.IntegerProperty(default=0)
+
+<b>@db.transactional
+def increment_counter(key, amount)</b>:
+    obj = db.get(key)
+    obj.counter += amount
+    obj.put()
+
+q = db.GqlQuery("SELECT * FROM Accumulator")
+acc = q.get()
+
+<b>increment_counter(acc.key(), 5)</b>
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+...
+<b>def increment_counter(key, amount):</b>
+...
+
+<b>db.run_in_transaction(increment_counter, acc.key(), 5)</b>
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transaction Concurrency</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>When two or more transactions simultaneously attempt to modify entities in one or more common entity groups, only the first transaction to commit its changes can succeed; all the others will fail on commit.<ul>
+<li><a href="http://en.wikipedia.org/wiki/Optimistic_concurrency_control">Optimistic concurrency control</a></li>
+<li><strong>Tip:</strong> <em>A transaction should happen as quickly as possible to reduce the likelihood that the entities used by the transaction will change, causing the transaction to fail.</em></li>
+</ul>
+</li>
+<li>In HRD, the transaction is typically completely applied within a few hundred milliseconds after the commit returns.</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transaction Notes</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>An operation may fail when:<ul>
+<li>Too many users try to modify an entity group simultaneously.</li>
+<li>The application reaches a resource limit.</li>
+<li>The Datastore encounters an internal error.</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modeling Entity Relationships</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/articles/modeling">https://developers.google.com/appengine/articles/modeling</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Further Reading on Datastore</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/articles/datastore/overview">Mastering the datastore</a></li>
+<li><a href="https://developers.google.com/appengine/articles/handling_datastore_errors">Handling datastore errores</a></li>
+<li><a href="https://developers.google.com/appengine/articles/life_of_write">Life of a Datastore Write</a></li>
+<li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation in App Engine</a></li>
+<li><a href="https://developers.google.com/appengine/articles/storage_breakdown">How Entities and Indexes are Stored</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html">Life in App Engine Production</a> Google IO2012 talk</li>
+<li><a href="http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html">More 9s Please: Under The Covers of the High Replication Datastore</a>  Google IO2012 talk</li>
 </ul></article>
  
 </slide>
