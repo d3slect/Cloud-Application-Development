@@ -46,211 +46,30 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
-      <h2>Course Info</h2>
-      <h3></h3>
-    </hgroup>
-    <article ><p><a href="https://github.com/keznikl/Cloud-Application-Development">https://github.com/keznikl/Cloud-Application-Development</a></p>
-<h1>Schedule</h1>
-<ul>
-<li><strong>Lab 1</strong> Intro, SDK, Hello World</li>
-<li><strong>Lab 2</strong> Selection of features (datastore, tasks, blobs, ...)</li>
-<li><strong>Lab 3</strong> Homework<ul>
-<li>preferably Python (easier to use)</li>
-<li>individually or in small groups</li>
-</ul>
-</li>
-<li><strong>Lab 4</strong> Homework cont.</li>
-<li><strong>Lab 5</strong> HW summary and advanced services (map-reduce, ...)</li>
-</ul>
-<h1>Requirements</h1>
-<ul>
-<li>Google Account</li>
-<li>Python (basics of OOP, copy/paste) </li>
-</ul></article>
- 
-</slide>
-
-<slide class="segue dark nobackground" >
-  
-    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
-    <hgroup class="auto-fadein">
-      <h2>Introduction</h2>
-      <h3>What is (isn't) Google App Engine</h3>
-    </hgroup>
-  
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>What is Cloud Computing?</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><p><img alt="Cloud Computing" src="images/cloud.png" /></p>
-<ul>
-<li>Further reading<ul>
-<li><em>"What is Cloud Computing?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
-</ul>
-</li>
-</ul></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>What is Google App Engine?</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><p><a href="https://developers.google.com/appengine/">https://developers.google.com/appengine/</a></p>
-<ul>
-<li>Platform for development of scalable cloud-based web apps<ul>
-<li>Motto: <em>Solutions that do not scale cannot be created at all!</em></li>
-<li>Based entirely on HTTP request handling</li>
-</ul>
-</li>
-<li>PaaS - SDK for Python / Java / Go <ul>
-<li>Runs on Google infrastructure</li>
-</ul>
-</li>
-<li>Integrated with Google services<ul>
-<li>Management console and Google Accounts authentication</li>
-<li>Can be integrated with Google Apps (own domain name, ...)</li>
-<li>Access to API of Youtube and other Google services</li>
-</ul>
-</li>
-<li>Free / paid option <ul>
-<li>Maximum daily budget, works until depleted</li>
-</ul>
-</li>
-<li>Further reading<ul>
-<li><em>"What is (isn't) Google App Engine?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
-</ul>
-</li>
-</ul></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>What can App Engine do?</h2>
+      <h2>Datastore Overview</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Handle HTTP requests (<a href="https://developers.google.com/appengine/docs/python/runtime#Requests">doc</a>)</li>
-<li>Store data<ul>
-<li>Focus on Datastore &mdash; non-relational (entity-based) storage (<a href="https://developers.google.com/appengine/docs/python/datastore/overview">doc</a>)</li>
-<li>Relational (<a href="https://developers.google.com/cloud-sql/">doc</a>) and blob (<a href="https://developers.google.com/appengine/docs/python/blobstore/overview">doc</a>) storage also available</li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/overview">https://developers.google.com/appengine/docs/python/datastore/overview</a></li>
+<li>Distributed storage based on <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf">Bigtable</a><ul>
+<li>Highly scalable</li>
+<li>In fact 6 Bigtables (1 for all the data, 4 for predefined indexes, 1 for user-defined indexes, <a href="https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables">doc</a>)</li>
 </ul>
 </li>
-<li>Process data asynchronously on background (<a href="https://developers.google.com/appengine/docs/python/taskqueue/">doc</a>)</li>
-<li>Cache processed results for quick access (<a href="https://developers.google.com/appengine/docs/python/memcache/">doc</a>)</li>
-<li>Render HTML from templates (<a href="https://developers.google.com/appengine/docs/python/tools/webapp2">doc</a>)</li>
-<li>Push data to clients (<a href="https://developers.google.com/appengine/docs/python/channel/">doc</a>)</li>
-<li>Download URL content (<a href="https://developers.google.com/appengine/docs/python/urlfetch/">doc</a>)</li>
-<li>Send e-mails (<a href="https://developers.google.com/appengine/docs/python/mail/">doc</a>)</li>
-<li>and much more... (<a href="https://developers.google.com/appengine/docs/python/apis">doc</a>)</li>
+<li>Replication across multiple data centers using the <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/archive/paxos_made_live.pdf">Paxos algorithm</a><ul>
+<li>High availability (five 9s)</li>
+<li>Eventual consistency (<a href="http://en.wikipedia.org/wiki/Eventual_consistency">wiki</a>)</li>
 </ul>
-<h1>It does everything in such a way that it scales!</h1></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Quotas</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/quotas">https://developers.google.com/appengine/docs/quotas</a></li>
-<li>Safety (daily, per minute), <a href="https://developers.google.com/appengine/docs/billing">billable</a>, fixed</li>
+</li>
+<li>Entity = unit of data storage<ul>
+<li>kind, id, value, ...</li>
 </ul>
-<table>
-  <tbody><tr>
-    <th width="30%">Resource</th>
-    <th>Free Default Daily Limit</th>
-    <th>Billing Enabled Default Limit</th>
-  </tr>
-  <tr>
-    <td>Blobstore Stored Data</td>
-    <td>First 5 GB <br /><strong>Note:</strong> Not a daily limit but
-a total limit.</td>
-    <td>no maximum</td>
-  </tr>
-  <tr>
-    <td>Code & Static Data Storage <br />(includes all versions)</td>
-    <td>First 1 GB <br /><strong>Note:</strong> Not a daily limit but
-a total limit.</td>
-    <td>$0.13 per GB per month</td>
-  </tr>
-  <tr>
-    <td>Stored Data <br />(billable)</td>
-    <td>1 GB <br /><strong>Note:</strong> Not a daily limit but
-a total limit.</td>
-    <td>1 GB free; no maximum</td>
-  </tr>
-  <tr>
-    <td>Number of Indexes</td>
-    <td>200 <br /><strong>Note:</strong> Not a daily limit but
-a total limit.</td>
-    <td>200</td>
-  </tr>
-  <tr>
-    <td>Read/Write Operations</td>
-    <td>50,000</td>
-    <td>Unlimited</td>
-  </tr>
-  <tr>
-    <td>Outgoing Bandwidth <br />(billable, includes HTTPS)</td>
-    <td>1 GB<br />56 MB/minute</td>
-    <td>1 GB free; 14,400 GB maximum<br />10 GB/minute</td>
-  </tr>
-  <tr>
-    <td>Incoming Bandwidth (includes HTTPS)</td>
-    <td>1 GB; 14,400 GB maximum<br />56 MB/minute</td>
-    <td>None</td>
-  </tr>
-
-</tbody></table></article>
- 
-</slide>
-
-<slide class="segue dark nobackground" >
-  
-    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
-    <hgroup class="auto-fadein">
-      <h2>Hello World</h2>
-      <h3>Following the Google's Tutorial</h3>
-    </hgroup>
-  
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Dev Tools</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><h1>SDK</h1>
-<ul>
-<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted#install">Installation tutorial</a></li>
-<li>Python 2.7 (<a href="http://www.python.org/getit/releases/2.7.3/">link</a>) </li>
-<li>GAE Python SDK (<a href="https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">link</a>)</li>
-<li>Make sure that the python and GAE SDK directories added to PATH (<a href="http://docs.python.org/2/using/windows.html#setting-envvars">link</a>).</li>
+</li>
+<li>Entities located either directly via keys or in queries via pre-built indexes <ul>
+<li>All queries are served via the indexes =&gt; limited but scalable queries </li>
+<li>Direct access via key can be simple/<a href="https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations">batch</a>/<a href="">async</a></li>
 </ul>
-<h1>File types you will encounter</h1>
-<ul>
-<li>Python sources (<code>.py</code>)</li>
-<li>YAML configuraiton files (<code>.yaml</code>)</li>
-<li>Web sources (<code>.html</code>, <code>.css</code>, ...)</li>
-</ul>
-<h1>Recommended tools</h1>
-<ul>
-<li>Your favorite text editor (vim, ...)</li>
-<li>IDLE: default Python editor (<a href="http://docs.python.org/2/library/idle.html">link</a>)</li>
-<li>Aptana Studio: Eclispe-based IDE (<a href="http://www.aptana.com/">link</a>)</li>
-<li>...</li>
+</li>
 </ul></article>
  
 </slide>
@@ -258,25 +77,35 @@ a total limit.</td>
 <slide  >
   
     <hgroup>
-      <h2>Workflow</h2>
+      <h2>Entities</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Choose an application ID</li>
-<li>Implement the app <ul>
-<li>Configuration files</li>
-<li>Request handlers</li>
-<li>...</li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities">https://developers.google.com/appengine/docs/python/datastore/entities</a></li>
+<li>Identifier<ul>
+<li>User-supplied key name </li>
+<li>Automatically assigned numeric ID</li>
 </ul>
 </li>
-<li>Test it via the development server of the SDK<ul>
-<li>Automatically detects changes in the code</li>
+<li>Named properties of various <a href="https://developers.google.com/appengine/docs/python/datastore/entities#Properties_and_Value_Types">types</a><ul>
+<li>Each can have one or more values </li>
 </ul>
 </li>
-<li>Upload it to Google</li>
-<li>Monitor and manage the live app</li>
-<li>Download production data/logs</li>
-<li>Repeat</li>
+<li>Kind: categorizes the entity for the purpose of queries<ul>
+<li>In python the Model class</li>
+</ul>
+</li>
+<li>Model: prescription of an entity (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling">doc</a>)<ul>
+<li>Individual entities of the same kind can have different sets of properties (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_Expando_Class">doc</a>)</li>
+<li>Models can be hierarchic, allowing queries over a kind and its sub-kinds (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_PolyModel_Class">doc</a>)</li>
+</ul>
+</li>
+<li>Key: enables direct access<ul>
+<li>Unique for each entity</li>
+<li>Includes: entity's kind, identifier, ancestor path (later)</li>
+<li>Permanent == cannot be changed</li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
@@ -284,32 +113,56 @@ a total limit.</td>
 <slide  >
   
     <hgroup>
-      <h2>Hello World</h2>
+      <h2>Entities II</h2>
+      <h3>Ancestors</h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Parent property<ul>
+<li>Entities form hierarchically structured space (similar to a file system)</li>
+<li>Root entities: no parent</li>
+<li>Permanent == cannot be changed</li>
+</ul>
+</li>
+<li>Entity group<ul>
+<li>An entity and its descendants (transitive children)</li>
+<li>Unit of transactionality (later)</li>
+</ul>
+</li>
+<li>Ancestor path<ul>
+<li>Full path from the root entity to a given entity</li>
+<li>Kind-identifier pairs</li>
+<li><code>Person:GreatGrandpa / Person:Grandpa / Person:Dad / Person:Me</code></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Queries</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/helloworld">Getting started guide at GAE docs</a></li>
-<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted">Getting started tutorial at Google Training</a>
-<p></p></li>
-<li>Create a skeleton of a new Google Appengine app<ul>
-<li>Choose an ID, e.g., <code>helloworld</code></li>
-<li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#creating">tutorial</a>)</li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries">https://developers.google.com/appengine/docs/python/datastore/queries</a></li>
+<li>Each query includes:<ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities#Kinds_and_Identifiers">Entity kind</a></li>
+<li>Zero or more <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Filters">filters</a> (based on property values, keys, ancestors)<ul>
+<li>Property queries may take one of the forms: =, &lt;, &lt;=, ..., !=, IN</li>
 </ul>
 </li>
-<li>You should get the following structure (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#hello">tutorial</a>)<ul>
-<li><code>app.yaml</code> - configuration of the app</li>
-<li><code>main.py</code> - implementation of the req. handler</li>
-<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/helloworld">github</a></li>
-</ul>
-</li>
-<li>Test the app<ul>
-<li>Run the development server and visit <a href="http://localhost:8080/">http://localhost:8080/</a></li>
-<li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#startdev">tutorial</a>), or:</li>
+<li>Zero or more <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Sort_Orders">sort orders</a></li>
 </ul>
 </li>
 </ul>
-<pre class="prettyprint" data-lang="cmd">
-python google_appengine/dev_appserver.py helloworld/
+<pre class="prettyprint" data-lang="Python">
+# Query interface constructs a query using instance methods
+q = Person.all()
+q.filter("last_name =", "Smith")
+q.filter("height <=", max_height)
+q.ancestor(ancestor_key)
+q.order("-height")
 </pre></article>
  
 </slide>
@@ -317,27 +170,113 @@ python google_appengine/dev_appserver.py helloworld/
 <slide  >
   
     <hgroup>
-      <h2>App Configuration</h2>
+      <h2>Queries II</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><p>The configuraiton of a GAE app is in the <code>app.yaml</code> file</p>
-<pre class="prettyprint" data-lang="YAML">
-<b>application: helloworld
-version: 1
-runtime: python</b>27
-api_version: 1
-threadsafe: true
+    <article class="smaller"><ul>
+<li>Queries are based solely on the indexes
+  (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">doc</a>)<ul>
+<li>First row of the corresponding index matching the filter is found (fast)</li>
+<li>All the consecutive rows matching the filter are returned (up to the limit)</li>
+</ul>
+</li>
+<li>Benefits<ul>
+<li>Scalable with the size of the result set</li>
+</ul>
+</li>
+<li>Restrictions<ul>
+<li>A lot of indexes required</li>
+<li>Entities lacking a property named in the query are ignored.</li>
+<li>Filtering on unindexed properties returns no results.</li>
+<li>Inequality filters are limited to at most one property, <em>but can include equality on another property:</em></li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="GQL">
+SELECT * FROM Person WHERE last_name = :target_last_name
+                       AND city = :target_city
+                       AND birth_year >= :min_birth_year
+                       AND birth_year <= :max_birth_year
+</pre></article>
+ 
+</slide>
 
-<b>handlers:
-- url: /.*
-  script: main.app</b>
+<slide  >
+  
+    <hgroup>
+      <h2>Queries III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Restrictions cont.<ul>
+<li>Ordering of query results is undefined when no sort order is specified.</li>
+<li>Sort orders are ignored on properties with equality filters.</li>
+<li>Properties used in inequality filters must be sorted first.</li>
+<li>Properties with multiple values can behave in surprising ways.<ul>
+<li>Depends on index search</li>
+<li>At least one of the values satisfies <em>all</em> of the <em>inequality</em> filters</li>
+<li>All of the <em>equality</em> filters are satisfied by <em>at least one</em> (each by potentially different) value</li>
+</ul>
+</li>
+<li>Queries inside transactions must include ancestor filters.<ul>
+<li>Entity group == unit of transactionality</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
 
+<slide  >
+  
+    <hgroup>
+      <h2>Queries IV</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Retrieving data (<a href="https://developers.google.com/appengine/docs/python/datastore/queryclass#Query_run">doc</a>)<ul>
+<li>Limit on the number of results returned (to conserve resources)</li>
+<li>Offset of the first returned entity<ul>
+<li>Still retrieved internally, better to use a <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Query_Cursors">cursor</a></li>
+</ul>
+</li>
+<li>Internally retrieved in batches (batch size can be set)</li>
+<li>Queries can have time-outs (maximum 60sec)</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+q = Person.all()
 ...
-</pre>
 
-<ul>
-<li>Further reading<ul>
-<li>Application configuration <a href="https://developers.google.com/appengine/docs/python/config/appconfig">doc</a></li>
+for p in q.run(offset=5, limit=5, batch_size=50, dealine=10):
+  print "%s %s, %d inches tall" % (p.first_name, p.last_name, p.height)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Special Types of Queries</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Projection Query (<a href="https://developers.google.com/appengine/docs/python/datastore/projectionqueries">doc</a>)<ul>
+<li>Retrieves only selected (indexed) properties</li>
+<li>Runs solely on top of indexes (runs faster and costs less than normal query)</li>
+<li>Entities returned by a projection query cannot be stored back</li>
+<li>For multivalued properties generates all combination of found values (as stored in the index)<ul>
+<li>Including more than one multi-valued property in a projection requires an <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Big_Entities_and_Exploding_Indexes">exploding index</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Keys-Only Query (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Keys_Only_Queries">doc</a>)<ul>
+<li>Returns only keys </li>
+<li>Usually combined with a batch read of the relevant entities</li>
+<li>Same advantages/limitations as projection query </li>
 </ul>
 </li>
 </ul></article>
@@ -347,23 +286,19 @@ threadsafe: true
 <slide  >
   
     <hgroup>
-      <h2>Handling Requests</h2>
+      <h2>Special Types of Queries II</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><p>Request handler is a specific Python object in a specific module referred in the <code>app.yaml</code> file; e.g., <code>app</code> in <code>main.py</code></p>
-<pre class="prettyprint" data-lang="python">
-import webapp2
-
-class MainHandler(webapp2.<b>RequestHandler</b>):
-    def <b>get</b>(self):
-        self.<b>response.write</b>('Hello world!')
-
-app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
-</pre>
-
-<ul>
-<li>Further reading<ul>
-<li>webapp2 framework <a href="https://developers.google.com/appengine/docs/python/tools/webapp2">doc</a></li>
+    <article class="smaller"><ul>
+<li>Kindles Query (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Kindless_Queries">doc</a>)<ul>
+<li>Cannot include filters or sort orders on property values</li>
+<li>Can have filter on keys, <code>db.Query().filter('__key__ &gt;', last_seen_key)</code></li>
+<li>Can have ancestor filter</li>
+</ul>
+</li>
+<li>Ancestor query<ul>
+<li>Every query with an ancestor filter</li>
+<li><code>db.query_descendants()</code> to return a query for all descendants of a given entity</li>
 </ul>
 </li>
 </ul></article>
@@ -373,29 +308,24 @@ app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
 <slide  >
   
     <hgroup>
-      <h2>Uploading the App to Google</h2>
+      <h2>Cursors</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><p><em>"Feed the Big Brother"</em></p>
-<ul>
-<li>Create the app in the GAE Administration Console (<a href="https://appengine.google.com/">link</a>)<ul>
-<li>Choose the same ID you've selected before</li>
+    <article class="smaller"><ul>
+<li>For fetching additional results of a query in a subsequent request without offset overhead</li>
+<li>String-encoded position in the index corresponding to the query<ul>
+<li>base64-encoded string, may expose the key (app ID, kind, key name or ID, and all ancestor keys) and properties used in the query (including filters and sort orders)</li>
+<li>Cursor can be passed as HTTP GET/POST parameter or stored in datastore/memcache</li>
 </ul>
 </li>
-<li>Upload the app (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading">tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/tools/uploadinganapp">doc</a>)<ul>
-<li>You need to fill in your Google Account information</li>
-<li>You can upload different versions for the same app ID and select which one is used as the default (<a href="https://developers.google.com/appengine/docs/adminconsole/index">doc</a>)</li>
-<li>Use the <em>Google App Engine Launcher</em> "Deploy" button (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#upload">tutorial</a>), or:</li>
+<li>Can be used only by the same application to resume the same query</li>
+<li>A cursor determines an absolute position within an index<ul>
+<li>NOT a relative position in the result list</li>
+<li>Data updates can have impact on the next results returned</li>
 </ul>
 </li>
-</ul>
-<pre class="prettyprint" data-lang="cmd">
-python google_appengine/appcfg.py update helloworld/
-</pre>
-
-<ul>
-<li>Test the uploaded version<ul>
-<li>Default domain <code>http://your_app_id.appspot.com/</code></li>
+<li>Both <em>start</em> and <em>end</em> cursors<ul>
+<li>You are not guaranteed that the size of the results will be the same as when you generated the cursors</li>
 </ul>
 </li>
 </ul></article>
@@ -405,76 +335,48 @@ python google_appengine/appcfg.py update helloworld/
 <slide  >
   
     <hgroup>
-      <h2>Monitoring and Management</h2>
+      <h2>Cursors II</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><ul>
-<li>Development Console (<a href="https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console">doc</a>)<ul>
-<li>Runs on <a href="http://localhost:8000/">http://localhost:8000/</a></li>
-<li>"SDK Console" button in the <em>Google App Engine Launcher</em></li>
-<li>Basic infromation about the app in the <em>development</em> environment</li>
-<li>Service usage/state overview (Datastore Viewer, Task Queues)</li>
-<li>Interactive Console </li>
-</ul>
-</li>
-<li>Administrator Console (<a href="https://developers.google.com/appengine/docs/adminconsole/?hl=en">doc</a>, <a href="http://appengine.google.com">link</a>)<ul>
-<li>All the 'possible' infromation about the app in the <em>production</em> environment</li>
-<li>Service usage/state overview (again)</li>
-<li>Resource usage, quotas (Main &gt;&gt; Quota Details)</li>
-<li>Version management (Main &gt;&gt; Versions)</li>
-<li>...</li>
-</ul>
-</li>
-<li>Try out and explore!</li>
-</ul></article>
- 
-</slide>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+people = Person.all()
 
-<slide class="segue dark nobackground" >
-  
-    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
-    <hgroup class="auto-fadein">
-      <h2>Guestbook app</h2>
-      <h3>Following (again) the Google's Tutorial</h3>
-    </hgroup>
-  
+person_cursor = memcache.get('person_cursor')
+if person_cursor:
+  people<b>.with_cursor(start_cursor=person_cursor)</b>
+
+for person in people:
+  # Do something
+
+person_cursor = people<b>.cursor()</b>
+memcache.set('person_cursor', person_cursor)
+</pre></article>
+ 
 </slide>
 
 <slide  >
   
     <hgroup>
-      <h2>Guestbook App</h2>
+      <h2>Indexes</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><p><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">https://developers.google.com/appengine/docs/python/gettingstartedpython27/</a></p>
-<ul>
-<li>Google Accounts for authentication
-(
-<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">tutorial</a>, 
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a>
-)</li>
-<li>Users post text messages via HTML forms
-(
-<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>,
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a>
-)</li>
-<li>Datastore for storage of persistent data
-(
-<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>,
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a>
-)</li>
-<li>Jinja2 templating engine for HTML rendering
-(
-<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>, 
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a>
-)</li>
-<li>Static CSS file
-(
-<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">tutorial</a>,
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a>
-)
-<p></p></li>
-<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook">github</a></li>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/indexes">https://developers.google.com/appengine/docs/python/datastore/indexes</a></li>
+<li><strong>Index</strong> is a table containing entity keys of a given kind in a sequence specified by the index's properties<ul>
+<li>A column for every property in the index</li>
+<li>A row for every entity in the Datastore that is a potential result for queries based on the index</li>
+<li>Rows are sorted first by ancestor and then by property values, in the order specified in the index definition</li>
+</ul>
+</li>
+<li><code>index.yaml</code> configuration file (<a href="https://developers.google.com/appengine/docs/python/config/indexconfig">doc</a>)<ul>
+<li>Automatically updated by the dev. server when a new query is executed</li>
+</ul>
+</li>
+<li>An entity is included in the index only if it has a value set for every property used in the index<ul>
+<li>Can have value <code>None</code></li>
+</ul>
+</li>
+<li>A <em>perfect index</em> ensures that all results for every possible execution of the query appear in consecutive rows of the index table</li>
 </ul></article>
  
 </slide>
@@ -482,277 +384,121 @@ python google_appengine/appcfg.py update helloworld/
 <slide  >
   
     <hgroup>
-      <h2>Using the Users Service</h2>
+      <h2>Indexes II</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">Tutorial</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a></li>
-<li>Users API (<a href="https://developers.google.com/appengine/docs/python/users/">doc</a>)<ul>
-<li>Google authentication</li>
-<li>Access to basic Google user properties (nickname, email)</li>
+<li>A <em>perfect index</em> has (in the order of importance):<ul>
+<li>Properties used in equality filters</li>
+<li>Property used in an inequality filter (of which there can be no more than one)</li>
+<li>Properties used in sort orders</li>
+</ul>
+</li>
+<li>During execution of a query, the Datastore:<ul>
+<li>Identifies the perfect index corresponding to the query</li>
+<li>Scans from the beginning of the index to the first entity that meets all of the query's filter conditions</li>
+<li>Continues scanning the index, returning each entity in turn, until it<ul>
+<li>encounters an entity that does not meet the filter conditions, or</li>
+<li>reaches the end of the index, or</li>
+<li>has collected the maximum number of results requested by the query.</li>
 </ul>
 </li>
 </ul>
-<pre class="prettyprint" data-lang="python">
-import webapp2
-<b>from google.appengine.api import users</b>
-
-class MainPage(webapp2.RequestHandler):
-    def get(self):
-        <b>user = users.get_current_user()</b>
-
-        <b>if user:</b>
-            self.response.headers['Content-Type'] = 'text/plain'
-            self.response.out.write('Hello, ' + <b>user.nickname()</b>)
-        <b>else:</b>
-            self.redirect(<b>users.create_login_url(self.request.uri)</b>)
-
-app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
-</pre></article>
+</li>
+</ul></article>
  
 </slide>
 
 <slide  >
   
     <hgroup>
-      <h2>Handling Forms</h2>
+      <h2>Indexes III</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">Tutorial</a>,
-webapp2 framework <a href="http://webapp-improved.appspot.com/">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a></li>
-</ul>
-<pre class="prettyprint" data-lang="python">
-<b>import webapp2</b>
-
-class <b>MainPage</b>(webapp2.RequestHandler):
-    <b>def get(self):</b>
-        self.response.out.write("""
-          &lt;html>
-            &lt;body>
-              &lt;form <b>action="/sign"</b> method="post">
-                &lt;div>&lt;textarea name="content" rows="3" cols="60">&lt;/textarea>&lt;/div>
-                &lt;div>&lt;input type="submit" value="Sign Guestbook">&lt;/div>
-              &lt;/form>
-            &lt;/body>
-          &lt;/html>""")
-
-class <b>Guestbook</b>(webapp2.RequestHandler):
-    <b>def post(self):</b>
-        self.response.out.write('&lt;html>&lt;body>You wrote:&lt;pre>')
-        self.response.out.write(<b>self.request.get('content')</b>)
-        self.response.out.write('&lt;/pre>&lt;/body>&lt;/html>')
-
-app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
-                              <b>('/sign', Guestbook)</b>],
-                              debug=True)
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Using the Datastore</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">Tutorial</a>,
-Datastore <a href="https://developers.google.com/appengine/docs/python/datastore/">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a></li>
-</ul>
-<h1>Modeling data</h1>
-<pre class="prettyprint" data-lang="python">
-from google.appengine.ext import db
-
-class Greeting(db.Model):
-    author = db.StringProperty()
-    content = db.StringProperty(multiline=True)
-    date = db.DateTimeProperty(auto_now_add=True)
-</pre>
-
-<h1>Storing data</h1>
-<pre class="prettyprint" data-lang="python">
-class Guestbook(webapp2.RequestHandler):
-    def post(self):
-      guestbook_name = self.request.get('guestbook_name')
-      <b>greeting = Greeting(parent=guestbook_key(guestbook_name))</b>
-
-      if users.get_current_user():
-        greeting.author = users.get_current_user().nickname()
-
-      greeting.content = self.request.get('content')
-      <b>greeting.put()</b>
-      self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Using the Datastore II.</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><h1>Retrieving data</h1>
-<ul>
-<li>GQL (<a href="https://developers.google.com/appengine/docs/python/datastore/gqlreference">doc</a>)</li>
-</ul>
-<pre class="prettyprint" data-lang="python">
-greetings = db.GqlQuery("SELECT * "
-                        "FROM Greeting "
-                        "WHERE ANCESTOR IS :1 "
-                        "ORDER BY date DESC LIMIT 10",
-                         guestbook_key(guestbook_name))
-
-</pre>
-
-<pre class="prettyprint" data-lang="python">
-
-greetings = Greeting.gql("WHERE ANCESTOR IS :1 ORDER BY date DESC LIMIT 10",
-                          guestbook_key(guestbook_name))
-</pre>
-
-<ul>
-<li>Query API (<a href="https://developers.google.com/appengine/docs/python/datastore/queries">doc</a>)</li>
-</ul>
-<pre class="prettyprint" data-lang="python">
-greetings = Greeting.all()
-greetings.ancestor(guestbook_key(guestbook_name))
-greetings.filter("date >", datetime.datetime.now() + datetime.timedelta(days=-7))
-greetings.order("-date")
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Using Templates</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">Tutorial</a>,
-Jinja2 <a href="http://jinja.pocoo.org/docs/">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a></li>
-</ul>
-<pre class="prettyprint" data-lang="yaml">
-libraries:
-- name: jinja2
-  version: latest
-</pre>
-
-<pre class="prettyprint" data-lang="python">
-<b>import jinja2</b>
-import os
-
-<b>jinja_environment = jinja2.Environment</b>(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
-
-class MainPage(webapp2.RequestHandler):
-    def get(self):
-        greetings = Greeting.all()...
-        ...
-        <b>template_values = {
-            'greetings': greetings,
-            'url': url,
-            'url_linktext': url_linktext,
-        }
-        template = jinja_environment.get_template('index.html')</b>
-        self.response.out.write(<b>template.render(template_values)</b>)
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Using Templates II.</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><p><code>index.html</code>:</p>
-<pre class="prettyprint" data-lang="python">
-&lthtml>
-  &ltbody>
-    <b>{% for greeting in greetings %}</b>
-      <b>{% if greeting.author %}</b>
-        &ltb><b>{{ greeting.author }}</b>&lt/b> wrote:
-      <b>{% else %}</b>
-        An anonymous person wrote:
-      <b>{% endif %}</b>
-      &ltblockquote><b>{{ greeting.content|escape }}</b>&lt/blockquote>
-    <b>{% endfor %}</b>
-
-    &ltform action="/sign" method="post">
-      &ltdiv>&lttextarea name="content" rows="3" cols="60">&lt/textarea>&lt/div>
-      &ltdiv>&ltinput type="submit" value="Sign Guestbook">&lt/div>
-    &lt/form>
-
-    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>&lt/a>
-
-  &lt/body>
-&lt/html>
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Using Static Files</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">Tutorial</a>,
-Python application configuration <a href="https://developers.google.com/appengine/docs/python/config/appconfig">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a></li>
-</ul>
-<pre class="prettyprint" data-lang="yaml">
-application: helloworld
-version: 1
-runtime: python27
-api_version: 1
-threadsafe: true
-
-<b>handlers:
-- url: /stylesheets
-  static_dir: stylesheets</b>
-
-- url: /.*
-  script: helloworld.app
-
-libraries:
-- name: jinja2
-  version: latest
-</pre></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>Next Time</h2>
-      <h3>Advanced Topics in GAE Service APIs</h3>
-    </hgroup>
-    <article class="smaller"><ul>
-<li>Datastore<ul>
-<li>Tradeoffs of efficient queries</li>
-<li>Consistency guarantees, designing data for consistency</li>
-<li>Designing data structure for large scale</li>
-<li>Transactions</li>
-<li>Discussion on the internals</li>
+<li>Indexes have <a href="https://developers.google.com/appengine/docs/python/datastore/overview#Quotas_and_Limits">limits</a><ul>
+<li>Maximum number of index entries for an entity (20000)</li>
+<li>Maximum number of bytes in composite indexes for an entity (2 megabytes)</li>
 </ul>
 </li>
-<li>Task queues<ul>
-<li>Deferred tasks</li>
-<li>Advanced background task usage</li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/indexes#Index_Limits">Exploding indexes</a><ul>
+<li>For entities with multiple properties where each has multiple values the index must include an entry <em>for every possible combination</em> of property values</li>
+<li>The number of entries "explodes" combinatorially</li>
+<li>For example the entity<br />
+<pre class="prettyprint" data-lang="Python">
+    class Widget(db.Expando):
+      pass    <br />
+    e2 = Widget()
+    e2.x = [1, 2, 3, 4]
+    e2.y = ['red', 'green', 'blue']
+    e2.date = datetime.datetime.now()
+    e2.put()  <br />
+</pre>  requires 12 index entries for the composite index <code>Widget(x, y, date)</code></li>
 </ul>
 </li>
-<li>Overview of other services (Memcache, Blobstore, ...)</li>
-<li>Best practices</li>
-<li>Maybe more</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Indexes IV</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>The number/type of indexes influences the cost of a single write (<a href="https://developers.google.com/appengine/docs/python/datastore/indexes#Index_Limits">doc</a>, <a href="https://developers.google.com/appengine/docs/python/datastore/entities#Understanding_Write_Costs">tutorial</a>)<ul>
+<li>1 + the number of entries in the indexes the entity would appear in </li>
+<li>By default 3 indexes<ul>
+<li><code>EntitiesByKind</code></li>
+<li><code>EntitiesByProperty</code></li>
+<li><code>EntitiesByPropertyDesc</code></li>
+<li>i.e., 1 for the kind index and then 2 for each property value. </li>
+</ul>
+</li>
+<li>Exploding indexes slow down entity writes dramatically (and may cause the entity to exceed the index limit)</li>
+</ul>
+</li>
+<li>Exploding indexes can be manually avoided (<a href="https://developers.google.com/appengine/articles/indexselection">tutorial</a>)</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Data Consistency</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Two consistency levels (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Data_Consistency">doc</a>)<ul>
+<li><a href="http://en.wikipedia.org/wiki/Strong_consistency">Strong consistency</a>: queries guarantee the freshest results, but may take longer to complete</li>
+<li><a href="http://en.wikipedia.org/wiki/Eventual_consistency">Eventual consistency</a>: queries generally run faster, but may occasionally return stale results</li>
+</ul>
+</li>
+<li>Eventually consistent queries:<ul>
+<li>May use stale indexes</li>
+<li>May sometimes return entities that no longer match the original query criteria</li>
+</ul>
+</li>
+<li>Ancestor queries are strongly consistent by default<ul>
+<li>Can be made eventually consistent Datastore read policy</li>
+<li><code>Employee.all()...run(read_policy=db.EVENTUAL_CONSISTENCY)</code></li>
+</ul>
+</li>
+<li>Non-ancestor queries are always eventually consistent</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Furthe Details on Datastore</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="">https://developers.google.com/appengine/articles/datastore/overview</a></li>
 </ul></article>
  
 </slide>

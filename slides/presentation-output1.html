@@ -1,0 +1,799 @@
+<!--
+Google IO 2012 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahe <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NSWI152</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="all" href="theme/css/app.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout">
+
+<slide class="logoslide nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/google_developers_logo.png"></span>
+    </article>
+</slide>
+<slide class="title-slide segue nobackground">
+  <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+  <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+  <hgroup class="auto-fadein">
+    <h1 data-config-title><!-- populated from slide_config.json --></h1>
+    <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+    <p data-config-presenter><!-- populated from slide_config.json --></p>
+  </hgroup>
+</slide>
+
+
+<slide  >
+  
+    <hgroup>
+      <h2>Course Info</h2>
+      <h3></h3>
+    </hgroup>
+    <article ><p><a href="https://github.com/keznikl/Cloud-Application-Development">https://github.com/keznikl/Cloud-Application-Development</a></p>
+<h1>Schedule</h1>
+<ul>
+<li><strong>Lab 1</strong> Intro, SDK, Hello World</li>
+<li><strong>Lab 2</strong> Selection of features (datastore, tasks, blobs, ...)</li>
+<li><strong>Lab 3</strong> Homework<ul>
+<li>preferably Python (easier to use)</li>
+<li>individually or in small groups</li>
+</ul>
+</li>
+<li><strong>Lab 4</strong> Homework cont.</li>
+<li><strong>Lab 5</strong> HW summary and advanced services (map-reduce, ...)</li>
+</ul>
+<h1>Requirements</h1>
+<ul>
+<li>Google Account</li>
+<li>Python (basics of OOP, copy/paste) </li>
+</ul></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Introduction</h2>
+      <h3>What is (isn't) Google App Engine</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>What is Cloud Computing?</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><img alt="Cloud Computing" src="images/cloud.png" /></p>
+<ul>
+<li>Further reading<ul>
+<li><em>"What is Cloud Computing?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>What is Google App Engine?</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><a href="https://developers.google.com/appengine/">https://developers.google.com/appengine/</a></p>
+<ul>
+<li>Platform for development of scalable cloud-based web apps<ul>
+<li>Motto: <em>Solutions that do not scale cannot be created at all!</em></li>
+<li>Based entirely on HTTP request handling</li>
+</ul>
+</li>
+<li>PaaS - SDK for Python / Java / Go <ul>
+<li>Runs on Google infrastructure</li>
+</ul>
+</li>
+<li>Integrated with Google services<ul>
+<li>Management console and Google Accounts authentication</li>
+<li>Can be integrated with Google Apps (own domain name, ...)</li>
+<li>Access to API of Youtube and other Google services</li>
+</ul>
+</li>
+<li>Free / paid option <ul>
+<li>Maximum daily budget, works until depleted</li>
+</ul>
+</li>
+<li>Further reading<ul>
+<li><em>"What is (isn't) Google App Engine?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>What can App Engine do?</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Handle HTTP requests (<a href="https://developers.google.com/appengine/docs/python/runtime#Requests">doc</a>)</li>
+<li>Store data<ul>
+<li>Focus on Datastore &mdash; non-relational (entity-based) storage (<a href="https://developers.google.com/appengine/docs/python/datastore/overview">doc</a>)</li>
+<li>Relational (<a href="https://developers.google.com/cloud-sql/">doc</a>) and blob (<a href="https://developers.google.com/appengine/docs/python/blobstore/overview">doc</a>) storage also available</li>
+</ul>
+</li>
+<li>Process data asynchronously on background (<a href="https://developers.google.com/appengine/docs/python/taskqueue/">doc</a>)</li>
+<li>Cache processed results for quick access (<a href="https://developers.google.com/appengine/docs/python/memcache/">doc</a>)</li>
+<li>Render HTML from templates (<a href="https://developers.google.com/appengine/docs/python/tools/webapp2">doc</a>)</li>
+<li>Push data to clients (<a href="https://developers.google.com/appengine/docs/python/channel/">doc</a>)</li>
+<li>Download URL content (<a href="https://developers.google.com/appengine/docs/python/urlfetch/">doc</a>)</li>
+<li>Send e-mails (<a href="https://developers.google.com/appengine/docs/python/mail/">doc</a>)</li>
+<li>and much more... (<a href="https://developers.google.com/appengine/docs/python/apis">doc</a>)</li>
+</ul>
+<h1>It does everything in such a way that it scales!</h1></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Quotas</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/quotas">https://developers.google.com/appengine/docs/quotas</a></li>
+<li>Safety (daily, per minute), <a href="https://developers.google.com/appengine/docs/billing">billable</a>, fixed</li>
+</ul>
+<table>
+  <tbody><tr>
+    <th width="30%">Resource</th>
+    <th>Free Default Daily Limit</th>
+    <th>Billing Enabled Default Limit</th>
+  </tr>
+  <tr>
+    <td>Blobstore Stored Data</td>
+    <td>First 5 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>no maximum</td>
+  </tr>
+  <tr>
+    <td>Code & Static Data Storage <br />(includes all versions)</td>
+    <td>First 1 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>$0.13 per GB per month</td>
+  </tr>
+  <tr>
+    <td>Stored Data <br />(billable)</td>
+    <td>1 GB <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>1 GB free; no maximum</td>
+  </tr>
+  <tr>
+    <td>Number of Indexes</td>
+    <td>200 <br /><strong>Note:</strong> Not a daily limit but
+a total limit.</td>
+    <td>200</td>
+  </tr>
+  <tr>
+    <td>Read/Write Operations</td>
+    <td>50,000</td>
+    <td>Unlimited</td>
+  </tr>
+  <tr>
+    <td>Outgoing Bandwidth <br />(billable, includes HTTPS)</td>
+    <td>1 GB<br />56 MB/minute</td>
+    <td>1 GB free; 14,400 GB maximum<br />10 GB/minute</td>
+  </tr>
+  <tr>
+    <td>Incoming Bandwidth (includes HTTPS)</td>
+    <td>1 GB; 14,400 GB maximum<br />56 MB/minute</td>
+    <td>None</td>
+  </tr>
+
+</tbody></table></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Hello World</h2>
+      <h3>Following the Google's Tutorial</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Dev Tools</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><h1>SDK</h1>
+<ul>
+<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted#install">Installation tutorial</a></li>
+<li>Python 2.7 (<a href="http://www.python.org/getit/releases/2.7.3/">link</a>) </li>
+<li>GAE Python SDK (<a href="https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">link</a>)</li>
+<li>Make sure that the python and GAE SDK directories added to PATH (<a href="http://docs.python.org/2/using/windows.html#setting-envvars">link</a>).</li>
+</ul>
+<h1>File types you will encounter</h1>
+<ul>
+<li>Python sources (<code>.py</code>)</li>
+<li>YAML configuraiton files (<code>.yaml</code>)</li>
+<li>Web sources (<code>.html</code>, <code>.css</code>, ...)</li>
+</ul>
+<h1>Recommended tools</h1>
+<ul>
+<li>Your favorite text editor (vim, ...)</li>
+<li>IDLE: default Python editor (<a href="http://docs.python.org/2/library/idle.html">link</a>)</li>
+<li>Aptana Studio: Eclispe-based IDE (<a href="http://www.aptana.com/">link</a>)</li>
+<li>...</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Workflow</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Choose an application ID</li>
+<li>Implement the app <ul>
+<li>Configuration files</li>
+<li>Request handlers</li>
+<li>...</li>
+</ul>
+</li>
+<li>Test it via the development server of the SDK<ul>
+<li>Automatically detects changes in the code</li>
+</ul>
+</li>
+<li>Upload it to Google</li>
+<li>Monitor and manage the live app</li>
+<li>Download production data/logs</li>
+<li>Repeat</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Hello World</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/helloworld">Getting started guide at GAE docs</a></li>
+<li><a href="https://developers.google.com/appengine/training/intro/gettingstarted">Getting started tutorial at Google Training</a>
+<p></p></li>
+<li>Create a skeleton of a new Google Appengine app<ul>
+<li>Choose an ID, e.g., <code>helloworld</code></li>
+<li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#creating">tutorial</a>)</li>
+</ul>
+</li>
+<li>You should get the following structure (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#hello">tutorial</a>)<ul>
+<li><code>app.yaml</code> - configuration of the app</li>
+<li><code>main.py</code> - implementation of the req. handler</li>
+<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/helloworld">github</a></li>
+</ul>
+</li>
+<li>Test the app<ul>
+<li>Run the development server and visit <a href="http://localhost:8080/">http://localhost:8080/</a></li>
+<li>Use the <em>Google App Engine Launcher</em> (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#startdev">tutorial</a>), or:</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="cmd">
+python google_appengine/dev_appserver.py helloworld/
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>App Configuration</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p>The configuraiton of a GAE app is in the <code>app.yaml</code> file</p>
+<pre class="prettyprint" data-lang="YAML">
+<b>application: helloworld
+version: 1
+runtime: python</b>27
+api_version: 1
+threadsafe: true
+
+<b>handlers:
+- url: /.*
+  script: main.app</b>
+
+...
+</pre>
+
+<ul>
+<li>Further reading<ul>
+<li>Application configuration <a href="https://developers.google.com/appengine/docs/python/config/appconfig">doc</a></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Handling Requests</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p>Request handler is a specific Python object in a specific module referred in the <code>app.yaml</code> file; e.g., <code>app</code> in <code>main.py</code></p>
+<pre class="prettyprint" data-lang="python">
+import webapp2
+
+class MainHandler(webapp2.<b>RequestHandler</b>):
+    def <b>get</b>(self):
+        self.<b>response.write</b>('Hello world!')
+
+app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
+</pre>
+
+<ul>
+<li>Further reading<ul>
+<li>webapp2 framework <a href="https://developers.google.com/appengine/docs/python/tools/webapp2">doc</a></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Uploading the App to Google</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><em>"Feed the Big Brother"</em></p>
+<ul>
+<li>Create the app in the GAE Administration Console (<a href="https://appengine.google.com/">link</a>)<ul>
+<li>Choose the same ID you've selected before</li>
+</ul>
+</li>
+<li>Upload the app (<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading">tutorial</a>, <a href="https://developers.google.com/appengine/docs/python/tools/uploadinganapp">doc</a>)<ul>
+<li>You need to fill in your Google Account information</li>
+<li>You can upload different versions for the same app ID and select which one is used as the default (<a href="https://developers.google.com/appengine/docs/adminconsole/index">doc</a>)</li>
+<li>Use the <em>Google App Engine Launcher</em> "Deploy" button (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#upload">tutorial</a>), or:</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="cmd">
+python google_appengine/appcfg.py update helloworld/
+</pre>
+
+<ul>
+<li>Test the uploaded version<ul>
+<li>Default domain <code>http://your_app_id.appspot.com/</code></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Monitoring and Management</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Development Console (<a href="https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console">doc</a>)<ul>
+<li>Runs on <a href="http://localhost:8000/">http://localhost:8000/</a></li>
+<li>"SDK Console" button in the <em>Google App Engine Launcher</em></li>
+<li>Basic infromation about the app in the <em>development</em> environment</li>
+<li>Service usage/state overview (Datastore Viewer, Task Queues)</li>
+<li>Interactive Console </li>
+</ul>
+</li>
+<li>Administrator Console (<a href="https://developers.google.com/appengine/docs/adminconsole/?hl=en">doc</a>, <a href="http://appengine.google.com">link</a>)<ul>
+<li>All the 'possible' infromation about the app in the <em>production</em> environment</li>
+<li>Service usage/state overview (again)</li>
+<li>Resource usage, quotas (Main &gt;&gt; Quota Details)</li>
+<li>Version management (Main &gt;&gt; Versions)</li>
+<li>...</li>
+</ul>
+</li>
+<li>Try out and explore!</li>
+</ul></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Guestbook app</h2>
+      <h3>Following (again) the Google's Tutorial</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Guestbook App</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/">https://developers.google.com/appengine/docs/python/gettingstartedpython27/</a></p>
+<ul>
+<li>Google Accounts for authentication
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">tutorial</a>, 
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a>
+)</li>
+<li>Users post text messages via HTML forms
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>,
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a>
+)</li>
+<li>Datastore for storage of persistent data
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>,
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a>
+)</li>
+<li>Jinja2 templating engine for HTML rendering
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>, 
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a>
+)</li>
+<li>Static CSS file
+(
+<a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">tutorial</a>,
+<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a>
+)
+<p></p></li>
+<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook">github</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using the Users Service</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">Tutorial</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a></li>
+<li>Users API (<a href="https://developers.google.com/appengine/docs/python/users/">doc</a>)<ul>
+<li>Google authentication</li>
+<li>Access to basic Google user properties (nickname, email)</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+import webapp2
+<b>from google.appengine.api import users</b>
+
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+        <b>user = users.get_current_user()</b>
+
+        <b>if user:</b>
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.out.write('Hello, ' + <b>user.nickname()</b>)
+        <b>else:</b>
+            self.redirect(<b>users.create_login_url(self.request.uri)</b>)
+
+app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Handling Forms</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">Tutorial</a>,
+webapp2 framework <a href="http://webapp-improved.appspot.com/">doc</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a></li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+<b>import webapp2</b>
+
+class <b>MainPage</b>(webapp2.RequestHandler):
+    <b>def get(self):</b>
+        self.response.out.write("""
+          &lt;html>
+            &lt;body>
+              &lt;form <b>action="/sign"</b> method="post">
+                &lt;div>&lt;textarea name="content" rows="3" cols="60">&lt;/textarea>&lt;/div>
+                &lt;div>&lt;input type="submit" value="Sign Guestbook">&lt;/div>
+              &lt;/form>
+            &lt;/body>
+          &lt;/html>""")
+
+class <b>Guestbook</b>(webapp2.RequestHandler):
+    <b>def post(self):</b>
+        self.response.out.write('&lt;html>&lt;body>You wrote:&lt;pre>')
+        self.response.out.write(<b>self.request.get('content')</b>)
+        self.response.out.write('&lt;/pre>&lt;/body>&lt;/html>')
+
+app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
+                              <b>('/sign', Guestbook)</b>],
+                              debug=True)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using the Datastore</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">Tutorial</a>,
+Datastore <a href="https://developers.google.com/appengine/docs/python/datastore/">doc</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a></li>
+</ul>
+<h1>Modeling data</h1>
+<pre class="prettyprint" data-lang="python">
+from google.appengine.ext import db
+
+class Greeting(db.Model):
+    author = db.StringProperty()
+    content = db.StringProperty(multiline=True)
+    date = db.DateTimeProperty(auto_now_add=True)
+</pre>
+
+<h1>Storing data</h1>
+<pre class="prettyprint" data-lang="python">
+class Guestbook(webapp2.RequestHandler):
+    def post(self):
+      guestbook_name = self.request.get('guestbook_name')
+      <b>greeting = Greeting(parent=guestbook_key(guestbook_name))</b>
+
+      if users.get_current_user():
+        greeting.author = users.get_current_user().nickname()
+
+      greeting.content = self.request.get('content')
+      <b>greeting.put()</b>
+      self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using the Datastore II.</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><h1>Retrieving data</h1>
+<ul>
+<li>GQL (<a href="https://developers.google.com/appengine/docs/python/datastore/gqlreference">doc</a>)</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+greetings = db.GqlQuery("SELECT * "
+                        "FROM Greeting "
+                        "WHERE ANCESTOR IS :1 "
+                        "ORDER BY date DESC LIMIT 10",
+                         guestbook_key(guestbook_name))
+
+</pre>
+
+<pre class="prettyprint" data-lang="python">
+
+greetings = Greeting.gql("WHERE ANCESTOR IS :1 ORDER BY date DESC LIMIT 10",
+                          guestbook_key(guestbook_name))
+</pre>
+
+<ul>
+<li>Query API (<a href="https://developers.google.com/appengine/docs/python/datastore/queries">doc</a>)</li>
+</ul>
+<pre class="prettyprint" data-lang="python">
+greetings = Greeting.all()
+greetings.ancestor(guestbook_key(guestbook_name))
+greetings.filter("date >", datetime.datetime.now() + datetime.timedelta(days=-7))
+greetings.order("-date")
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using Templates</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">Tutorial</a>,
+Jinja2 <a href="http://jinja.pocoo.org/docs/">doc</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a></li>
+</ul>
+<pre class="prettyprint" data-lang="yaml">
+libraries:
+- name: jinja2
+  version: latest
+</pre>
+
+<pre class="prettyprint" data-lang="python">
+<b>import jinja2</b>
+import os
+
+<b>jinja_environment = jinja2.Environment</b>(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+        greetings = Greeting.all()...
+        ...
+        <b>template_values = {
+            'greetings': greetings,
+            'url': url,
+            'url_linktext': url_linktext,
+        }
+        template = jinja_environment.get_template('index.html')</b>
+        self.response.out.write(<b>template.render(template_values)</b>)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using Templates II.</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><code>index.html</code>:</p>
+<pre class="prettyprint" data-lang="python">
+&lthtml>
+  &ltbody>
+    <b>{% for greeting in greetings %}</b>
+      <b>{% if greeting.author %}</b>
+        &ltb><b>{{ greeting.author }}</b>&lt/b> wrote:
+      <b>{% else %}</b>
+        An anonymous person wrote:
+      <b>{% endif %}</b>
+      &ltblockquote><b>{{ greeting.content|escape }}</b>&lt/blockquote>
+    <b>{% endfor %}</b>
+
+    &ltform action="/sign" method="post">
+      &ltdiv>&lttextarea name="content" rows="3" cols="60">&lt/textarea>&lt/div>
+      &ltdiv>&ltinput type="submit" value="Sign Guestbook">&lt/div>
+    &lt/form>
+
+    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>&lt/a>
+
+  &lt/body>
+&lt/html>
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Using Static Files</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">Tutorial</a>,
+Python application configuration <a href="https://developers.google.com/appengine/docs/python/config/appconfig">doc</a>,
+sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a></li>
+</ul>
+<pre class="prettyprint" data-lang="yaml">
+application: helloworld
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+<b>handlers:
+- url: /stylesheets
+  static_dir: stylesheets</b>
+
+- url: /.*
+  script: helloworld.app
+
+libraries:
+- name: jinja2
+  version: latest
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Next Time</h2>
+      <h3>Advanced Topics in GAE Service APIs</h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Datastore<ul>
+<li>Tradeoffs of efficient queries</li>
+<li>Consistency guarantees, designing data for consistency</li>
+<li>Designing data structure for large scale</li>
+<li>Transactions</li>
+<li>Discussion on the internals</li>
+</ul>
+</li>
+<li>Task queues<ul>
+<li>Deferred tasks</li>
+<li>Advanced background task usage</li>
+</ul>
+</li>
+<li>Overview of other services (Memcache, Blobstore, ...)</li>
+<li>Best practices</li>
+<li>Maybe more</li>
+</ul></article>
+ 
+</slide>
+
+
+<slide class="thank-you-slide segue nobackground">
+  <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <h2>Thank You!</h2>
+    <!--<p>Important contact information goes here.</p>-->
+  </article>
+  <p class="auto-fadein" data-config-contact>
+    <!-- populated from slide_config.json -->
+  </p>
+</slide>
+
+<!-- <slide class="logoslide dark nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo_white.png"></span>
+  </article>
+</slide> -->
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
