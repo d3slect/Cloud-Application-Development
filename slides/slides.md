@@ -474,3 +474,58 @@ content_class: smaller
 - [Best practices for writing scalable applications](https://developers.google.com/appengine/articles/scaling/overview)
 - [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html) Google IO 2012 talk
 - [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)  Google IO 2012 talk
+
+---
+
+title: Other GAE Services
+subtitle: What comes handy
+class: segue dark nobackground
+
+---
+
+title: Memcache
+content_class: smaller
+
+- <https://developers.google.com/appengine/docs/python/memcache/>
+- Further reading &mdash; [Effective memcache](https://developers.google.com/appengine/articles/scaling/memcache)
+
+---
+
+title: Task Queues
+content_class: smaller
+
+- <https://developers.google.com/appengine/docs/python/taskqueue/>
+
+---
+
+title: Background Work with the Deferred Library
+content_class: smaller
+
+- <https://developers.google.com/appengine/articles/deferred>
+
+---
+
+title: Backends
+content_class: smaller
+
+- <https://developers.google.com/appengine/docs/python/backends/>
+
+---
+
+title: Blobstore
+content_class: smaller
+
+- <https://developers.google.com/appengine/docs/python/blobstore/overview>
+
+---
+
+title: NDB
+content_class: smaller
+
+---
+
+title: Homework
+content_class: smaller
+
+
+
