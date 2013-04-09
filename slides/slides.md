@@ -561,10 +561,45 @@ content_class: smaller
 
 ---
 
-title: Background Work with the Deferred Library
+title: The Deferred Library
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/articles/deferred0
+- [Tutorial](https://developers.google.com/appengine/articles/deferred)
+- Wrapper on top of Push Task Queues
+	- Automatically packages the function call and its arguments and adds it to a task queue
+	- No more setting up dedicated task handlers and serializing and deserializing parameters
+- Built-in handler ([doc](https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers))
+- Works with any python 'callable', including functions, methods, class methods and callable objects
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import deferred
+
+  def do_something_expensive(a, b, c=None):
+      logging.info("Doing something expensive!")
+      # Do your work here
+
+  # Somewhere else
+  deferred.defer(do_something_expensive, "Hello, world!", 42, c=True, 
+                 _countdown=30, _queue="myqueue")
+</pre>
+
+---
+
+title: The Deferred Library Tips
+content_class: smaller
+
+- Make tasks as small as possible (10KB limit)
+	- The deferred library automatically stores the exceeding information into datastore (1MB limit)
+- Don't pass entities to deferred.defer since it can cause races (better to pass keys)
+- Failed tasks is always retried
+	- If you don't wont GAE to retry, either return normally or raise `deferred.PermanentTaskFailure`
+- You can't call nested functions, methods of nested classes, lambda functions, static methods, **methods in a request handler module**
+- Use the deferred library if
+	- You want a simple way of delegating workload to background
+	- You have a lot of different background tasks
+- Use the Task Queue API if
+	- You need a control over how tasks are queued and executed
+	- You want to manage throughput, minimize overhead, have direct control over tasks and better monitoring
 
 ---
 

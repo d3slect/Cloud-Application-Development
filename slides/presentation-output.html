@@ -897,11 +897,60 @@ def get_data():
 <slide  >
   
     <hgroup>
-      <h2>Background Work with the Deferred Library</h2>
+      <h2>The Deferred Library</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/articles/deferred">https://developers.google.com/appengine/articles/deferred</a></li>
+<li><a href="https://developers.google.com/appengine/articles/deferred">Tutorial</a></li>
+<li>Wrapper on top of Push Task Queues<ul>
+<li>Automatically packages the function call and its arguments and adds it to a task queue</li>
+<li>No more setting up dedicated task handlers and serializing and deserializing parameters</li>
+</ul>
+</li>
+<li>Built-in handler (<a href="https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers">doc</a>)</li>
+<li>Works with any python 'callable', including functions, methods, class methods and callable objects</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import deferred
+
+  def do_something_expensive(a, b, c=None):
+      logging.info("Doing something expensive!")
+      # Do your work here
+
+  # Somewhere else
+  deferred.defer(do_something_expensive, "Hello, world!", 42, c=True, 
+                 _countdown=30, _queue="myqueue")
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Deferred Library Tips</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Make tasks as small as possible (10KB limit)<ul>
+<li>The deferred library automatically stores the exceeding information into datastore (1MB limit)</li>
+</ul>
+</li>
+<li>Don't pass entities to deferred.defer since it can cause races (better to pass keys)</li>
+<li>Failed tasks is always retried<ul>
+<li>If you don't wont GAE to retry, either return normally or raise <code>deferred.PermanentTaskFailure</code></li>
+</ul>
+</li>
+<li>You can't call nested functions, methods of nested classes, lambda functions, static methods, <strong>methods in a request handler module</strong></li>
+<li>Use the deferred library if<ul>
+<li>You want a simple way of delegating workload to background</li>
+<li>You have a lot of different background tasks</li>
+</ul>
+</li>
+<li>Use the Task Queue API if<ul>
+<li>You need a control over how tasks are queued and executed</li>
+<li>You want to manage throughput, minimize overhead, have direct control over tasks and better monitoring</li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
