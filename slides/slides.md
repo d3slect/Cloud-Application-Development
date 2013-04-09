@@ -514,7 +514,7 @@ def get_data():
     <b>if data is not None</b>:
         return data
     <b>else</b>:
-        data = self.<b>query_for_data()</b>
+        data = self.<b>query_for_data()</b> !L!J
         <b>memcache.add</b>('key', data, 60)
         return data
 </pre>
@@ -526,14 +526,45 @@ def get_data():
 title: Task Queues
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/taskqueue/>
+- [Doc](https://developers.google.com/appengine/docs/python/taskqueue/)
+- Helps organizing the background work in discrete *tasks* and execute them in a designated worker *queue*
+- [Push queues](https://developers.google.com/appengine/docs/python/taskqueue/overview-push)
+	- Defers tasks to be executed by GAE on background
+	- Ideal for long-running (longer than 60s) request reactions (up to 10 minutes)
+		- Sending notification emails
+	- Allows configuring processing rate
+- [Pull queues](https://developers.google.com/appengine/docs/python/taskqueue/overview-pull)
+	- Allows to execute (consume) tasks outside the GAE's default taks processing system
+	- In a [backend](https://developers.google.com/appengine/docs/python/backends) (later)
+	- Outside GAE ([Task Queue REST API](https://developers.google.com/appengine/docs/python/taskqueue/rest))
+
+---
+
+title: Push Task Queues
+content_class: smaller
+
+- [Doc](https://developers.google.com/appengine/docs/python/taskqueue/overview-push)
+- Tasks are mapped to request handlers asynchronously invoked by GAE (queue)
+	- Access to tasks URLs can be restricted to admins only ([doc](https://developers.google.com/appengine/docs/python/config/appconfig#Requiring_Login_or_Administrator_Status))
+- `DeadlineExceededError` shortly before the 10min limit
+	-  To save your work, log progress, or forward to a new task
+- Order of execution
+	- FIFO + optimization of global latency + countdown
+- Failed tasks are automatically retried (gradual back-off)
+	- Tasks should be [idempotent](http://en.wikipedia.org/wiki/idempotent)
+- Queues configured in the `queue.yaml` file ([doc](https://developers.google.com/appengine/docs/python/config/queue))
+	- Maximum execution rate
+- Can be integrated with [CRON](https://developers.google.com/appengine/docs/python/config/cron)
+- Can be deferred to a [backend](https://developers.google.com/appengine/docs/python/backends) (later) ([doc](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Push_Queues_and_Backends))
+- [Limits](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Quotas_and_Limits_for_Push_Queues)
+	- Task size (100KB), number of queues (10), queue execution rate (500 tasks/s)
 
 ---
 
 title: Background Work with the Deferred Library
 content_class: smaller
 
-- <https://developers.google.com/appengine/articles/deferred>
+- [Tutorial](https://developers.google.com/appengine/articles/deferred0
 
 ---
 
