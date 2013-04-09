@@ -490,6 +490,7 @@ content_class: smaller
 	- [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
 	- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html)
 	- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
+	- [Android + App Engine: A Developer's Dream Combination](http://www.google.com/events/io/2011/sessions/android-app-engine-a-developer-s-dream-combination.html)
 
 
 ---
@@ -610,23 +611,180 @@ title: Backends
 content_class: smaller
 
 - [Doc](https://developers.google.com/appengine/docs/python/backends/)
+- Separate Python instances within your GAE app
+	- No request deadlines
+	- Have more resources than normal instances
+	- Manually defined number and resources (do not scale with the app)
+- Resident/Dynamic [types](https://developers.google.com/appengine/docs/python/config/backends#Types_of_Backends)
+- Accessed via HTTP requests ([doc](https://developers.google.com/appengine/docs/python/backends/overview#Addressing_Backends))
+- Pending task queue for incoming traffic
+- Specific request handlers for start/processing ([doc](https://developers.google.com/appengine/docs/python/backends/overview#Backend_States))
+	- Background (start) handler can start a program, that runs indefinitely, without accepting requests ([doc](https://developers.google.com/appengine/docs/python/backends/overview#background_threads))
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.api import background_thread
+
+def f(arg1, arg2, *kwargs):
+  ...something useful...
+
+tid = background_thread.start_new_background_thread(f, ["foo", "bar"])
+</pre>
+
+
+---
+
+title: Backends &mdash; Types
+content_class: smaller
+
+<table>
+  <tbody><tr>
+    <th></th>
+    <th>Resident</th>
+    <th>Dynamic</th>
+  </tr>
+  <tr>
+    <td>Startup/Shutdown</td>
+    <td>Manual (Admin Console)</td>
+    <td>Upon receipt of HTTP request / after idling a few minutes</td>
+  </tr>
+  <tr>
+    <td>State</td>
+    <td>Preserved</td>
+    <td>Erased when shutdown after idle</td>
+  </tr>
+  <tr>
+    <td>Processing type</td>
+    <td>Continuous or driven by requests</td>
+    <td>Driven by requests</td>
+  </tr>
+  <tr>
+    <td>Cost</td>
+    <td>More (run continuously)</td>
+    <td>Less (shutdown after idle)</td>
+  </tr>
+  <tr>
+    <td>Use</td>
+    <td>
+	Continuous processing or preserving state
+        <ul>
+        <li>Storing a game state in memory</li>
+        <li>Caching a social graph or web index</li>
+        <li>Running a web crawler</li>
+        </ul>
+    </td>
+    <td>
+	Request-based processing
+    <ul>
+      <li>Task queue requests requiring more power, time, or memory to complete.</li>
+      <li>Report generation</li>
+      <li>Large or complex user requests</li>
+      <li>Ad-hoc queries or admin scripts</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Load balancing</td>
+    <td>Evenly balanced accross all instances</td>
+    <td>Served by minimum number of instances first, new instances allocated as traffic increases</td>
+  </tr>
+</table>
+
 
 ---
 
 title: Blobstore
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/blobstore/overview>
+- [Doc](https://developers.google.com/appengine/docs/python/blobstore/overview)
+- Storage of large data objects (blobs)
+- Blobs not created directly but sent to the Blostore service via HTTP Post request
+	- Specific URL: `blobstore.create_upload_url('/upload')`
+	- Redirected to a given handler with information about the uploaded blob
+		 - `blobstore_handlers.BlobstoreUploadHandler` base class
+	- Served by subclass of `blobstore_handlers.BlobstoreDownloadHandler`
+		 - `send_blob`
+- Each blob has a blob info record, stored in the datastore
+	 - creation, content type, access URLs
+- Blobs can't be modified after they're created
+- Integrated with Images and MapReduce services
+- Async API
+
+
+---
+
+title: Blobstore &mdash; API
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import blobstore
+
+
+class MainHandler(webapp2.RequestHandler):
+  def get(self):
+    upload_url = <b>blobstore.create_upload_url</b>('/upload')
+    self.response.out.write(self.render_form(upload_url))
+</pre> 
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext.webapp import blobstore_handlers
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    upload_files = <b>self.get_uploads</b>('file')  # 'file' is file upload form field
+    <b>blob_info = upload_files[0]</b>
+    self.redirect('/serve/%s' % blob_info.key())
+</pre> 
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self, resource):
+    resource = str(urllib.unquote(resource))
+    blob_info = <b>blobstore.BlobInfo.get(resource)</b>
+    <b>self.send_blob</b>(blob_info)
+</pre> 
 
 ---
 
 title: NDB
 content_class: smaller
 
+- [Doc](https://developers.google.com/appengine/docs/python/ndb/)
+- Wrapper over the basic Datastore API and Memcache
+- Additional features
+	- The `StructuredProperty` allowing nested entity structure
+	- Automatic caching giving fast (and inexpensive) reads via an in-context cache and Memcache
+	- Asynchronous APIs allowing concurrency (and "synchronous" APIs if you don't need that)
+
+---
+
+title: Other Interesting Services
+content_class: smaller
+
+- [Mail](https://developers.google.com/appengine/docs/python/mail/)
+	- Sending/receiving email on behalf of users with Google Accounts/admins
+- [URL Fetch](https://developers.google.com/appengine/docs/python/urlfetch/)
+	- Fetching resources and communicate with other hostsusing HTTP and HTTPS requests
+- [Images](https://developers.google.com/appengine/docs/python/images/)
+	- Manipulation of image data, integration with Blobstore
+- [Channels](https://developers.google.com/appengine/docs/python/channel/)
+	- Sending messages to client using JavaScript
+- [MapReduce API](https://developers.google.com/appengine/docs/python/dataprocessing/overview)
+	- Parallel processing and analysis of large data sets
+- [BigQuery API](https://developers.google.com/bigquery/articles/datastoretobigquery)
+	- Queries over very large data sets
+- And a lot [more](https://developers.google.com/appengine/docs/python/apis)
+
 ---
 
 title: Homework
 content_class: smaller
 
-
+- Should use at least 2 of the advanced datastore-based features
+	- Transactions, consistency, sharding, cursors, special types of queries, asynchronous operations
+- Should use at least 2 service APIs
+	- Memcache, Task Queues, Blobstore, Channels, ...
+- Send a description via email for confirmation
+- Work in groups preferred
+- Due in 2 weeks
 

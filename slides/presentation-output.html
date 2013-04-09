@@ -785,6 +785,7 @@ def increment():
 <li><a href="https://developers.google.com/appengine/articles/storage_breakdown">How Entities and Indexes are Stored</a></li>
 <li><a href="http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html">Life in App Engine Production</a></li>
 <li><a href="http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html">More 9s Please: Under The Covers of the High Replication Datastore</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions/android-app-engine-a-developer-s-dream-combination.html">Android + App Engine: A Developer's Dream Combination</a></li>
 </ul>
 </li>
 </ul></article>
@@ -970,7 +971,89 @@ from google.appengine.ext import deferred
     </hgroup>
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/backends/">Doc</a></li>
-</ul></article>
+<li>Separate Python instances within your GAE app<ul>
+<li>No request deadlines</li>
+<li>Have more resources than normal instances</li>
+<li>Manually defined number and resources (do not scale with the app)</li>
+</ul>
+</li>
+<li>Resident/Dynamic <a href="https://developers.google.com/appengine/docs/python/config/backends#Types_of_Backends">types</a></li>
+<li>Accessed via HTTP requests (<a href="https://developers.google.com/appengine/docs/python/backends/overview#Addressing_Backends">doc</a>)</li>
+<li>Pending task queue for incoming traffic</li>
+<li>Specific request handlers for start/processing (<a href="https://developers.google.com/appengine/docs/python/backends/overview#Backend_States">doc</a>)<ul>
+<li>Background (start) handler can start a program, that runs indefinitely, without accepting requests (<a href="https://developers.google.com/appengine/docs/python/backends/overview#background_threads">doc</a>)</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.api import background_thread
+
+def f(arg1, arg2, *kwargs):
+  ...something useful...
+
+tid = background_thread.start_new_background_thread(f, ["foo", "bar"])
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Backends &mdash; Types</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><table>
+  <tbody><tr>
+    <th></th>
+    <th>Resident</th>
+    <th>Dynamic</th>
+  </tr>
+  <tr>
+    <td>Startup/Shutdown</td>
+    <td>Manual (Admin Console)</td>
+    <td>Upon receipt of HTTP request / after idling a few minutes</td>
+  </tr>
+  <tr>
+    <td>State</td>
+    <td>Preserved</td>
+    <td>Erased when shutdown after idle</td>
+  </tr>
+  <tr>
+    <td>Processing type</td>
+    <td>Continuous or driven by requests</td>
+    <td>Driven by requests</td>
+  </tr>
+  <tr>
+    <td>Cost</td>
+    <td>More (run continuously)</td>
+    <td>Less (shutdown after idle)</td>
+  </tr>
+  <tr>
+    <td>Use</td>
+    <td>
+    Continuous processing or preserving state
+        <ul>
+        <li>Storing a game state in memory</li>
+        <li>Caching a social graph or web index</li>
+        <li>Running a web crawler</li>
+        </ul>
+    </td>
+    <td>
+    Request-based processing
+    <ul>
+      <li>Task queue requests requiring more power, time, or memory to complete.</li>
+      <li>Report generation</li>
+      <li>Large or complex user requests</li>
+      <li>Ad-hoc queries or admin scripts</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Load balancing</td>
+    <td>Evenly balanced accross all instances</td>
+    <td>Served by minimum number of instances first, new instances allocated as traffic increases</td>
+  </tr>
+</table></article>
  
 </slide>
 
@@ -981,8 +1064,64 @@ from google.appengine.ext import deferred
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/blobstore/overview">https://developers.google.com/appengine/docs/python/blobstore/overview</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/blobstore/overview">Doc</a></li>
+<li>Storage of large data objects (blobs)</li>
+<li>Blobs not created directly but sent to the Blostore service via HTTP Post request<ul>
+<li>Specific URL: <code>blobstore.create_upload_url('/upload')</code></li>
+<li>Redirected to a given handler with information about the uploaded blob<ul>
+<li><code>blobstore_handlers.BlobstoreUploadHandler</code> base class</li>
+</ul>
+</li>
+<li>Served by subclass of <code>blobstore_handlers.BlobstoreDownloadHandler</code><ul>
+<li><code>send_blob</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Each blob has a blob info record, stored in the datastore<ul>
+<li>creation, content type, access URLs</li>
+</ul>
+</li>
+<li>Blobs can't be modified after they're created</li>
+<li>Integrated with Images and MapReduce services</li>
+<li>Async API</li>
 </ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Blobstore &mdash; API</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import blobstore
+
+class MainHandler(webapp2.RequestHandler):
+  def get(self):
+    upload_url = <b>blobstore.create_upload_url</b>('/upload')
+    self.response.out.write(self.render_form(upload_url))
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext.webapp import blobstore_handlers
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    upload_files = <b>self.get_uploads</b>('file')  # 'file' is file upload form field
+    <b>blob_info = upload_files[0]</b>
+    self.redirect('/serve/%s' % blob_info.key())
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self, resource):
+    resource = str(urllib.unquote(resource))
+    blob_info = <b>blobstore.BlobInfo.get(resource)</b>
+    <b>self.send_blob</b>(blob_info)
+</pre></article>
  
 </slide>
 
@@ -992,7 +1131,52 @@ from google.appengine.ext import deferred
       <h2>NDB</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"></article>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/ndb/">Doc</a></li>
+<li>Wrapper over the basic Datastore API and Memcache</li>
+<li>Additional features<ul>
+<li>The <code>StructuredProperty</code> allowing nested entity structure</li>
+<li>Automatic caching giving fast (and inexpensive) reads via an in-context cache and Memcache</li>
+<li>Asynchronous APIs allowing concurrency (and "synchronous" APIs if you don't need that)</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Other Interesting Services</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/mail/">Mail</a><ul>
+<li>Sending/receiving email on behalf of users with Google Accounts/admins</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/urlfetch/">URL Fetch</a><ul>
+<li>Fetching resources and communicate with other hostsusing HTTP and HTTPS requests</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/images/">Images</a><ul>
+<li>Manipulation of image data, integration with Blobstore</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/channel/">Channels</a><ul>
+<li>Sending messages to client using JavaScript</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/dataprocessing/overview">MapReduce API</a><ul>
+<li>Parallel processing and analysis of large data sets</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/bigquery/articles/datastoretobigquery">BigQuery API</a><ul>
+<li>Queries over very large data sets</li>
+</ul>
+</li>
+<li>And a lot <a href="https://developers.google.com/appengine/docs/python/apis">more</a></li>
+</ul></article>
  
 </slide>
 
@@ -1002,7 +1186,19 @@ from google.appengine.ext import deferred
       <h2>Homework</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"></article>
+    <article class="smaller"><ul>
+<li>Should use at least 2 of the advanced datastore-based features<ul>
+<li>Transactions, consistency, sharding, cursors, special types of queries, asynchronous operations</li>
+</ul>
+</li>
+<li>Should use at least 2 service APIs<ul>
+<li>Memcache, Task Queues, Blobstore, Channels, ...</li>
+</ul>
+</li>
+<li>Send a description via email for confirmation</li>
+<li>Work in groups preferred</li>
+<li>Due in 2 weeks</li>
+</ul></article>
  
 </slide>
 
