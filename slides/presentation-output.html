@@ -60,7 +60,7 @@ URL: https://code.google.com/p/io-2012-slides
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/datastore/overview">https://developers.google.com/appengine/docs/python/datastore/overview</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/overview">Doc</a></li>
 <li>Distributed storage based on <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf">Bigtable</a><ul>
 <li>Highly scalable</li>
 <li>In fact 6 Bigtables (1 for all the data, 4 for predefined indexes, 1 for user-defined indexes, <a href="https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables">doc</a>)</li>
@@ -91,7 +91,7 @@ URL: https://code.google.com/p/io-2012-slides
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities">https://developers.google.com/appengine/docs/python/datastore/entities</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities">Doc</a></li>
 <li>Identifier<ul>
 <li>User-supplied key name </li>
 <li>Automatically assigned numeric ID</li>
@@ -110,12 +110,6 @@ URL: https://code.google.com/p/io-2012-slides
 <li>Models can be hierarchic, allowing queries over a kind and its sub-kinds (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_PolyModel_Class">doc</a>)</li>
 </ul>
 </li>
-<li>Key: enables direct access<ul>
-<li>Unique for each entity</li>
-<li>Includes: entity's kind, identifier, ancestor path (later)</li>
-<li>Permanent == cannot be changed</li>
-</ul>
-</li>
 </ul></article>
  
 </slide>
@@ -127,26 +121,65 @@ URL: https://code.google.com/p/io-2012-slides
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
+<li>Key: enables direct access<ul>
+<li>Unique for each entity</li>
+<li>Includes: entity's kind, identifier, ancestor path (later)</li>
+<li>Permanent == cannot be changed</li>
+</ul>
+</li>
 <li>Parent property<ul>
 <li>Entities form hierarchically structured space (similar to a file system)</li>
 <li>Root entities: no parent</li>
 <li>Permanent == cannot be changed</li>
 </ul>
 </li>
-<li>Entity group<ul>
-<li>An entity and its descendants (transitive children)</li>
-<li>Unit of transactionality (later)</li>
-<li>Inside an enetity group max 1 write/s (in reality up to 5/s)<ul>
-<li>Better to make small entity groups</li>
-</ul>
-</li>
-<li>Root entities are in separate entity groups</li>
-</ul>
-</li>
 <li>Ancestor path<ul>
 <li>Full path from the root entity to a given entity</li>
 <li>Kind-identifier pairs</li>
+</ul>
+</li>
+<li>Key = Ancestor path + own kind-identifier pair<ul>
 <li><code>Person:GreatGrandpa / Person:Grandpa / Person:Dad / Person:Me</code></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Entities III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Entity group (<a href="https://developers.google.com/appengine/docs/python/datastore/entities#Transactions_and_Entity_Groups">doc</a>)<ul>
+<li>An entity and its descendants (transitive children)</li>
+<li>Unit of transactionality (later)<ul>
+<li>Transactions can only read/write entities in a single group</li>
+</ul>
+</li>
+<li>Unit of consistency (later)<ul>
+<li>Will always Get an entity once Put</li>
+</ul>
+</li>
+<li>Limitations<ul>
+<li>Limited throughput <ul>
+<li>Max 1 write/s, in reality up to 5-10 writes/s</li>
+</ul>
+</li>
+<li>Write/s != Entity/s<ul>
+<li>Batch puts count as 1 write (<a href="https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations">doc</a>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Arbitrary size<ul>
+<li>10's of Milions of entities</li>
+<li>Better to make small entity groups to avoid write contention (<a href="https://developers.google.com/appengine/articles/scaling/contention?hl=en">tutorial</a>)</li>
+</ul>
+</li>
+<li>Root entities are in separate entity groups</li>
 </ul>
 </li>
 </ul></article>
@@ -160,7 +193,7 @@ URL: https://code.google.com/p/io-2012-slides
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries">https://developers.google.com/appengine/docs/python/datastore/queries</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries">Doc</a></li>
 <li>Each query includes:<ul>
 <li><a href="https://developers.google.com/appengine/docs/python/datastore/entities#Kinds_and_Identifiers">Entity kind</a></li>
 <li>Zero or more <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Filters">filters</a> (based on property values, keys, ancestors)<ul>
@@ -190,7 +223,7 @@ q.order("-height")
     </hgroup>
     <article class="smaller"><ul>
 <li>Queries are based solely on the indexes
-  (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">doc</a>)<ul>
+  (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">doc</a>) (details later)<ul>
 <li>First row of the corresponding index matching the filter is found (fast)</li>
 <li>All the consecutive rows matching the filter are returned (up to the limit)</li>
 </ul>
@@ -199,7 +232,7 @@ q.order("-height")
 <li>Scalable with the size of the result set</li>
 </ul>
 </li>
-<li>Restrictions<ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">Restrictions</a><ul>
 <li>A lot of indexes required</li>
 <li>Entities lacking a property named in the query are ignored.</li>
 <li>Filtering on unindexed properties returns no results.</li>
@@ -223,7 +256,7 @@ SELECT * FROM Person WHERE last_name = :target_last_name
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Restrictions cont.<ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">Restrictions</a> cont.<ul>
 <li>Ordering of query results is undefined when no sort order is specified.</li>
 <li>Sort orders are ignored on properties with equality filters.</li>
 <li>Properties used in inequality filters must be sorted first.</li>
@@ -257,7 +290,10 @@ SELECT * FROM Person WHERE last_name = :target_last_name
 </ul>
 </li>
 <li>Internally retrieved in batches (batch size can be set)</li>
-<li>Queries can have time-outs (maximum 60sec)</li>
+<li>Queries can have time-outs (maximum 60sec)<ul>
+<li>To ensure fast response</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -327,6 +363,7 @@ for p in q.run(offset=5, limit=5, batch_size=50, dealine=10):
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries?hl=en#Query_Cursors">Doc</a></li>
 <li>For fetching additional results of a query in a subsequent request without offset overhead</li>
 <li>String-encoded position in the index corresponding to the query<ul>
 <li>base64-encoded string, may expose the key (app ID, kind, key name or ID, and all ancestor keys) and properties used in the query (including filters and sort orders)</li>
@@ -376,7 +413,7 @@ memcache.set('person_cursor', person_cursor)
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/datastore/indexes">https://developers.google.com/appengine/docs/python/datastore/indexes</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/indexes">Doc</a></li>
 <li><strong>Index</strong> is a table containing entity keys of a given kind in a sequence specified by the index's properties<ul>
 <li>A column for every property in the index</li>
 <li>A row for every entity in the Datastore that is a potential result for queries based on the index</li>
@@ -515,7 +552,7 @@ memcache.set('person_cursor', person_cursor)
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/datastore/transactions">https://developers.google.com/appengine/docs/python/datastore/transactions</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/transactions">Doc</a></li>
 <li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation</a></li>
 <li>An operation or set of operations that is atomic<ul>
 <li>Either all or none operations are applied</li>
@@ -706,23 +743,23 @@ from google.appengine.ext import ndb
 
 NUM_SHARDS = 20
 
-class SimpleCounterShard(ndb.Model):
-    count = ndb.IntegerProperty(default=0)
+class <b>SimpleCounterShard</b>(ndb.Model):
+    <b>count = ndb.IntegerProperty</b>(default=0)
 
 def get_count():
     total = 0
-    for counter in SimpleCounterShard.query():
-        total += counter.count
-    return total
+    <b>for counter in SimpleCounterShard.query():</b>
+        <b>total += counter.count</b>
+    <b>return total</b>
 
-@ndb.transactional
+<b>@ndb.transactional</b>
 def increment():
-    shard_string_index = str(random.randint(0, NUM_SHARDS - 1))
-    counter = SimpleCounterShard.get_by_id(shard_string_index)
+    <b>shard_string_index =</b> str(<b>random.randint</b>(0, NUM_SHARDS - 1))
+    <b>counter = SimpleCounterShard.get_by_id(shard_string_index)</b>
     if counter is None:
         counter = SimpleCounterShard(id=shard_string_index)
-    counter.count += 1
-    counter.put()
+    <b>counter.count += 1</b>
+    <b>counter.put()</b>
 </pre></article>
  
 </slide>

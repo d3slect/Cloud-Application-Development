@@ -8,7 +8,7 @@ class: segue dark nobackground
 title: Datastore Overview
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/datastore/overview>
+- [Doc](https://developers.google.com/appengine/docs/python/datastore/overview)
 - Distributed storage based on [Bigtable](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf)
 	- Highly scalable
 	- In fact 6 Bigtables (1 for all the data, 4 for predefined indexes, 1 for user-defined indexes, [doc](https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables))
@@ -27,7 +27,7 @@ content_class: smaller
 title: Entities
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/datastore/entities>
+- [Doc](https://developers.google.com/appengine/docs/python/datastore/entities)
 - Identifier
 	- User-supplied key name 
 	- Automatically assigned numeric ID
@@ -38,37 +38,54 @@ content_class: smaller
 - Model: prescription of an entity ([doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling))
 	- Individual entities of the same kind can have different sets of properties ([doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_Expando_Class))
 	- Models can be hierarchic, allowing queries over a kind and its sub-kinds ([doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_PolyModel_Class))
-- Key: enables direct access
-	- Unique for each entity
-	- Includes: entity's kind, identifier, ancestor path (later)
-	- Permanent == cannot be changed
 
 ---
 
 title: Entities II
 content_class: smaller
 
+- Key: enables direct access
+	- Unique for each entity
+	- Includes: entity's kind, identifier, ancestor path (later)
+	- Permanent == cannot be changed
 - Parent property
 	- Entities form hierarchically structured space (similar to a file system)
 	- Root entities: no parent
 	- Permanent == cannot be changed
-- Entity group
-	- An entity and its descendants (transitive children)
-	- Unit of transactionality (later)
-	- Inside an enetity group max 1 write/s (in reality up to 5/s)
-		- Better to make small entity groups
-	- Root entities are in separate entity groups
 - Ancestor path
 	- Full path from the root entity to a given entity
 	- Kind-identifier pairs
+- Key = Ancestor path + own kind-identifier pair
 	- `Person:GreatGrandpa / Person:Grandpa / Person:Dad / Person:Me`
+
+
+---
+
+title: Entities III
+content_class: smaller
+
+- Entity group ([doc](https://developers.google.com/appengine/docs/python/datastore/entities#Transactions_and_Entity_Groups))
+	- An entity and its descendants (transitive children)
+	- Unit of transactionality (later)
+		- Transactions can only read/write entities in a single group
+	- Unit of consistency (later)
+		- Will always Get an entity once Put
+	- Limitations
+		- Limited throughput 
+			- Max 1 write/s, in reality up to 5-10 writes/s
+		- Write/s != Entity/s
+			- Batch puts count as 1 write ([doc](https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations))
+	- Arbitrary size
+		- 10's of Milions of entities
+		- Better to make small entity groups to avoid write contention ([tutorial](https://developers.google.com/appengine/articles/scaling/contention?hl=en))
+	- Root entities are in separate entity groups
 
 ---
 
 title: Queries
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/datastore/queries>
+- [Doc](https://developers.google.com/appengine/docs/python/datastore/queries)
 - Each query includes:
 	- [Entity kind](https://developers.google.com/appengine/docs/python/datastore/entities#Kinds_and_Identifiers)
 	- Zero or more [filters](https://developers.google.com/appengine/docs/python/datastore/queries#Filters) (based on property values, keys, ancestors)
@@ -90,12 +107,12 @@ title: Queries II
 content_class: smaller
 
 - Queries are based solely on the indexes
-  ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries))
+  ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries)) (details later)
 	- First row of the corresponding index matching the filter is found (fast)
 	- All the consecutive rows matching the filter are returned (up to the limit)
 - Benefits
 	- Scalable with the size of the result set
-- Restrictions
+- [Restrictions](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries)
 	- A lot of indexes required
 	- Entities lacking a property named in the query are ignored.
 	- Filtering on unindexed properties returns no results.
@@ -114,7 +131,7 @@ SELECT * FROM Person WHERE last_name = :target_last_name
 title: Queries III
 content_class: smaller
 
-- Restrictions cont.
+- [Restrictions](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries) cont.
 	- Ordering of query results is undefined when no sort order is specified.
 	- Sort orders are ignored on properties with equality filters.
 	- Properties used in inequality filters must be sorted first.
@@ -137,6 +154,7 @@ content_class: smaller
 		- Still retrieved internally, better to use a [cursor](https://developers.google.com/appengine/docs/python/datastore/queries#Query_Cursors)
 	- Internally retrieved in batches (batch size can be set)
 	- Queries can have time-outs (maximum 60sec)
+		- To ensure fast response
 	
 <pre class="prettyprint" data-lang="Python">
 q = Person.all()
@@ -180,6 +198,7 @@ content_class: smaller
 title: Cursors
 content_class: smaller
 
+- [Doc](https://developers.google.com/appengine/docs/python/datastore/queries?hl=en#Query_Cursors)
 - For fetching additional results of a query in a subsequent request without offset overhead
 - String-encoded position in the index corresponding to the query
 	- base64-encoded string, may expose the key (app ID, kind, key name or ID, and all ancestor keys) and properties used in the query (including filters and sort orders)
@@ -217,7 +236,7 @@ memcache.set('person_cursor', person_cursor)
 title: Indexes
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/datastore/indexes>
+- [Doc](https://developers.google.com/appengine/docs/python/datastore/indexes)
 - **Index** is a table containing entity keys of a given kind in a sequence specified by the index's properties
 	- A column for every property in the index
 	- A row for every entity in the Datastore that is a potential result for queries based on the index
@@ -308,7 +327,7 @@ content_class: smaller
 title: Transactions
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/datastore/transactions>
+- [Doc](https://developers.google.com/appengine/docs/python/datastore/transactions)
 - [Transaction Isolation](https://developers.google.com/appengine/articles/transaction_isolation)
 - An operation or set of operations that is atomic
 	- Either all or none operations are applied
@@ -435,23 +454,23 @@ from google.appengine.ext import ndb
 
 NUM_SHARDS = 20
 
-class SimpleCounterShard(ndb.Model):
-    count = ndb.IntegerProperty(default=0)
+class <b>SimpleCounterShard</b>(ndb.Model):
+    <b>count = ndb.IntegerProperty</b>(default=0)
 
 def get_count():
     total = 0
-    for counter in SimpleCounterShard.query():
-        total += counter.count
-    return total
+    <b>for counter in SimpleCounterShard.query():</b>
+        <b>total += counter.count</b>
+    <b>return total</b>
 
-@ndb.transactional
+<b>@ndb.transactional</b>
 def increment():
-    shard_string_index = str(random.randint(0, NUM_SHARDS - 1))
-    counter = SimpleCounterShard.get_by_id(shard_string_index)
+    <b>shard_string_index =</b> str(<b>random.randint</b>(0, NUM_SHARDS - 1))
+    <b>counter = SimpleCounterShard.get_by_id(shard_string_index)</b>
     if counter is None:
         counter = SimpleCounterShard(id=shard_string_index)
-    counter.count += 1
-    counter.put()
+    <b>counter.count += 1</b>
+    <b>counter.put()</b>
 </pre>
 
 ---
