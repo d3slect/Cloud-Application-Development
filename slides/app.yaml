@@ -6,8 +6,16 @@ threadsafe: yes
 
 handlers:
 - url: /
+  static_files: contents.html
+  upload: contents\.html
+
+- url: /presentation-output\.html
   static_files: presentation-output.html
   upload: presentation-output\.html
+
+- url: /presentation-output1\.html
+  static_files: presentation-output1.html
+  upload: presentation-output1\.html
 
 - url: /slide_config\.js
   static_files: slide_config.js
