@@ -473,21 +473,24 @@ def increment():
     <b>counter.put()</b>
 </pre>
 
-
 ---
 
 title: Further Reading on Datastore
 content_class: smaller
 
-- [Mastering the datastore](https://developers.google.com/appengine/articles/datastore/overview)
-- [Handling datastore errors](https://developers.google.com/appengine/articles/handling_datastore_errors)
-- [Modeling Entity Relationships](https://developers.google.com/appengine/articles/modeling)
-- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
-- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
-- [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
-- [Best practices for writing scalable applications](https://developers.google.com/appengine/articles/scaling/overview)
-- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html)
-- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
+- Tutorials
+	- [Mastering the datastore](https://developers.google.com/appengine/articles/datastore/overview)
+	- [Handling datastore errors](https://developers.google.com/appengine/articles/handling_datastore_errors)
+	- [Modeling Entity Relationships](https://developers.google.com/appengine/articles/modeling)
+	- [Accessing the Datastore Remotely With remote_api](https://developers.google.com/appengine/articles/remote_api)	
+	- [Best practices for writing scalable applications](https://developers.google.com/appengine/articles/scaling/overview)
+- Datastore internals
+	- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
+	- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
+	- [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
+	- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html)
+	- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
+
 
 ---
 
@@ -606,7 +609,7 @@ content_class: smaller
 title: Backends
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/backends/>
+- [Doc](https://developers.google.com/appengine/docs/python/backends/)
 
 ---
 
