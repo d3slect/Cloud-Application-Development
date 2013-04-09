@@ -11,7 +11,7 @@ content_class: smaller
 - [Doc](https://developers.google.com/appengine/docs/python/datastore/overview)
 - Distributed storage based on [Bigtable](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf)
 	- Highly scalable
-	- In fact 6 Bigtables (1 for all the data, 4 for predefined indexes, 1 for user-defined indexes, [doc](https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables))
+	- In fact 6 Bigtables (1 for all the data, 4 for indexes, ..., [doc](https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables))
 - Replication across multiple data centers using the [Paxos algorithm](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/archive/paxos_made_live.pdf)
 	- High availability (five 9s)
 	- Eventual consistency ([wiki](http://en.wikipedia.org/wiki/Eventual_consistency))
