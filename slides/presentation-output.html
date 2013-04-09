@@ -767,30 +767,19 @@ def increment():
 <slide  >
   
     <hgroup>
-      <h2>Modeling Entity Relationships</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/articles/modeling">https://developers.google.com/appengine/articles/modeling</a></li>
-</ul></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
       <h2>Further Reading on Datastore</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/articles/datastore/overview">Mastering the datastore</a></li>
-<li><a href="https://developers.google.com/appengine/articles/handling_datastore_errors">Handling datastore errores</a></li>
+<li><a href="https://developers.google.com/appengine/articles/handling_datastore_errors">Handling datastore errors</a></li>
+<li><a href="https://developers.google.com/appengine/articles/modeling">Modeling Entity Relationships</a></li>
 <li><a href="https://developers.google.com/appengine/articles/life_of_write">Life of a Datastore Write</a></li>
 <li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation in App Engine</a></li>
 <li><a href="https://developers.google.com/appengine/articles/storage_breakdown">How Entities and Indexes are Stored</a></li>
 <li><a href="https://developers.google.com/appengine/articles/scaling/overview">Best practices for writing scalable applications</a></li>
-<li><a href="http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html">Life in App Engine Production</a> Google IO 2012 talk</li>
-<li><a href="http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html">More 9s Please: Under The Covers of the High Replication Datastore</a>  Google IO 2012 talk</li>
+<li><a href="http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html">Life in App Engine Production</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html">More 9s Please: Under The Covers of the High Replication Datastore</a></li>
 </ul></article>
  
 </slide>
@@ -812,7 +801,28 @@ def increment():
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="https://developers.google.com/appengine/docs/python/memcache/">https://developers.google.com/appengine/docs/python/memcache/</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/memcache/">Doc</a></li>
+<li>A high-performance, distributed memory object caching system</li>
+<li>Useful for storing<ul>
+<li>Frequently fetched entities</li>
+<li>Transient and frequently updated data (non-critical counters)</li>
+<li>Rendered HTML for popular requests</li>
+</ul>
+</li>
+<li>Typically used in the following pattern</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+def get_data():
+    data = <b>memcache.get</b>('key')
+    <b>if data is not None</b>:
+        return data
+    <b>else</b>:
+        data = self.<b>query_for_data()</b>
+        <b>memcache.add</b>('key', data, 60)
+        return data
+</pre>
+
+<ul>
 <li>Further reading &mdash; <a href="https://developers.google.com/appengine/articles/scaling/memcache">Effective memcache</a></li>
 </ul></article>
  

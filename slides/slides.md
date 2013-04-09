@@ -473,12 +473,6 @@ def increment():
     <b>counter.put()</b>
 </pre>
 
----
-
-title: Modeling Entity Relationships
-content_class: smaller
-
-- <https://developers.google.com/appengine/articles/modeling>
 
 ---
 
@@ -486,13 +480,14 @@ title: Further Reading on Datastore
 content_class: smaller
 
 - [Mastering the datastore](https://developers.google.com/appengine/articles/datastore/overview)
-- [Handling datastore errores](https://developers.google.com/appengine/articles/handling_datastore_errors)
+- [Handling datastore errors](https://developers.google.com/appengine/articles/handling_datastore_errors)
+- [Modeling Entity Relationships](https://developers.google.com/appengine/articles/modeling)
 - [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
 - [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
 - [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
 - [Best practices for writing scalable applications](https://developers.google.com/appengine/articles/scaling/overview)
-- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html) Google IO 2012 talk
-- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)  Google IO 2012 talk
+- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html)
+- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
 
 ---
 
@@ -505,7 +500,25 @@ class: segue dark nobackground
 title: Memcache
 content_class: smaller
 
-- <https://developers.google.com/appengine/docs/python/memcache/>
+- [Doc](https://developers.google.com/appengine/docs/python/memcache/)
+- A high-performance, distributed memory object caching system
+- Useful for storing
+	- Frequently fetched entities
+	- Transient and frequently updated data (non-critical counters)
+	- Rendered HTML for popular requests
+- Typically used in the following pattern
+
+<pre class="prettyprint" data-lang="Python">
+def get_data():
+    data = <b>memcache.get</b>('key')
+    <b>if data is not None</b>:
+        return data
+    <b>else</b>:
+        data = self.<b>query_for_data()</b>
+        <b>memcache.add</b>('key', data, 60)
+        return data
+</pre>
+
 - Further reading &mdash; [Effective memcache](https://developers.google.com/appengine/articles/scaling/memcache)
 
 ---
