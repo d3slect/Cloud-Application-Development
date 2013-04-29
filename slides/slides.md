@@ -17,7 +17,7 @@ class: segue dark nobackground
 
 ---
 
-title: MapReduce in General
+title: MapReduce 
 content_class: smaller
 
 - [wiki](http://en.wikipedia.org/wiki/MapReduce), [paper](http://research.google.com/archive/mapreduce.html)
@@ -67,13 +67,15 @@ content_class: smaller
 - Filters and maps raw data input to a list of key-value pairs 
 - Indicates which values should be processed together 
 	- By assigning the same keys
-- Formally &mdash; `Map(data) -> list(key, value)`
+- `Map(data) -> list(key, value)`
+- User code
 - Runs (in isolation) once per each piece of input data
 	- Highly parallelizeable
 - Can exploit data locality
 	- Local data are passed to local mapper tasks
 - Can be scaled
 	- By increasing the number of parallel mapper tasks
+- Usualy produces huge amounts of key-value pairs
 	 
 
 ---
@@ -83,7 +85,13 @@ content_class: smaller
 
 <img alt="Map" src="images/mr-shuffle.png"  style="float: right" />
 
-- TODO
+- Groups the values that should be processed together
+	- Based on the same keys of the key-value pairs 
+- Complicated to parallelize
+	- Includes sorting	
+	- Huge sets of key-value pairs from map phase
+- `Shuffle(list(key, value)) -> list(key, list(value))`
+- No user code
 
 ---
 
@@ -92,7 +100,17 @@ content_class: smaller
 
 <img alt="Map" src="images/mr-reduce.png"  style="float: right" />
 
-- TODO
+- Produces final output by processing corresponding values
+	- Values of the key-value pairs with the same key are processed together
+	- The lists of corresponding values might be pretty long
+- `Reduce(key, list(value)) -> list(value)`
+- User code
+	- Usually includes most of the computation
+- Runs (in isolation) once per each group of data with the same key
+	- Easily parallelizeable
+	- Different (coarser) granularity than map phase
+ - Can be scaled
+	- By increasing the number of parallel reduce tasks
 
 ---
 
@@ -101,7 +119,13 @@ content_class: smaller
 
 <img alt="Map" src="images/mr-write.png"  style="float: right" />
 
-- TODO
+- Aggregates and stores the outputs produced in the reduce phase
+- Has to serialized to some extent
+- Various output formats
+	- GAE Datastore entities
+	- Files on a file system
+	- ...
+- No user code
 
 ---
 

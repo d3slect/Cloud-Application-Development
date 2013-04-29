@@ -77,7 +77,7 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
-      <h2>MapReduce in General</h2>
+      <h2>MapReduce</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
@@ -144,7 +144,8 @@ URL: https://code.google.com/p/io-2012-slides
 <li>By assigning the same keys</li>
 </ul>
 </li>
-<li>Formally &mdash; <code>Map(data) -&gt; list(key, value)</code></li>
+<li><code>Map(data) -&gt; list(key, value)</code></li>
+<li>User code</li>
 <li>Runs (in isolation) once per each piece of input data<ul>
 <li>Highly parallelizeable</li>
 </ul>
@@ -157,6 +158,7 @@ URL: https://code.google.com/p/io-2012-slides
 <li>By increasing the number of parallel mapper tasks</li>
 </ul>
 </li>
+<li>Usualy produces huge amounts of key-value pairs</li>
 </ul></article>
  
 </slide>
@@ -169,7 +171,17 @@ URL: https://code.google.com/p/io-2012-slides
     </hgroup>
     <article class="smaller"><p><img alt="Map" src="images/mr-shuffle.png"  style="float: right" /></p>
 <ul>
-<li>TODO</li>
+<li>Groups the values that should be processed together<ul>
+<li>Based on the same keys of the key-value pairs </li>
+</ul>
+</li>
+<li>Complicated to parallelize<ul>
+<li>Includes sorting  </li>
+<li>Huge sets of key-value pairs from map phase</li>
+</ul>
+</li>
+<li><code>Shuffle(list(key, value)) -&gt; list(key, list(value))</code></li>
+<li>No user code</li>
 </ul></article>
  
 </slide>
@@ -182,7 +194,25 @@ URL: https://code.google.com/p/io-2012-slides
     </hgroup>
     <article class="smaller"><p><img alt="Map" src="images/mr-reduce.png"  style="float: right" /></p>
 <ul>
-<li>TODO</li>
+<li>Produces final output by processing corresponding values<ul>
+<li>Values of the key-value pairs with the same key are processed together</li>
+<li>The lists of corresponding values might be pretty long</li>
+</ul>
+</li>
+<li><code>Reduce(key, list(value)) -&gt; list(value)</code></li>
+<li>User code<ul>
+<li>Usually includes most of the computation</li>
+</ul>
+</li>
+<li>Runs (in isolation) once per each group of data with the same key<ul>
+<li>Easily parallelizeable</li>
+<li>Different (coarser) granularity than map phase</li>
+</ul>
+</li>
+<li>Can be scaled<ul>
+<li>By increasing the number of parallel reduce tasks</li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
@@ -195,7 +225,15 @@ URL: https://code.google.com/p/io-2012-slides
     </hgroup>
     <article class="smaller"><p><img alt="Map" src="images/mr-write.png"  style="float: right" /></p>
 <ul>
-<li>TODO</li>
+<li>Aggregates and stores the outputs produced in the reduce phase</li>
+<li>Has to serialized to some extent</li>
+<li>Various output formats<ul>
+<li>GAE Datastore entities</li>
+<li>Files on a file system</li>
+<li>...</li>
+</ul>
+</li>
+<li>No user code</li>
 </ul></article>
  
 </slide>
