@@ -1,0 +1,1244 @@
+<!--
+Google IO 2012 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahe <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NSWI152</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="all" href="theme/css/app.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout">
+
+<slide class="logoslide nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/google_developers_logo.png"></span>
+    </article>
+</slide>
+<slide class="title-slide segue nobackground">
+  <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+  <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+  <hgroup class="auto-fadein">
+    <h1 data-config-title><!-- populated from slide_config.json --></h1>
+    <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+    <p data-config-presenter><!-- populated from slide_config.json --></p>
+  </hgroup>
+</slide>
+
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Datastore</h2>
+      <h3>In-depth look</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Datastore Overview</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/overview">Doc</a></li>
+<li>Distributed storage based on <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf">Bigtable</a><ul>
+<li>Highly scalable</li>
+<li>In fact 6 Bigtables (1 for all the data, 4 for indexes, ..., <a href="https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables">doc</a>)</li>
+</ul>
+</li>
+<li>Replication across multiple data centers using the <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/archive/paxos_made_live.pdf">Paxos algorithm</a><ul>
+<li>High availability (five 9s)</li>
+<li>Eventual consistency (<a href="http://en.wikipedia.org/wiki/Eventual_consistency">wiki</a>)</li>
+</ul>
+</li>
+<li>Entity = unit of data storage<ul>
+<li>kind, id, value, ...</li>
+</ul>
+</li>
+<li>Entities located either directly via keys or in queries via pre-built indexes <ul>
+<li>All queries are served via the indexes =&gt; limited but scalable queries </li>
+<li>Direct access via key can be simple/<a href="https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations">batch</a>/<a href="">async</a></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Entities</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities">Doc</a></li>
+<li>Identifier<ul>
+<li>User-supplied key name </li>
+<li>Automatically assigned numeric ID</li>
+</ul>
+</li>
+<li>Named properties of various <a href="https://developers.google.com/appengine/docs/python/datastore/entities#Properties_and_Value_Types">types</a><ul>
+<li>Each can have one or more values </li>
+</ul>
+</li>
+<li>Kind: categorizes the entity for the purpose of queries<ul>
+<li>In python the Model class</li>
+</ul>
+</li>
+<li>Model: prescription of an entity (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling">doc</a>)<ul>
+<li>Individual entities of the same kind can have different sets of properties (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_Expando_Class">doc</a>)</li>
+<li>Models can be hierarchic, allowing queries over a kind and its sub-kinds (<a href="https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_PolyModel_Class">doc</a>)</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Entities II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Key: enables direct access<ul>
+<li>Unique for each entity</li>
+<li>Includes: entity's kind, identifier, ancestor path (later)</li>
+<li>Permanent == cannot be changed</li>
+</ul>
+</li>
+<li>Parent property<ul>
+<li>Entities form hierarchically structured space (similar to a file system)</li>
+<li>Root entities: no parent</li>
+<li>Permanent == cannot be changed</li>
+</ul>
+</li>
+<li>Ancestor path<ul>
+<li>Full path from the root entity to a given entity</li>
+<li>Kind-identifier pairs</li>
+</ul>
+</li>
+<li>Key = Ancestor path + own kind-identifier pair<ul>
+<li><code>Person:GreatGrandpa / Person:Grandpa / Person:Dad / Person:Me</code></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Entities III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Entity group (<a href="https://developers.google.com/appengine/docs/python/datastore/entities#Transactions_and_Entity_Groups">doc</a>)<ul>
+<li>An entity and its descendants (transitive children)</li>
+<li>Unit of transactionality (later)<ul>
+<li>Transactions can only read/write entities in a single group</li>
+</ul>
+</li>
+<li>Unit of consistency (later)<ul>
+<li>Will always Get an entity once Put</li>
+</ul>
+</li>
+<li>Limitations<ul>
+<li>Limited throughput <ul>
+<li>Max 1 write/s, in reality up to 5-10 writes/s</li>
+</ul>
+</li>
+<li>Write/s != Entity/s<ul>
+<li>Batch puts count as 1 write (<a href="https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations">doc</a>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Arbitrary size<ul>
+<li>10's of Milions of entities</li>
+<li>Better to make small entity groups to avoid write contention (<a href="https://developers.google.com/appengine/articles/scaling/contention?hl=en">tutorial</a>)</li>
+</ul>
+</li>
+<li>Root entities are in separate entity groups</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Queries</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries">Doc</a></li>
+<li>Each query includes:<ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities#Kinds_and_Identifiers">Entity kind</a></li>
+<li>Zero or more <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Filters">filters</a> (based on property values, keys, ancestors)<ul>
+<li>Property queries may take one of the forms: =, &lt;, &lt;=, ..., !=, IN</li>
+</ul>
+</li>
+<li>Zero or more <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Sort_Orders">sort orders</a></li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+# Query interface constructs a query using instance methods
+q = Person.all()
+q.filter("last_name =", "Smith")
+q.filter("height <=", max_height)
+q.ancestor(ancestor_key)
+q.order("-height")
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Queries II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Queries are based solely on the indexes
+  (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">doc</a>) (details later)<ul>
+<li>First row of the corresponding index matching the filter is found (fast)</li>
+<li>All the consecutive rows matching the filter are returned (up to the limit)</li>
+</ul>
+</li>
+<li>Benefits<ul>
+<li>Scalable with the size of the result set</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">Restrictions</a><ul>
+<li>A lot of indexes required</li>
+<li>Entities lacking a property named in the query are ignored.</li>
+<li>Filtering on unindexed properties returns no results.</li>
+<li>Inequality filters are limited to at most one property, <em>but can include equality on another property:</em></li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="GQL">
+SELECT * FROM Person WHERE last_name = :target_last_name
+                       AND city = :target_city
+                       AND birth_year >= :min_birth_year
+                       AND birth_year <= :max_birth_year
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Queries III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries">Restrictions</a> cont.<ul>
+<li>Ordering of query results is undefined when no sort order is specified.</li>
+<li>Sort orders are ignored on properties with equality filters.</li>
+<li>Properties used in inequality filters must be sorted first.</li>
+<li>Properties with multiple values can behave in surprising ways.<ul>
+<li>Depends on index search</li>
+<li>At least one of the values satisfies <em>all</em> of the <em>inequality</em> filters</li>
+<li>All of the <em>equality</em> filters are satisfied by <em>at least one</em> (each by potentially different) value</li>
+</ul>
+</li>
+<li>Queries inside transactions must include ancestor filters.<ul>
+<li>Entity group == unit of transactionality</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Queries IV</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Retrieving data (<a href="https://developers.google.com/appengine/docs/python/datastore/queryclass#Query_run">doc</a>)<ul>
+<li>Limit on the number of results returned (to conserve resources)</li>
+<li>Offset of the first returned entity<ul>
+<li>Still retrieved internally, better to use a <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Query_Cursors">cursor</a></li>
+</ul>
+</li>
+<li>Internally retrieved in batches (batch size can be set)</li>
+<li>Queries can have time-outs (maximum 60sec)<ul>
+<li>To ensure fast response</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+q = Person.all()
+...
+
+for p in q.run(offset=5, limit=5, batch_size=50, dealine=10):
+  print "%s %s, %d inches tall" % (p.first_name, p.last_name, p.height)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Special Types of Queries</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Projection Query (<a href="https://developers.google.com/appengine/docs/python/datastore/projectionqueries">doc</a>)<ul>
+<li>Retrieves only selected (indexed) properties</li>
+<li>Runs solely on top of indexes (runs faster and costs less than normal query)</li>
+<li>Entities returned by a projection query cannot be stored back</li>
+<li>For multivalued properties generates all combination of found values (as stored in the index)<ul>
+<li>Including more than one multi-valued property in a projection requires an <a href="https://developers.google.com/appengine/docs/python/datastore/queries#Big_Entities_and_Exploding_Indexes">exploding index</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Keys-Only Query (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Keys_Only_Queries">doc</a>)<ul>
+<li>Returns only keys </li>
+<li>Usually combined with a batch read of the relevant entities</li>
+<li>Same advantages/limitations as projection query </li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Special Types of Queries II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Kindles Query (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Kindless_Queries">doc</a>)<ul>
+<li>Cannot include filters or sort orders on property values</li>
+<li>Can have filter on keys, <code>db.Query().filter('__key__ &gt;', last_seen_key)</code></li>
+<li>Can have ancestor filter</li>
+</ul>
+</li>
+<li>Ancestor query<ul>
+<li>Every query with an ancestor filter</li>
+<li><code>db.query_descendants()</code> to return a query for all descendants of a given entity</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Cursors</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/queries?hl=en#Query_Cursors">Doc</a></li>
+<li>For fetching additional results of a query in a subsequent request without offset overhead</li>
+<li>String-encoded position in the index corresponding to the query<ul>
+<li>base64-encoded string, may expose the key (app ID, kind, key name or ID, and all ancestor keys) and properties used in the query (including filters and sort orders)</li>
+<li>Cursor can be passed as HTTP GET/POST parameter or stored in datastore/memcache</li>
+</ul>
+</li>
+<li>Can be used only by the same application to resume the same query</li>
+<li>A cursor determines an absolute position within an index<ul>
+<li>NOT a relative position in the result list</li>
+<li>Data updates can have impact on the next results returned</li>
+</ul>
+</li>
+<li>Both <em>start</em> and <em>end</em> cursors<ul>
+<li>You are not guaranteed that the size of the results will be the same as when you generated the cursors</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Cursors II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+people = Person.all()
+
+person_cursor = memcache.get('person_cursor')
+if person_cursor:
+  people<b>.with_cursor(start_cursor=person_cursor)</b>
+
+for person in people:
+  # Do something
+
+person_cursor = people<b>.cursor()</b>
+memcache.set('person_cursor', person_cursor)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Indexes</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/indexes">Doc</a></li>
+<li><strong>Index</strong> is a table containing entity keys of a given kind in a sequence specified by the index's properties<ul>
+<li>A column for every property in the index</li>
+<li>A row for every entity in the Datastore that is a potential result for queries based on the index</li>
+<li>Rows are sorted first by ancestor and then by property values, in the order specified in the index definition</li>
+</ul>
+</li>
+<li><code>index.yaml</code> configuration file (<a href="https://developers.google.com/appengine/docs/python/config/indexconfig">doc</a>)<ul>
+<li>Automatically updated by the dev. server when a new query is executed</li>
+</ul>
+</li>
+<li>An entity is included in the index only if it has a value set for every property used in the index<ul>
+<li>Can have value <code>None</code></li>
+</ul>
+</li>
+<li>A <em>perfect index</em> ensures that all results for every possible execution of the query appear in consecutive rows of the index table</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Indexes II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>A <em>perfect index</em> has (in the order of importance):<ul>
+<li>Properties used in equality filters</li>
+<li>Property used in an inequality filter (of which there can be no more than one)</li>
+<li>Properties used in sort orders</li>
+</ul>
+</li>
+<li>During execution of a query, the Datastore:<ul>
+<li>Identifies the perfect index corresponding to the query</li>
+<li>Scans from the beginning of the index to the first entity that meets all of the query's filter conditions</li>
+<li>Continues scanning the index, returning each entity in turn, until it<ul>
+<li>encounters an entity that does not meet the filter conditions, or</li>
+<li>reaches the end of the index, or</li>
+<li>has collected the maximum number of results requested by the query.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Indexes III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Indexes have <a href="https://developers.google.com/appengine/docs/python/datastore/overview#Quotas_and_Limits">limits</a><ul>
+<li>Maximum number of index entries for an entity (20000)</li>
+<li>Maximum number of bytes in composite indexes for an entity (2 megabytes)</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/indexes#Index_Limits">Exploding indexes</a><ul>
+<li>For entities with multiple properties where each has multiple values the index must include an entry <em>for every possible combination</em> of property values</li>
+<li>The number of entries "explodes" combinatorially</li>
+<li>For example the entity<br />
+<pre class="prettyprint" data-lang="Python">
+    class Widget(db.Expando):
+      pass    <br />
+    e2 = Widget()
+    e2.x = [1, 2, 3, 4]
+    e2.y = ['red', 'green', 'blue']
+    e2.date = datetime.datetime.now()
+    e2.put()  <br />
+</pre>  requires 12 index entries for the composite index <code>Widget(x, y, date)</code></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Indexes IV</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>The number/type of indexes influences the cost of a single write (<a href="https://developers.google.com/appengine/docs/python/datastore/indexes#Index_Limits">doc</a>, <a href="https://developers.google.com/appengine/docs/python/datastore/entities#Understanding_Write_Costs">tutorial</a>)<ul>
+<li>1 + the number of entries in the indexes the entity would appear in </li>
+<li>By default 3 indexes<ul>
+<li><code>EntitiesByKind</code></li>
+<li><code>EntitiesByProperty</code></li>
+<li><code>EntitiesByPropertyDesc</code></li>
+<li>i.e., 1 for the kind index and then 2 for each property value. </li>
+</ul>
+</li>
+<li>Exploding indexes slow down entity writes dramatically (and may cause the entity to exceed the index limit)</li>
+</ul>
+</li>
+<li>Exploding indexes can be manually avoided (<a href="https://developers.google.com/appengine/articles/indexselection">tutorial</a>)</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Data Consistency</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Two consistency levels (<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Data_Consistency">doc</a>)<ul>
+<li><a href="http://en.wikipedia.org/wiki/Strong_consistency">Strong consistency</a>: queries guarantee the freshest results, but may take longer to complete</li>
+<li><a href="http://en.wikipedia.org/wiki/Eventual_consistency">Eventual consistency</a>: queries generally run faster, but may occasionally return stale results</li>
+</ul>
+</li>
+<li>Eventually consistent queries:<ul>
+<li>May use stale indexes</li>
+<li>May sometimes return entities that no longer match the original query criteria</li>
+</ul>
+</li>
+<li>Ancestor queries are strongly consistent by default<ul>
+<li>Can be made eventually consistent Datastore read policy</li>
+<li><code>Employee.all()...run(read_policy=db.EVENTUAL_CONSISTENCY)</code></li>
+</ul>
+</li>
+<li>Non-ancestor queries are always eventually consistent</li>
+<li><em>Facebook exercise:</em> users own posts are strongly consistent (for the purpose of administration), posts of other users are eventually consistent</li>
+<li>Further reading: <a href="https://developers.google.com/appengine/docs/python/datastore/structuring_for_strong_consistency">Structuring Data for Strong Consistency</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/transactions">Doc</a></li>
+<li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation</a></li>
+<li>An operation or set of operations that is atomic<ul>
+<li>Either all or none operations are applied</li>
+</ul>
+</li>
+<li>Defined on <em>a single entity group</em><ul>
+<li>Recall that each root entity belongs to a separate entity group</li>
+<li>Ancestor queries are always run in a transaction</li>
+</ul>
+</li>
+<li>Consistency Inside Transactions: Serializable <ul>
+<li>In a transaction, all reads reflect the current, consistent state of the Datastore at the time the transaction started.</li>
+<li><a href="http://en.wikipedia.org/wiki/Snapshot_isolation">Snapshot isolation</a></li>
+</ul>
+</li>
+<li>Consistency Outside Transactions: Read Committed<ul>
+<li>Entities retrieved from the datastore by queries or gets will only see committed data.</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Consistency Outside Transactions cont.<ul>
+<li>Queries can include entities, whose current data fail to meet the query constraints. </li>
+<li>Queries and gets inside a Datastore transaction <strong>do not see the results of previous writes</strong> inside that transaction.<ul>
+<li>If an entity is modified or deleted within a transaction, a query or get returns the original version of the entity as of the beginning of the transaction, or nothing if the entity did not exist then</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions &mdash; The Commit Process</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html">Google IO 2012 Video</a></li>
+<li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation in App Engine</a></li>
+<li><a href="https://developers.google.com/appengine/articles/life_of_write">Life of a Datastore Write</a></li>
+<li>Synchronous commit (to a majority of replicas), asynchronous (2-phase) apply<ul>
+<li>In the apply phase, the entity's data and the index rows are written to disk in parallel</li>
+</ul>
+</li>
+<li>Visibility to other transactions<ul>
+<li>First apply milestone &mdash; entity changes visible</li>
+<li>Second apply milestone &mdash; index changes visible</li>
+</ul>
+</li>
+</ul>
+<p><center><img alt="The Commit Process" src="images/transaction_iso.png" /></center></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions &mdash; The Return Value</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/articles/life_of_write">Life of a Datastore Write</a></li>
+<li>If the entity data fails to update in the commit phase, no changes are made. </li>
+<li>If the commit phase has succeeded but the apply phase failed<ul>
+<li>The next time you execute a read or write or start a transaction on this entity group, the datastore will first roll forward and fully apply this committed but unapplied write</li>
+<li>The datastore continuously sweeps for partially applied jobs and rolls forward writes to indexes and entities that have not yet received the changes to the entity</li>
+</ul>
+</li>
+<li>If your app receives an exception when submitting a transaction, it does not always mean that the transaction failed.<ul>
+<li>You can receive the following exceptions in cases where transactions have been committed and eventually will be applied successfully<ul>
+<li><code>Timeout</code>, <code>TransactionFailedError</code>, or <code>InternalError</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions &mdash; Concurrency</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>When two or more transactions simultaneously attempt to modify entities in one or more common entity groups, only the first transaction to commit its changes can succeed; all the others will fail on commit.<ul>
+<li><a href="http://en.wikipedia.org/wiki/Optimistic_concurrency_control">Optimistic concurrency control</a></li>
+<li><strong>Tip:</strong> <em>A transaction should happen as quickly as possible to reduce the likelihood that the entities used by the transaction will change, causing the transaction to fail.</em></li>
+</ul>
+</li>
+<li>In HRD, the transaction is typically completely applied within a few hundred milliseconds after the commit returns.</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Transactions API</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import db
+
+class Accumulator(db.Model):
+    counter = db.IntegerProperty(default=0)
+
+<b>@db.transactional
+def increment_counter(key, amount)</b>:
+    obj = db.get(key)
+    obj.counter += amount
+    obj.put()
+
+q = db.GqlQuery("SELECT * FROM Accumulator")
+acc = q.get()
+
+<b>increment_counter(acc.key(), 5)</b>
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+...
+<b>def increment_counter(key, amount):</b>
+...
+
+<b>db.run_in_transaction(increment_counter, acc.key(), 5)</b>
+</pre></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Datastore Tips & Tricks</h2>
+      <h3>How to do things effectively</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Sharding Counters</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/articles/sharding_counters">Tutorial</a>, <a href="https://sites.google.com/site/io/building-scalable-web-applications-with-google-app-engine">Google IO 2008 talk</a></li>
+<li>Main motivation:<ul>
+<li>Writes to a single entity (group) are expensive and limited to 1-5/s<ul>
+<li>Counters can be updated more than 5/s</li>
+</ul>
+</li>
+<li>Distributed reads are very effective</li>
+</ul>
+</li>
+<li>Solution &mdash; break the counter into N different counters<ul>
+<li>On increment choose a random shard and increment it</li>
+<li>When reading the counter value, read all shards and sum up their values</li>
+</ul>
+</li>
+<li>You can use <a href="https://developers.google.com/appengine/docs/python/memcache/">memcache</a> to improve the performance</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Sharding Counters II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+import random
+from google.appengine.ext import ndb
+
+NUM_SHARDS = 20
+
+class <b>SimpleCounterShard</b>(ndb.Model):
+    <b>count = ndb.IntegerProperty</b>(default=0)
+
+def get_count():
+    total = 0
+    <b>for counter in SimpleCounterShard.query():</b>
+        <b>total += counter.count</b>
+    <b>return total</b>
+
+<b>@ndb.transactional</b>
+def increment():
+    <b>shard_string_index =</b> str(<b>random.randint</b>(0, NUM_SHARDS - 1))
+    <b>counter = SimpleCounterShard.get_by_id(shard_string_index)</b>
+    if counter is None:
+        counter = SimpleCounterShard(id=shard_string_index)
+    <b>counter.count += 1</b>
+    <b>counter.put()</b>
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Further Reading on Datastore</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Tutorials<ul>
+<li><a href="https://developers.google.com/appengine/articles/datastore/overview">Mastering the datastore</a></li>
+<li><a href="https://developers.google.com/appengine/articles/handling_datastore_errors">Handling datastore errors</a></li>
+<li><a href="https://developers.google.com/appengine/articles/modeling">Modeling Entity Relationships</a></li>
+<li><a href="https://developers.google.com/appengine/articles/remote_api">Accessing the Datastore Remotely With remote_api</a>   </li>
+<li><a href="https://developers.google.com/appengine/articles/scaling/overview">Best practices for writing scalable applications</a></li>
+</ul>
+</li>
+<li>Datastore internals<ul>
+<li><a href="https://developers.google.com/appengine/articles/life_of_write">Life of a Datastore Write</a></li>
+<li><a href="https://developers.google.com/appengine/articles/transaction_isolation">Transaction Isolation in App Engine</a></li>
+<li><a href="https://developers.google.com/appengine/articles/storage_breakdown">How Entities and Indexes are Stored</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html">Life in App Engine Production</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html">More 9s Please: Under The Covers of the High Replication Datastore</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions/android-app-engine-a-developer-s-dream-combination.html">Android + App Engine: A Developer's Dream Combination</a></li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide class="segue dark nobackground" >
+  
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>Other GAE Services</h2>
+      <h3>What comes handy</h3>
+    </hgroup>
+  
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Memcache</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/memcache/">Doc</a></li>
+<li>A high-performance, distributed memory object caching system</li>
+<li>Useful for storing<ul>
+<li>Frequently fetched entities</li>
+<li>Transient and frequently updated data (non-critical counters)</li>
+<li>Rendered HTML for popular requests</li>
+</ul>
+</li>
+<li>Typically used in the following pattern</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+def get_data():
+    data = <b>memcache.get</b>('key')
+    <b>if data is not None</b>:
+        return data
+    <b>else</b>:
+        data = self.<b>query_for_data()</b> !L!J
+        <b>memcache.add</b>('key', data, 60)
+        return data
+</pre>
+
+<ul>
+<li>Further reading &mdash; <a href="https://developers.google.com/appengine/articles/scaling/memcache">Effective memcache</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Task Queues</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/">Doc</a></li>
+<li>Helps organizing the background work in discrete <em>tasks</em> and execute them in a designated worker <em>queue</em></li>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-push">Push queues</a><ul>
+<li>Defers tasks to be executed by GAE on background</li>
+<li>Ideal for long-running (longer than 60s) request reactions (up to 10 minutes)<ul>
+<li>Sending notification emails</li>
+</ul>
+</li>
+<li>Allows configuring processing rate</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-pull">Pull queues</a><ul>
+<li>Allows to execute (consume) tasks outside the GAE's default taks processing system</li>
+<li>In a <a href="https://developers.google.com/appengine/docs/python/backends">backend</a> (later)</li>
+<li>Outside GAE (<a href="https://developers.google.com/appengine/docs/python/taskqueue/rest">Task Queue REST API</a>)</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Push Task Queues</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-push">Doc</a></li>
+<li>Tasks are mapped to request handlers asynchronously invoked by GAE (queue)<ul>
+<li>Access to tasks URLs can be restricted to admins only (<a href="https://developers.google.com/appengine/docs/python/config/appconfig#Requiring_Login_or_Administrator_Status">doc</a>)</li>
+</ul>
+</li>
+<li><code>DeadlineExceededError</code> shortly before the 10min limit<ul>
+<li>To save your work, log progress, or forward to a new task</li>
+</ul>
+</li>
+<li>Order of execution<ul>
+<li>FIFO + optimization of global latency + countdown</li>
+</ul>
+</li>
+<li>Failed tasks are automatically retried (gradual back-off)<ul>
+<li>Tasks should be <a href="http://en.wikipedia.org/wiki/idempotent">idempotent</a></li>
+</ul>
+</li>
+<li>Queues configured in the <code>queue.yaml</code> file (<a href="https://developers.google.com/appengine/docs/python/config/queue">doc</a>)<ul>
+<li>Maximum execution rate</li>
+</ul>
+</li>
+<li>Can be integrated with <a href="https://developers.google.com/appengine/docs/python/config/cron">CRON</a></li>
+<li>Can be deferred to a <a href="https://developers.google.com/appengine/docs/python/backends">backend</a> (later) (<a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Push_Queues_and_Backends">doc</a>)</li>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Quotas_and_Limits_for_Push_Queues">Limits</a><ul>
+<li>Task size (100KB), number of queues (10), queue execution rate (500 tasks/s)</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Deferred Library</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/articles/deferred">Tutorial</a></li>
+<li>Wrapper on top of Push Task Queues<ul>
+<li>Automatically packages the function call and its arguments and adds it to a task queue</li>
+<li>No more setting up dedicated task handlers and serializing and deserializing parameters</li>
+</ul>
+</li>
+<li>Built-in handler (<a href="https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers">doc</a>)</li>
+<li>Works with any python 'callable', including functions, methods, class methods and callable objects</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import deferred
+
+  def do_something_expensive(a, b, c=None):
+      logging.info("Doing something expensive!")
+      # Do your work here
+
+  # Somewhere else
+  deferred.defer(do_something_expensive, "Hello, world!", 42, c=True, 
+                 _countdown=30, _queue="myqueue")
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>The Deferred Library Tips</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Make tasks as small as possible (10KB limit)<ul>
+<li>The deferred library automatically stores the exceeding information into datastore (1MB limit)</li>
+</ul>
+</li>
+<li>Don't pass entities to deferred.defer since it can cause races (better to pass keys)</li>
+<li>Failed tasks is always retried<ul>
+<li>If you don't wont GAE to retry, either return normally or raise <code>deferred.PermanentTaskFailure</code></li>
+</ul>
+</li>
+<li>You can't call nested functions, methods of nested classes, lambda functions, static methods, <strong>methods in a request handler module</strong></li>
+<li>Use the deferred library if<ul>
+<li>You want a simple way of delegating workload to background</li>
+<li>You have a lot of different background tasks</li>
+</ul>
+</li>
+<li>Use the Task Queue API if<ul>
+<li>You need a control over how tasks are queued and executed</li>
+<li>You want to manage throughput, minimize overhead, have direct control over tasks and better monitoring</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Backends</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/backends/">Doc</a></li>
+<li>Separate Python instances within your GAE app<ul>
+<li>No request deadlines</li>
+<li>Have more resources than normal instances</li>
+<li>Manually defined number and resources (do not scale with the app)</li>
+</ul>
+</li>
+<li>Resident/Dynamic <a href="https://developers.google.com/appengine/docs/python/config/backends#Types_of_Backends">types</a></li>
+<li>Accessed via HTTP requests (<a href="https://developers.google.com/appengine/docs/python/backends/overview#Addressing_Backends">doc</a>)</li>
+<li>Pending task queue for incoming traffic</li>
+<li>Specific request handlers for start/processing (<a href="https://developers.google.com/appengine/docs/python/backends/overview#Backend_States">doc</a>)<ul>
+<li>Background (start) handler can start a program, that runs indefinitely, without accepting requests (<a href="https://developers.google.com/appengine/docs/python/backends/overview#background_threads">doc</a>)</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.api import background_thread
+
+def f(arg1, arg2, *kwargs):
+  ...something useful...
+
+tid = background_thread.start_new_background_thread(f, ["foo", "bar"])
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Backends &mdash; Types</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><table>
+  <tbody><tr>
+    <th></th>
+    <th>Resident</th>
+    <th>Dynamic</th>
+  </tr>
+  <tr>
+    <td>Startup/Shutdown</td>
+    <td>Manual (Admin Console)</td>
+    <td>Upon receipt of HTTP request / after idling a few minutes</td>
+  </tr>
+  <tr>
+    <td>State</td>
+    <td>Preserved</td>
+    <td>Erased when shutdown after idle</td>
+  </tr>
+  <tr>
+    <td>Processing type</td>
+    <td>Continuous or driven by requests</td>
+    <td>Driven by requests</td>
+  </tr>
+  <tr>
+    <td>Cost</td>
+    <td>More (run continuously)</td>
+    <td>Less (shutdown after idle)</td>
+  </tr>
+  <tr>
+    <td>Use</td>
+    <td>
+    Continuous processing or preserving state
+        <ul>
+        <li>Storing a game state in memory</li>
+        <li>Caching a social graph or web index</li>
+        <li>Running a web crawler</li>
+        </ul>
+    </td>
+    <td>
+    Request-based processing
+    <ul>
+      <li>Task queue requests requiring more power, time, or memory to complete.</li>
+      <li>Report generation</li>
+      <li>Large or complex user requests</li>
+      <li>Ad-hoc queries or admin scripts</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Load balancing</td>
+    <td>Evenly balanced accross all instances</td>
+    <td>Served by minimum number of instances first, new instances allocated as traffic increases</td>
+  </tr>
+</table></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Blobstore</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/blobstore/overview">Doc</a></li>
+<li>Storage of large data objects (blobs)</li>
+<li>Blobs not created directly but sent to the Blostore service via HTTP Post request<ul>
+<li>Specific URL: <code>blobstore.create_upload_url('/upload')</code></li>
+<li>Redirected to a given handler with information about the uploaded blob<ul>
+<li><code>blobstore_handlers.BlobstoreUploadHandler</code> base class</li>
+</ul>
+</li>
+<li>Served by subclass of <code>blobstore_handlers.BlobstoreDownloadHandler</code><ul>
+<li><code>send_blob</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Each blob has a blob info record, stored in the datastore<ul>
+<li>creation, content type, access URLs</li>
+</ul>
+</li>
+<li>Blobs can't be modified after they're created</li>
+<li>Integrated with Images and MapReduce services</li>
+<li>Async API</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Blobstore &mdash; API</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import blobstore
+
+class MainHandler(webapp2.RequestHandler):
+  def get(self):
+    upload_url = <b>blobstore.create_upload_url</b>('/upload')
+    self.response.out.write(self.render_form(upload_url))
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext.webapp import blobstore_handlers
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    upload_files = <b>self.get_uploads</b>('file')  # 'file' is file upload form field
+    <b>blob_info = upload_files[0]</b>
+    self.redirect('/serve/%s' % blob_info.key())
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self, resource):
+    resource = str(urllib.unquote(resource))
+    blob_info = <b>blobstore.BlobInfo.get(resource)</b>
+    <b>self.send_blob</b>(blob_info)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>NDB</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/ndb/">Doc</a></li>
+<li>Wrapper over the basic Datastore API and Memcache</li>
+<li>Additional features<ul>
+<li>The <code>StructuredProperty</code> allowing nested entity structure</li>
+<li>Automatic caching giving fast (and inexpensive) reads via an in-context cache and Memcache</li>
+<li>Asynchronous APIs allowing concurrency (and "synchronous" APIs if you don't need that)</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Other Interesting Services</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/mail/">Mail</a><ul>
+<li>Sending/receiving email on behalf of users with Google Accounts/admins</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/urlfetch/">URL Fetch</a><ul>
+<li>Fetching resources and communicate with other hostsusing HTTP and HTTPS requests</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/images/">Images</a><ul>
+<li>Manipulation of image data, integration with Blobstore</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/channel/">Channels</a><ul>
+<li>Sending messages to client using JavaScript</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/appengine/docs/python/dataprocessing/overview">MapReduce API</a><ul>
+<li>Parallel processing and analysis of large data sets</li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/bigquery/articles/datastoretobigquery">BigQuery API</a><ul>
+<li>Queries over very large data sets</li>
+</ul>
+</li>
+<li>And a lot <a href="https://developers.google.com/appengine/docs/python/apis">more</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Homework</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Should use at least 2 of the advanced datastore-based features<ul>
+<li>Transactions, consistency, sharding, cursors, special types of queries, asynchronous operations</li>
+</ul>
+</li>
+<li>Should use at least 2 service APIs<ul>
+<li>Memcache, Task Queues, Blobstore, Channels, ...</li>
+</ul>
+</li>
+<li>Send a description via email for confirmation</li>
+<li>Work in groups preferred</li>
+<li>Due in 2 weeks</li>
+</ul></article>
+ 
+</slide>
+
+
+<slide class="thank-you-slide segue nobackground">
+  <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+  <article class="flexbox vleft auto-fadein">
+    <h2>Thank You!</h2>
+    <!--<p>Important contact information goes here.</p>-->
+  </article>
+  <p class="auto-fadein" data-config-contact>
+    <!-- populated from slide_config.json -->
+  </p>
+</slide>
+
+<!-- <slide class="logoslide dark nobackground">
+  <article class="flexbox vcenter">
+    <span><img src="images/google_developers_logo_white.png"></span>
+  </article>
+</slide> -->
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
