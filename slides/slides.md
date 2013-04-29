@@ -23,6 +23,8 @@ content_class: smaller
 - [wiki](http://en.wikipedia.org/wiki/MapReduce), [paper](http://research.google.com/archive/mapreduce.html)
 - Computing model for processing of large data sets
 - Distributed, parallel, scalable, ...
+- Robust
+	- Based on functional programming (restarts almost always possible)
 - General framework for implementing parallel processing
 - Goal: Process as much data as possible, as fast as possible
 - Used in a lot of Google (and other) products
@@ -136,12 +138,122 @@ content_class: smaller
 ![MapReduceOverview](images/mapreduce_mapshuffle.png)
 </center>
 
+
+---
+
+title: MR Hello World &mdash; Word Count
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+#Map
+def map(line):
+  for w in clean(line).split():
+    yield (w, "")
+
+# Reduce
+def reduce(key, values):
+  yield (key, len(values))
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+#Input
+"Zed's dead, baby, Zed's dead!"
+
+#Map
+("zed's", ""), ("dead", ""), ("baby", ""), ("zed's", ""), ("dead", "")
+
+#Shuffle
+("zed's", ["", ""]), ("dead", ["", ""]), ("baby", [""])
+
+#Reduce
+("zed's", 2), ("dead", 2), ("baby", 1)
+</pre>
+
+
+---
+
+title: MR Example &mdash; Distinguishing phrases
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+# Map
+def map(text, filename):
+  for phrase in phrases(text):
+    yield (phrase, filename)
+
+# Reduce
+def reduce(phrase, filenames):
+  #not very frequent phrase, ignore
+  if len(filenames) < 10:
+    return
+  #count occurence of the phrase in each of the files
+  for filename, count in count_occurences(filenames):
+    #phrase occurs in 'filename' more often than anywhere else combined
+    if count > len(values) / 2:
+      yield (key, filename)
+</pre>
+
 ---
 
 title: MapReduce on GAE
 content_class: smaller
 
-- [Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html)
+- [doc](https://developers.google.com/appengine/docs/python/dataprocessing/overview), 
+[sources](https://code.google.com/p/appengine-mapreduce/),
+[demo app](https://code.google.com/p/appengine-mapreduce/wiki/MapReduceDemoApp),
+[Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html)
+- Problems of running the general MapReduce on GAE
+	- Performance isolation
+		- A lot of MRs will be running at the same time
+		- One user's MR shouldn't influence performance of other users' MRs
+		- Originally &mdash; only a few MRs running concurrently
+	- Process rate limiting
+		- App must not to spend resources to quickly
+		- Quota management is critical for some apps
+		- Originally &mdash; as fast as possible, as much data as possible
+	- Security 
+		- Originally &mdash; only 'trusted' MRs
+
+---
+
+title: GAE MapReduce Features
+content_class: smaller
+
+- Processing rate limiting
+- Automatic sharding
+- Predefined standard data input readers/writers
+	- Datastore entities, blobstore plain/zip files
+- Status and management pages
+- Pipeline API
+	- Wires all MR phases together
+- Files API
+	- Persistent/Intermediate storage for MR data
+
+
+---
+
+title: GAE MapReduce Examples
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+# Map
+def map(text, filename):
+  for phrase in phrases(text):
+    yield (phrase, filename)
+
+# Reduce
+def reduce(phrase, filenames):
+  #not very frequent phrase, ignore
+  if len(filenames) < 10:
+    return
+  #count occurence of the phrase in each of the files
+  for filename, count in count_occurences(filenames):
+    #phrase occurs in 'filename' more often than anywhere else combined
+    if count > len(values) / 2:
+      yield (key, filename)
+</pre>
+
+
 
 ---
 

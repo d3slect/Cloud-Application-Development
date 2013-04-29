@@ -84,6 +84,10 @@ URL: https://code.google.com/p/io-2012-slides
 <li><a href="http://en.wikipedia.org/wiki/MapReduce">wiki</a>, <a href="http://research.google.com/archive/mapreduce.html">paper</a></li>
 <li>Computing model for processing of large data sets</li>
 <li>Distributed, parallel, scalable, ...</li>
+<li>Robust<ul>
+<li>Based on functional programming (restarts almost always possible)</li>
+</ul>
+</li>
 <li>General framework for implementing parallel processing</li>
 <li>Goal: Process as much data as possible, as fast as possible</li>
 <li>Used in a lot of Google (and other) products</li>
@@ -253,11 +257,117 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
+      <h2>MR Hello World &mdash; Word Count</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+#Map
+def map(line):
+  for w in clean(line).split():
+    yield (w, "")
+
+# Reduce
+def reduce(key, values):
+  yield (key, len(values))
+</pre>
+
+<pre class="prettyprint" data-lang="Python">
+#Input
+"Zed's dead, baby, Zed's dead!"
+
+#Map
+("zed's", ""), ("dead", ""), ("baby", ""), ("zed's", ""), ("dead", "")
+
+#Shuffle
+("zed's", ["", ""]), ("dead", ["", ""]), ("baby", [""])
+
+#Reduce
+("zed's", 2), ("dead", 2), ("baby", 1)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>MR Example &mdash; Distinguishing phrases</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+# Map
+def map(text, filename):
+  for phrase in phrases(text):
+    yield (phrase, filename)
+
+# Reduce
+def reduce(phrase, filenames):
+  #not very frequent phrase, ignore
+  if len(filenames) < 10:
+    return
+  #count occurence of the phrase in each of the files
+  for filename, count in count_occurences(filenames):
+    #phrase occurs in 'filename' more often than anywhere else combined
+    if count > len(values) / 2:
+      yield (key, filename)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
       <h2>MapReduce on GAE</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html">Google IO 2011 talk</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/dataprocessing/overview">doc</a>, 
+<a href="https://code.google.com/p/appengine-mapreduce/">sources</a>,
+<a href="http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html">Google IO 2011 talk</a></li>
+<li>Problems of running the general MapReduce on GAE<ul>
+<li>Performance isolation<ul>
+<li>A lot of MRs will be running at the same time</li>
+<li>One user's MR shouldn't influence performance of other users' MRs</li>
+<li>Originally &mdash; only a few MRs running concurrently</li>
+</ul>
+</li>
+<li>Process rate limiting<ul>
+<li>App must not to spend resources to quickly</li>
+<li>Quota management is critical for some apps</li>
+<li>Originally &mdash; as fast as possible, as much data as possible</li>
+</ul>
+</li>
+<li>Security <ul>
+<li>Originally &mdash; only 'trusted' MRs</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>GAE MapReduce Features</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Processing rate limiting</li>
+<li>Automatic sharding</li>
+<li>Predefined standard data input readers/writers<ul>
+<li>Datastore entities, blobstore plain/zip files</li>
+</ul>
+</li>
+<li>Status and management pages</li>
+<li>Pipeline API<ul>
+<li>Wires all MR phases together</li>
+</ul>
+</li>
+<li>Files API<ul>
+<li>Persistent/Intermediate storage for MR data</li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
