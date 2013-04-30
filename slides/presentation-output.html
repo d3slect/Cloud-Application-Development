@@ -373,6 +373,7 @@ def reduce(phrase, filenames):
 </ul>
 </li>
 <li>Status and management pages</li>
+<li>Open source &mdash; get involved!</li>
 </ul></article>
  
 </slide>
@@ -380,7 +381,19 @@ def reduce(phrase, filenames):
 <slide  >
   
     <hgroup>
-      <h2>GAE MapReduce API Example</h2>
+      <h2>GAE MapReduce Pipeline Overview</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><center>
+<img alt="GAE MapReduce Pipeline Overview" src="images/mapreduce_pipeline.png" height="500px" />
+</center></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>GAE MR API &mdash; Pipeline Definition</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><pre class="prettyprint" data-lang="Python">
@@ -417,17 +430,7 @@ class WordCountPipeline(<b>base_handler.PipelineBase</b>):
 <slide  >
   
     <hgroup>
-      <h2>GAE MapReduce Pipeline Overview</h2>
-      <h3></h3>
-    </hgroup>
-    <article class="smaller"><p><img alt="GAE MapReduce Pipeline Overview" src="images/mapreduce_pipeline.png" height="500px" /></p></article>
- 
-</slide>
-
-<slide  >
-  
-    <hgroup>
-      <h2>GAE MapReduce API Example II</h2>
+      <h2>GAE MR API &mdash; Start & Status</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><pre class="prettyprint" data-lang="Python">
@@ -459,7 +462,7 @@ class WaitHandler(webapp2.RequestHandler):
 <slide  >
   
     <hgroup>
-      <h2>GAE MapReduce API Example III</h2>
+      <h2>GAE MR API &mdash; App Configuration</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><p><code>app.yaml</code></p>

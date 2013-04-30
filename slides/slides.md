@@ -232,12 +232,21 @@ content_class: smaller
 	- Persistent/Intermediate storage for MR data
 	- Generic API for high-performance write-only/read-only file storage
 - Status and management pages
-
+- Open source &mdash; get involved!
 
 
 ---
 
-title: GAE MapReduce API Example
+title: GAE MapReduce Pipeline Overview
+content_class: smaller 
+
+<center>
+<img alt="GAE MapReduce Pipeline Overview" src="images/mapreduce_pipeline.png" height="500px" />
+</center>
+
+---
+
+title: GAE MR API &mdash; Pipeline Definition
 content_class: smaller
 
 <pre class="prettyprint" data-lang="Python">
@@ -272,14 +281,7 @@ class WordCountPipeline(<b>base_handler.PipelineBase</b>):
 
 ---
 
-title: GAE MapReduce Pipeline Overview
-content_class: smaller
-
-<img alt="GAE MapReduce Pipeline Overview" src="images/mapreduce_pipeline.png" height="500px" />
-
----
-
-title: GAE MapReduce API Example II
+title: GAE MR API &mdash; Start & Status
 content_class: smaller
 
 <pre class="prettyprint" data-lang="Python">
@@ -309,7 +311,7 @@ class WaitHandler(webapp2.RequestHandler):
 
 ---
 
-title: GAE MapReduce API Example III
+title: GAE MR API &mdash; App Configuration
 content_class: smaller
 
 `app.yaml`
