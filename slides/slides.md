@@ -345,10 +345,10 @@ content_class: smaller
 - [Google IO 2011](http://www.google.com/events/io/2011/sessions.html)
 	- Filter By: App Engine	
 - [Google IO 2012](https://developers.google.com/events/io/2012/sessions#cloud-platform)
-	- Big Query ([talk 1](https://developers.google.com/events/io/2012/sessions/gooio2012/312/)), ([talk 2](https://developers.google.com/events/io/2012/sessions/gooio2012/307)), ([doc](https://developers.google.com/bigquery/)),
+- Big Query ([talk 1](https://developers.google.com/events/io/2012/sessions/gooio2012/312/)), ([talk 2](https://developers.google.com/events/io/2012/sessions/gooio2012/307)), ([doc](https://developers.google.com/bigquery/)),
 ([tutorial](https://developers.google.com/bigquery/articles/datastoretobigquery))
-	- [Google Compute Engine](https://developers.google.com/events/io/2012/sessions/gooio2012/302/) ([doc](https://cloud.google.com/products/compute-engine))
-
+- Google Compute Engine ([talk](https://developers.google.com/events/io/2012/sessions/gooio2012/302/)), ([doc](https://cloud.google.com/products/compute-engine))
+- Google Cloud SQL ([doc](https://developers.google.com/cloud-sql/))
 
 ---
 
