@@ -5,7 +5,7 @@ content_class: smaller
 - Other GAE Services
 	- MapReduce & GAE MapReduce API
 	- Google Big Query service
-- Miscellaneous
+- Organizational
 	- Discussion on HWs.
 	- Concluding remarks
 
@@ -333,6 +333,41 @@ content_class: smaller
 - [Google IO 2011](http://www.google.com/events/io/2011/sessions.html)
 	- Filter By: App Engine	
 - [Google IO 2012](https://developers.google.com/events/io/2012/sessions#cloud-platform)
-	- [Big Query](https://developers.google.com/events/io/2012/sessions/gooio2012/312/) ([doc](https://developers.google.com/bigquery/))
-	- [Google Compute Engine](https://developers.google.com/events/io/2012/sessions/gooio2012/302/)
+	- [Big Query](https://developers.google.com/events/io/2012/sessions/gooio2012/312/) ([doc](https://developers.google.com/bigquery/)),
+([tutorial](https://developers.google.com/bigquery/articles/datastoretobigquery))
+	- [Google Compute Engine](https://developers.google.com/events/io/2012/sessions/gooio2012/302/) ([doc](https://cloud.google.com/products/compute-engine))
+
+
+---
+
+title: Organizational
+class: segue dark nobackground
+
+---
+
+title: Homeworks
+content_class: smaller
+
+- Homework submissions accepted till the end of the week (5.5.2013)
+- Some already submited (not quite all)
+
+#Discussion
+
+- What problem/domain did you choose?
+- What was interesting?
+- What services did you use?
+
+
+---
+
+title: Conclusion & Discussion
+content_class: smaller
+
+- Did you find the course useful?
+- What was (not) interesting?
+- What would (wouldn't) you like to know more about?
+- What did you learn during lectures/homeworks?
+- Would you use GAE 	in the future?
+
+For shy people: <keznikl@d3s.mff.cuni.cz>
 
