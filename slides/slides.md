@@ -223,37 +223,106 @@ content_class: smaller
 - Automatic sharding
 - Predefined standard data input readers/writers
 	- Datastore entities, blobstore plain/zip files
-- Status and management pages
 - Pipeline API
 	- Wires all MR phases together
+	- [sources](https://code.google.com/p/appengine-pipeline/), [Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/large-scale-data-analysis-using-the-app-engine-pipeline-api.html)
 - Files API
 	- Persistent/Intermediate storage for MR data
+- Status and management pages
+
 
 
 ---
 
-title: GAE MapReduce Examples
+title: GAE MapReduce API Example
 content_class: smaller
 
 <pre class="prettyprint" data-lang="Python">
-# Map
-def map(text, filename):
-  for phrase in phrases(text):
-    yield (phrase, filename)
+from mapreduce import base_handler
+from mapreduce import mapreduce_pipeline
 
-# Reduce
-def reduce(phrase, filenames):
-  #not very frequent phrase, ignore
-  if len(filenames) < 10:
-    return
-  #count occurence of the phrase in each of the files
-  for filename, count in count_occurences(filenames):
-    #phrase occurs in 'filename' more often than anywhere else combined
-    if count > len(values) / 2:
-      yield (key, filename)
+class WordCountPipeline(<b>base_handler.PipelineBase</b>):
+  def run(self, filekey, blobkey):
+    logging.debug("filename is %s" % filekey)
+    output = <b>yield mapreduce_pipeline.MapreducePipeline</b>(
+        "word_count",
+        <b>"main.word_count_map"</b>,			#user code
+        <b>"main.word_count_reduce"</b>,		#user code
+        <b>"mapreduce.input_readers.BlobstoreZipInputReader"</b>,
+        <b>"mapreduce.output_writers.FileOutputWriter"</b>,
+        mapper_params={
+            "input_reader": {				# input reader params
+                "blob_key": blobkey,
+            },
+        },
+        reducer_params={
+            "output_writer": {				# output writer params
+                "mime_type": "text/plain",
+                "output_sharding": "input",
+                "filesystem": "blobstore",
+            },
+        },
+        shards=16)
+    <b>yield StoreOutput</b>("WordCount", filekey, output)
 </pre>
 
 
+---
+
+title: GAE MapReduce Pipeline Overview
+content_class: smaller
+
+<img alt="GAE MapReduce Pipeline Overview" src="images/mapreduce_pipeline.png" height="500px" />
+
+---
+
+title: GAE MapReduce API Example II
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+from mapreduce import mapreduce_pipeline
+
+class StartAndStatusHandler(webapp2.RequestHandler):
+  def post(self):
+    filekey = self.request.get("filekey")
+    blob_key = self.request.get("blobkey")
+
+    if self.request.get("word_count"):
+      <b>pipeline = WordCountPipeline(filekey, blob_key)</b>
+      <b>pipeline.start()</b>
+    
+      self.redirect(<b>pipeline.base_path + "/status?root=" + pipeline.pipeline_id</b>)
+
+class WaitHandler(webapp2.RequestHandler):
+  def get(self):
+    pipeline_id = self.request.get('pipeline')
+    <b>pipeline = mapreduce_pipeline.MapreducePipeline.from_id(pipeline_id)</b>
+    if <b>pipeline.has_finalized</b>:
+      # MapreducePipeline has completed
+    else:
+      # MapreducePipeline is still running
+</pre>
+
+
+---
+
+title: GAE MapReduce API Example III
+content_class: smaller
+
+`app.yaml`
+
+<pre class="prettyprint" data-lang="yaml">
+...
+
+includes:
+- mapreduce/include.yaml
+
+...
+</pre>
+
+- Declarative definition of MR pipelines in `mapreduce.yaml` ([doc](https://code.google.com/p/appengine-mapreduce/wiki/UserGuidePython))
+	- Work in progress
+	- Docs for mapper part only
 
 ---
 
@@ -261,3 +330,8 @@ title: Further Reading
 content_class: smaller
 
 - [Google IO 2011](http://www.google.com/events/io/2011/sessions.html)
+	- Filter By: App Engine	
+- [Google IO 2012](https://developers.google.com/events/io/2012/sessions#cloud-platform)
+	- [Big Query](https://developers.google.com/events/io/2012/sessions/gooio2012/312/) ([doc](https://developers.google.com/bigquery/))
+	- [Google Compute Engine](https://developers.google.com/events/io/2012/sessions/gooio2012/302/)
+

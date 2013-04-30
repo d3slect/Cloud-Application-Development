@@ -322,6 +322,7 @@ def reduce(phrase, filenames):
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/dataprocessing/overview">doc</a>, 
 <a href="https://code.google.com/p/appengine-mapreduce/">sources</a>,
+<a href="https://code.google.com/p/appengine-mapreduce/wiki/MapReduceDemoApp">demo app</a>,
 <a href="http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html">Google IO 2011 talk</a></li>
 <li>Problems of running the general MapReduce on GAE<ul>
 <li>Performance isolation<ul>
@@ -359,13 +360,119 @@ def reduce(phrase, filenames):
 <li>Datastore entities, blobstore plain/zip files</li>
 </ul>
 </li>
-<li>Status and management pages</li>
 <li>Pipeline API<ul>
 <li>Wires all MR phases together</li>
+<li><a href="https://code.google.com/p/appengine-pipeline/">sources</a>, <a href="http://www.google.com/events/io/2011/sessions/large-scale-data-analysis-using-the-app-engine-pipeline-api.html">Google IO 2011 talk</a></li>
 </ul>
 </li>
 <li>Files API<ul>
 <li>Persistent/Intermediate storage for MR data</li>
+</ul>
+</li>
+<li>Status and management pages</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>GAE MapReduce API Example</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+from mapreduce import base_handler
+from mapreduce import mapreduce_pipeline
+
+class WordCountPipeline(<b>base_handler.PipelineBase</b>):
+  def run(self, filekey, blobkey):
+    logging.debug("filename is %s" % filekey)
+    output = <b>yield mapreduce_pipeline.MapreducePipeline</b>(
+        "word_count",
+        <b>"main.word_count_map"</b>,           #user code
+        <b>"main.word_count_reduce"</b>,        #user code
+        <b>"mapreduce.input_readers.BlobstoreZipInputReader"</b>,
+        <b>"mapreduce.output_writers.FileOutputWriter"</b>,
+        mapper_params={
+            "input_reader": {               # input reader params
+                "blob_key": blobkey,
+            },
+        },
+        reducer_params={
+            "output_writer": {              # output writer params
+                "mime_type": "text/plain",
+                "output_sharding": "input",
+                "filesystem": "blobstore",
+            },
+        },
+        shards=16)
+    <b>yield StoreOutput</b>("WordCount", filekey, output)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>GAE MapReduce Pipeline Overview</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><img alt="GAE MapReduce Pipeline Overview" src="images/mapreduce_pipeline.png" height="500px" /></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>GAE MapReduce API Example II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Python">
+from mapreduce import mapreduce_pipeline
+
+class StartAndStatusHandler(webapp2.RequestHandler):
+  def post(self):
+    filekey = self.request.get("filekey")
+    blob_key = self.request.get("blobkey")
+
+    if self.request.get("word_count"):
+      <b>pipeline = WordCountPipeline(filekey, blob_key)</b>
+      <b>pipeline.start()</b>
+
+      self.redirect(<b>pipeline.base_path + "/status?root=" + pipeline.pipeline_id</b>)
+
+class WaitHandler(webapp2.RequestHandler):
+  def get(self):
+    pipeline_id = self.request.get('pipeline')
+    <b>pipeline = mapreduce_pipeline.MapreducePipeline.from_id(pipeline_id)</b>
+    if <b>pipeline.has_finalized</b>:
+      # MapreducePipeline has completed
+    else:
+      # MapreducePipeline is still running
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>GAE MapReduce API Example III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><p><code>app.yaml</code></p>
+<pre class="prettyprint" data-lang="yaml">
+...
+
+includes:
+- mapreduce/include.yaml
+
+...
+</pre>
+
+<ul>
+<li>Declarative definition of MR pipelines in <code>mapreduce.yaml</code> (<a href="https://code.google.com/p/appengine-mapreduce/wiki/UserGuidePython">doc</a>)<ul>
+<li>Work in progress</li>
+<li>Docs for mapper part only</li>
 </ul>
 </li>
 </ul></article>
@@ -379,7 +486,15 @@ def reduce(phrase, filenames):
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="http://www.google.com/events/io/2011/sessions.html">Google IO 2011</a></li>
+<li><a href="http://www.google.com/events/io/2011/sessions.html">Google IO 2011</a><ul>
+<li>Filter By: App Engine </li>
+</ul>
+</li>
+<li><a href="https://developers.google.com/events/io/2012/sessions#cloud-platform">Google IO 2012</a><ul>
+<li><a href="https://developers.google.com/events/io/2012/sessions/gooio2012/312/">Big Query</a> (<a href="https://developers.google.com/bigquery/">doc</a>)</li>
+<li><a href="https://developers.google.com/events/io/2012/sessions/gooio2012/302/">Google Compute Engine</a></li>
+</ul>
+</li>
 </ul></article>
  
 </slide>
