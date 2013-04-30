@@ -226,9 +226,11 @@ content_class: smaller
 	- Datastore entities, blobstore plain/zip files
 - Pipeline API
 	- Wires all MR phases together
-	- [sources](https://code.google.com/p/appengine-pipeline/), [Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/large-scale-data-analysis-using-the-app-engine-pipeline-api.html)
+	- Generic API for asynchronous data processing
+	- [sources](https://code.google.com/p/appengine-pipeline/), [Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/large-scale-data-analysis-using-the-app-engine-pipeline-api.html), [Google IO 2012 talk](https://developers.google.com/events/io/2012/sessions/gooio2012/307/)
 - Files API
 	- Persistent/Intermediate storage for MR data
+	- Generic API for high-performance write-only/read-only file storage
 - Status and management pages
 
 
@@ -325,6 +327,14 @@ includes:
 	- Work in progress
 	- Docs for mapper part only
 
+
+---
+
+title: GAE MapReduce API Demo
+content_class: smaller
+
+<iframe data-src="http://nswi152-mapreducedemo.appspot.com/"></iframe>
+
 ---
 
 title: Further Reading
@@ -333,7 +343,7 @@ content_class: smaller
 - [Google IO 2011](http://www.google.com/events/io/2011/sessions.html)
 	- Filter By: App Engine	
 - [Google IO 2012](https://developers.google.com/events/io/2012/sessions#cloud-platform)
-	- [Big Query](https://developers.google.com/events/io/2012/sessions/gooio2012/312/) ([doc](https://developers.google.com/bigquery/)),
+	- Big Query ([talk 1](https://developers.google.com/events/io/2012/sessions/gooio2012/312/)), ([talk 2](https://developers.google.com/events/io/2012/sessions/gooio2012/307)), ([doc](https://developers.google.com/bigquery/)),
 ([tutorial](https://developers.google.com/bigquery/articles/datastoretobigquery))
 	- [Google Compute Engine](https://developers.google.com/events/io/2012/sessions/gooio2012/302/) ([doc](https://cloud.google.com/products/compute-engine))
 
@@ -363,11 +373,14 @@ content_class: smaller
 title: Conclusion & Discussion
 content_class: smaller
 
+This course was a mere "door opening", rather than a fully-fledged lecture.  
+Please help us make it better!
+
 - Did you find the course useful?
 - What was (not) interesting?
 - What would (wouldn't) you like to know more about?
 - What did you learn during lectures/homeworks?
-- Would you use GAE 	in the future?
+- Would you consider using GAE in the future?
 
-For shy people: <keznikl@d3s.mff.cuni.cz>
+For offline discussion: <keznikl@d3s.mff.cuni.cz>
 
