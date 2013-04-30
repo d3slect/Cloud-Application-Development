@@ -200,7 +200,8 @@ content_class: smaller
 
 - [doc](https://developers.google.com/appengine/docs/python/dataprocessing/overview), 
 [sources](https://code.google.com/p/appengine-mapreduce/),
-[demo app](https://code.google.com/p/appengine-mapreduce/wiki/MapReduceDemoApp),
+[demo app](http://nswi152-mapreducedemo.appspot.com/),
+[demo app sources](https://code.google.com/p/appengine-mapreduce/wiki/MapReduceDemoApp),
 [Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html)
 - Problems of running the general MapReduce on GAE
 	- Performance isolation
