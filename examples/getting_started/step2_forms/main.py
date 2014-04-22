@@ -6,7 +6,7 @@ from google.appengine.api import users
 class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.out.write("""
-          <html>
+          <!doctype html><html>
             <body>
               <form action="/sign" method="post">
                 <div><textarea name="content" rows="3" cols="60"></textarea></div>
@@ -18,7 +18,7 @@ class MainPage(webapp2.RequestHandler):
 
 class Guestbook(webapp2.RequestHandler):
     def post(self):
-        self.response.out.write('<html><body>You wrote:<pre>')
+        self.response.out.write('<!doctype html><html><body>You wrote:<pre>')
         self.response.out.write(cgi.escape(self.request.get('content')))
         self.response.out.write('</pre></body></html>')
 

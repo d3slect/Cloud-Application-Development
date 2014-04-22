@@ -10,13 +10,15 @@ import jinja2
 import os
 
 jinja_environment = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
 
 class Greeting(db.Model):
   """Models an individual Guestbook entry with an author, content, and date."""
-  author = db.StringProperty()
+  author = db.UserProperty()
   content = db.StringProperty(multiline=True)
   date = db.DateTimeProperty(auto_now_add=True)
 
@@ -29,9 +31,10 @@ def guestbook_key(guestbook_name=None):
 class MainPage(webapp2.RequestHandler):
     def get(self):
         guestbook_name=self.request.get('guestbook_name')
+        week_ago = datetime.datetime.now() + datetime.timedelta(days=-7)	
         greetings_query = Greeting.all().ancestor(
-            guestbook_key(guestbook_name)).order('-date')
-        greetings = greetings_query.fetch(10)
+            guestbook_key(guestbook_name)).filter("date >", week_ago).order('-date')
+        greetings = greetings_query.run(limit=10)
 
         if users.get_current_user():
             url = users.create_logout_url(self.request.uri)
@@ -42,6 +45,7 @@ class MainPage(webapp2.RequestHandler):
 
         template_values = {
             'greetings': greetings,
+	    'guestbook_name': urllib.quote_plus(guestbook_name),
             'url': url,
             'url_linktext': url_linktext,
         }
@@ -61,7 +65,7 @@ class Guestbook(webapp2.RequestHandler):
     greeting = Greeting(parent=guestbook_key(guestbook_name))
 
     if users.get_current_user():
-      greeting.author = users.get_current_user().nickname()
+      greeting.author = users.get_current_user()
 
     greeting.content = self.request.get('content')
     greeting.put()

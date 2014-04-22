@@ -1,16 +1,16 @@
 title: Course Info
 
-<https://github.com/keznikl/Cloud-Application-Development>
+<http://d3s.mff.cuni.cz/~keznikl/teaching/google-app-engine/>
 
 #Schedule
 
 - **Lab 1** Intro, SDK, Hello World
-- **Lab 2** Selection of features (datastore, tasks, blobs, ...)
-- **Lab 3** Homework
+- **Lab 2** Selection of services - APIs and internals
+- **Lab 3** Advanced concepts (scaling up, high-availability)
+- **Lab 4** Homework
 	- preferably Python (easier to use)
 	- individually or in small groups
-- **Lab 4** Homework cont.
-- **Lab 5** HW summary and advanced services (map-reduce, ...)
+- **Lab 5** Homework cont.
 
 #Requirements
 
@@ -26,13 +26,17 @@ class: segue dark nobackground
 
 ---
 
-title: What is Cloud Computing?
+title: What is Cloud Computing (at Google)?
 content_class: smaller
 
-![Cloud Computing](images/cloud.png)
+<https://developers.google.com/cloud/>
 
-- Further reading
-	- *"What is Cloud Computing?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
+<center>
+![Cloud Computing](images/gcp.png)
+</center>
+
+- [GCP Live 2014](https://cloud.google.com/events/google-cloud-platform-live/)
+- *"What is Cloud Computing?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
 
 ---
 
@@ -41,17 +45,16 @@ content_class: smaller
 
 <https://developers.google.com/appengine/>
 
-- Platform for development of scalable cloud-based web apps
-	- Motto: *Solutions that do not scale cannot be created at all!*
-	- Based entirely on HTTP request handling
-- PaaS - SDK for Python / Java / Go 
+- Platform for development of scalable cloud-based web/mobile backends
+	- Motto: *Scalability in the box*
+	- Based on HTTP request handling
+- PaaS - SDK for Python / Java / Go / PHP 
 	- Runs on Google infrastructure
 - Integrated with Google services
 	- Management console and Google Accounts authentication
-	- Can be integrated with Google Apps (own domain name, ...)
-	- Access to API of Youtube and other Google services
-- Free / paid option 
-	- Maximum daily budget, works until depleted
+	- Other GCP Products (Compute Engine, Big Query, Endpoints, ...)
+	- Google Apps (own domain name, ...), Youtube, ...
+- Free quota 
 - Further reading
 	- *"What is (isn't) Google App Engine?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
 
@@ -62,17 +65,33 @@ content_class: smaller
 
 - Handle HTTP requests ([doc](https://developers.google.com/appengine/docs/python/runtime#Requests))
 - Store data
-	- Focus on Datastore &mdash; non-relational (entity-based) storage ([doc](https://developers.google.com/appengine/docs/python/datastore/overview))
-	- Relational ([doc](https://developers.google.com/cloud-sql/)) and blob ([doc](https://developers.google.com/appengine/docs/python/blobstore/overview)) storage also available
-- Process data asynchronously on background ([doc](https://developers.google.com/appengine/docs/python/taskqueue/))
-- Cache processed results for quick access ([doc](https://developers.google.com/appengine/docs/python/memcache/))
-- Render HTML from templates ([doc](https://developers.google.com/appengine/docs/python/tools/webapp2))
-- Push data to clients ([doc](https://developers.google.com/appengine/docs/python/channel/))
-- Download URL content ([doc](https://developers.google.com/appengine/docs/python/urlfetch/))
-- Send e-mails ([doc](https://developers.google.com/appengine/docs/python/mail/))
+	- Focus on non-relational (entity-based) store ([Datastore](https://developers.google.com/appengine/docs/python/datastore/overview))
+	- Relational store ([Google Cloud SQL](https://developers.google.com/cloud-sql/))
+	- Blob/raw store ([BlobStore](https://developers.google.com/appengine/docs/python/blobstore/overview), [Google Cloud Storage](https://developers.google.com/appengine/docs/python/googlecloudstorageclient/)) 
+- Process data asynchronously on background ([Tasks](https://developers.google.com/appengine/docs/python/taskqueue/), [Modules](https://developers.google.com/appengine/docs/python/modules/))
+- Cache data for quick access ([Memcache](https://developers.google.com/appengine/docs/python/memcache/), [NDB](https://developers.google.com/appengine/docs/python/ndb/))
+- Analyze data ([MapReduce](https://developers.google.com/appengine/docs/python/dataprocessing/), [BigQuery](https://developers.google.com/bigquery/articles/datastoretobigquery))
+- Interface with mobile/web clients ([Google Cloud Endpoints](https://developers.google.com/appengine/docs/python/endpoints/))
+- Render HTML from templates ([Webapp2](https://developers.google.com/appengine/docs/python/tools/webapp2))
+- Push data to clients ([Channel API](https://developers.google.com/appengine/docs/python/channel/))
+- Download URL content ([Urlfetch API](https://developers.google.com/appengine/docs/python/urlfetch/))
+- Send e-mails ([Mail API](https://developers.google.com/appengine/docs/python/mail/))
 - and much more... ([doc](https://developers.google.com/appengine/docs/python/apis))
 
-#It does everything in such a way that it scales!
+#It does everything in a way that scales!
+
+
+---
+
+title: (Example of) What App Engine can do
+content_class: smaller
+
+<center>
+![GAE Mobile App](images/gae-mobile.png)
+</center>
+
+<https://cloud.google.com/developers/articles/mobile-application-solutions>
+
 
 ---
 
@@ -144,7 +163,7 @@ content_class: smaller
 
 #SDK 
 
-- [Installation tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
+- [Doc](https://developers.google.com/appengine/docs/python/gettingstartedpython27/devenvironment), [Older tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
 - Python 2.7 ([link](http://www.python.org/getit/releases/2.7.3/)) 
 - GAE Python SDK ([link](https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python))
 - Make sure that the python and GAE SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
@@ -220,7 +239,9 @@ threadsafe: true
 - url: /.*
   script: main.app</b>
 
-...
+libraries:
+- name: webapp2
+  version: latest
 </pre>
 
 - Further reading
@@ -239,6 +260,7 @@ import webapp2
 
 class MainHandler(webapp2.<b>RequestHandler</b>):
     def <b>get</b>(self):
+        self.response.headers['Content-Type'] = 'text/plain'
         self.<b>response.write</b>('Hello world!')
 
 app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
@@ -273,7 +295,7 @@ python google_appengine/appcfg.py update helloworld/
 title: Monitoring and Management 
 content_class: smaller
 
-- Development Console ([doc](https://developers.google.com/appengine/docs/python/tools/devserver#The_Development_Console))
+- Development Console ([doc](https://developers.google.com/appengine/docs/python/tools/devserver#Python_The_Development_Console))
 	- Runs on <http://localhost:8000/>
 	- "SDK Console" button in the *Google App Engine Launcher*
 	- Basic infromation about the app in the *development* environment
@@ -299,7 +321,7 @@ class: segue dark nobackground
 title: Guestbook App
 content_class: smaller
 
-<https://developers.google.com/appengine/docs/python/gettingstartedpython27/>
+[Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/introduction)
 
 - Google Accounts for authentication
 (
@@ -311,11 +333,12 @@ content_class: smaller
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 )
-- Datastore for storage of persistent data
+- Datastore for storage of persistent data 
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 )
+	- we'll use the older/simpler DB API (the tutorial uses NDB)
 - Jinja2 templating engine for HTML rendering
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), 
@@ -367,24 +390,23 @@ webapp2 framework [doc](http://webapp-improved.appspot.com/),
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 
 <pre class="prettyprint" data-lang="python">
-<b>import webapp2</b>
+import webapp2
+import cgi
 
 class <b>MainPage</b>(webapp2.RequestHandler):
     <b>def get(self):</b>
         self.response.out.write("""
-          &lt;html>
-            &lt;body>
-              &lt;form <b>action="/sign"</b> method="post">
-                &lt;div>&lt;textarea name="content" rows="3" cols="60">&lt;/textarea>&lt;/div>
-                &lt;div>&lt;input type="submit" value="Sign Guestbook">&lt;/div>
-              &lt;/form>
-            &lt;/body>
-          &lt;/html>""")
+          &lt;!doctype html>&lt;html>&lt;body>
+            &lt;form <b>action="/sign"</b> method="post">
+              &lt;div>&lt;textarea name="content" rows="3" cols="60">&lt;/textarea>&lt;/div>
+              &lt;div>&lt;input type="submit" value="Sign Guestbook">&lt;/div>
+            &lt;/form>
+          &lt;/body>&lt;/html>""")
 
 class <b>Guestbook</b>(webapp2.RequestHandler):
     <b>def post(self):</b>
-        self.response.out.write('&lt;html>&lt;body>You wrote:&lt;pre>')
-        self.response.out.write(<b>self.request.get('content')</b>)
+        self.response.out.write('&lt;!doctype html>&lt;html>&lt;body>You wrote:&lt;pre>')
+        self.response.out.write(cgi.escape((<b>self.request.get('content')</b>))
         self.response.out.write('&lt;/pre>&lt;/body>&lt;/html>')
 
 app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
@@ -398,7 +420,8 @@ title: Using the Datastore
 content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
-Datastore [doc](https://developers.google.com/appengine/docs/python/datastore/),
+Datastore [doc](https://developers.google.com/appengine/docs/python/datastore/), 
+[NDB doc](https://developers.google.com/appengine/docs/python/ndb/), 
 sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 
 #Modeling data
@@ -415,17 +438,17 @@ class Greeting(db.Model):
 #Storing data
 
 <pre class="prettyprint" data-lang="python">
+import urllib
 class Guestbook(webapp2.RequestHandler):
     def post(self):
-      guestbook_name = self.request.get('guestbook_name')
-      <b>greeting = Greeting(parent=guestbook_key(guestbook_name))</b>
-
-      if users.get_current_user():
-        greeting.author = users.get_current_user().nickname()
-
-      greeting.content = self.request.get('content')
-      <b>greeting.put()</b>
-      self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
+        guestbook_name = self.request.get('guestbook_name')
+        # strong consistency, but max ~1/second
+        <b>greeting = Greeting(parent=guestbook_key(guestbook_name))</b>
+        if users.get_current_user(): !Y!P
+            greeting.author = users.get_current_user().nickname()
+        greeting.content = self.request.get('content')
+        <b>greeting.put()</b>
+        self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 </pre>
 
 ---
@@ -435,30 +458,33 @@ content_class: smaller
 
 #Retrieving data
 
-- GQL ([doc](https://developers.google.com/appengine/docs/python/datastore/gqlreference))
+
+- DB API: GQL ([doc](https://developers.google.com/appengine/docs/python/datastore/gqlreference)), Query API ([doc](https://developers.google.com/appengine/docs/python/datastore/queries))
 
 <pre class="prettyprint" data-lang="python">
-greetings = db.GqlQuery("SELECT * "
-                        "FROM Greeting "
-                        "WHERE ANCESTOR IS :1 "
-                        "ORDER BY date DESC LIMIT 10",
-                         guestbook_key(guestbook_name))
-
+week_ago = datetime.datetime.now() + datetime.timedelta(days=-7)
+q = db.GqlQuery("SELECT * FROM Greeting "
+                "WHERE ANCESTOR IS :1 AND date > :2 ORDER BY date DESC LIMIT 10",
+                guestbook_key(guestbook_name), week_ago)
+# or
+q = Greeting.gql("WHERE ANCESTOR IS :1 AND date > :2 ORDER BY date DESC LIMIT 10",
+                 guestbook_key(guestbook_name), week_ago)
+#or 
+q = Greeting.all().ancestor(guestbook_key(guestbook_name)).
+             filter("date >", week_ago).
+             order('-date')
+greetings = q.run(limit=10)
 </pre>
 
-<pre class="prettyprint" data-lang="python">
 
-greetings = Greeting.gql("WHERE ANCESTOR IS :1 ORDER BY date DESC LIMIT 10",
-                          guestbook_key(guestbook_name))
-</pre>
-
-- Query API ([doc](https://developers.google.com/appengine/docs/python/datastore/queries))
+- NDB Query API ([doc](https://developers.google.com/appengine/docs/python/ndb/queries))
 
 <pre class="prettyprint" data-lang="python">
-greetings = Greeting.all()
-greetings.ancestor(guestbook_key(guestbook_name))
-greetings.filter("date >", datetime.datetime.now() + datetime.timedelta(days=-7))
-greetings.order("-date")
+q = Greeting.query(ancestor=guestbook_key(guestbook_name)).
+             filter(Greeting.date > week_ago).
+             order(-Greeting.date)
+# also ndb.gql(...) and Greeting.gql(...)
+greetings = q.fetch(10)
 </pre>
 
 ---
@@ -478,21 +504,23 @@ libraries:
 
 <pre class="prettyprint" data-lang="python">
 <b>import jinja2</b>
-import os
 
 <b>jinja_environment = jinja2.Environment</b>(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        greetings = Greeting.all()...
+        greetings = ...
         ...
         <b>template_values = {
             'greetings': greetings,
+            'guestbook_name': urllib.quote_plus(guestbook_name),
             'url': url,
             'url_linktext': url_linktext,
-        }
-        template = jinja_environment.get_template('index.html')</b>
+        }</b>
+        <b>template = jinja_environment.get_template('index.html')</b>
         self.response.out.write(<b>template.render(template_values)</b>)
 </pre>
 
@@ -505,6 +533,7 @@ content_class: smaller
 
 
 <pre class="prettyprint" data-lang="python">
+<b>{% autoescape true %}</b>
 &lthtml>
   &ltbody>
     <b>{% for greeting in greetings %}</b>
@@ -513,18 +542,22 @@ content_class: smaller
       <b>{% else %}</b>
         An anonymous person wrote:
       <b>{% endif %}</b>
-      &ltblockquote><b>{{ greeting.content|escape }}</b>&lt/blockquote>
+      &ltblockquote><b>{{ greeting.content }}</b>&lt/blockquote>
     <b>{% endfor %}</b>
 
-    &ltform action="/sign" method="post">
+    &ltform action="/sign?guestbook_name=<b>{{ guestbook_name }</b>" method="post">
       &ltdiv>&lttextarea name="content" rows="3" cols="60">&lt/textarea>&lt/div>
       &ltdiv>&ltinput type="submit" value="Sign Guestbook">&lt/div>
     &lt/form>
-
-    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>&lt/a>
-
+    &lt;hr>
+    &lt;form>Guestbook name:
+      &lt;input value="<b>{{ guestbook_name }}</b>" name="guestbook_name">
+      &lt;input type="submit" value="switch">
+    &lt;/form>
+    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>& !f!Glt/a>
   &lt/body>
 &lt/html>
+<b>{% endautoescape %}</b>
 </pre>
 
 ---
@@ -551,6 +584,8 @@ threadsafe: true
   script: helloworld.app
 
 libraries:
+- name: webapp2
+  version: latest
 - name: jinja2
   version: latest
 </pre>

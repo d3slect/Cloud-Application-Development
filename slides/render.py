@@ -4,10 +4,11 @@ import codecs
 import re
 import jinja2
 import markdown
+import sys
 
-def process_slides():
-  with codecs.open('presentation-output.html', 'w', encoding='utf8') as outfile:
-    md = codecs.open('slides.md', encoding='utf8').read()
+def process_slides(mdName, outName):
+  with codecs.open(outName, 'w', encoding='utf8') as outfile:
+    md = codecs.open(mdName, encoding='utf8').read()
     md_slides = md.split('\n---\n')
     print 'Compiled %s slides.' % len(md_slides)
 
@@ -54,4 +55,9 @@ def postprocess_html(html, metadata):
   return html
 
 if __name__ == '__main__':
-  process_slides()
+  mdName = 'slides.md'
+  outName = 'presentation-output.html'
+  if len(sys.argv) == 3:
+    mdName = sys.argv[1]
+    outName = sys.argv[2]
+  process_slides(mdName, outName)
