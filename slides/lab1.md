@@ -323,34 +323,34 @@ content_class: smaller
 
 [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/introduction)
 
-- Google Accounts for authentication
+- User authentication via Google Accounts
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers), 
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
 )
-- Users post text messages via HTML forms
+- Handling HTTP requests (guestbook posts)
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 )
-- Datastore for storage of persistent data 
+- Storing persistent data in Datastore
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 )
 	- we'll use the older/simpler DB API (the tutorial uses NDB)
-- Jinja2 templating engine for HTML rendering
+- Rendering HTML via templates (Jinja2 templating engine)
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), 
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
 )
-- Static CSS file
+- Serving static (CSS) files
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
 [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 )
 <p></p>
-- complete sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook)
+- Sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook)
 
 ---
 
@@ -430,7 +430,7 @@ sources on [github](https://github.com/keznikl/Cloud-Application-Development/tre
 from google.appengine.ext import db
 
 class Greeting(db.Model):
-    author = db.StringProperty()
+    author = db.UserProperty()
     content = db.StringProperty(multiline=True)
     date = db.DateTimeProperty(auto_now_add=True)
 </pre>
@@ -444,8 +444,8 @@ class Guestbook(webapp2.RequestHandler):
         guestbook_name = self.request.get('guestbook_name')
         # strong consistency, but max ~1/second
         <b>greeting = Greeting(parent=guestbook_key(guestbook_name))</b>
-        if users.get_current_user(): !Y!P
-            greeting.author = users.get_current_user().nickname()
+        if users.get_current_user():
+            greeting.author = users.get_current_user()
         greeting.content = self.request.get('content')
         <b>greeting.put()</b>
         self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
@@ -469,7 +469,7 @@ q = db.GqlQuery("SELECT * FROM Greeting "
 # or
 q = Greeting.gql("WHERE ANCESTOR IS :1 AND date > :2 ORDER BY date DESC LIMIT 10",
                  guestbook_key(guestbook_name), week_ago)
-#or 
+# or 
 q = Greeting.all().ancestor(guestbook_key(guestbook_name)).
              filter("date >", week_ago).
              order('-date')
@@ -538,7 +538,7 @@ content_class: smaller
   &ltbody>
     <b>{% for greeting in greetings %}</b>
       <b>{% if greeting.author %}</b>
-        &ltb><b>{{ greeting.author }}</b>&lt/b> wrote:
+        &ltb><b>{{ greeting.author.nickname() }}</b>&lt/b> wrote:
       <b>{% else %}</b>
         An anonymous person wrote:
       <b>{% endif %}</b>
