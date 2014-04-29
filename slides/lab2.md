@@ -8,36 +8,108 @@ class: segue dark nobackground
 title: Datastore Overview
 content_class: smaller
 
-- [Doc](https://developers.google.com/appengine/docs/python/datastore/overview)
-- Distributed storage based on [Bigtable](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf)
-	- Highly scalable
-	- In fact 6 Bigtables (1 for all the data, 4 for indexes, ..., [doc](https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables))
-- Replication across multiple data centers using the [Paxos algorithm](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/archive/paxos_made_live.pdf)
-	- High availability (five 9s)
-	- Eventual consistency ([wiki](http://en.wikipedia.org/wiki/Eventual_consistency))
+- [Doc](https://developers.google.com/appengine/docs/python/ndb/), [Old API Doc](https://developers.google.com/appengine/docs/python/datastore/overview) (most parts still relevant)
+- Distributed storage based on
+	-  [Megastore](http://static.googleusercontent.com/media/research.google.com/cs//pubs/archive/36971.pdf): structured data model (entities), replication, partitioning (entity groups)
+	- [Bigtable](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/cs//archive/bigtable-osdi06.pdf): key-value storage, scalable, fault-tolerant (implements replication, low-level partitioning)
+		- In fact 6 Bigtables (1 for all the data, 4 for indexes, ..., [doc](https://developers.google.com/appengine/articles/storage_breakdown?hl=en#anc-tables))
+	- Replication across multiple data centers using the [Paxos algorithm](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/archive/paxos_made_live.pdf)
+- High availability (five 9s)
+- Eventual consistency ([article](https://cloud.google.com/developers/articles/balancing-strong-and-eventual-consistency-with-google-cloud-datastore))
 - Entity = unit of data storage
 	- kind, id, value, ...
 - Entities located either directly via keys or in queries via pre-built indexes 
-	- All queries are served via the indexes => limited but scalable queries 
-	- Direct access via key can be simple/[batch](https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations)/[async]()
+	- **All queries are served via the indexes** = limited but **scalable queries** 
+	- Direct access via key can be simple/[batch](https://developers.google.com/appengine/docs/python/ndb/entities#multiple)/[async](https://developers.google.com/appengine/docs/python/ndb/async)
 
+
+---
+
+title: Replication & Consistency
+content_class: smaller
+
+- Two consistency levels ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Python_Data_consistency))
+	- [Strong consistency](http://en.wikipedia.org/wiki/Strong_consistency): queries guarantee the freshest results, but may take longer to complete
+	- [Eventual consistency](http://en.wikipedia.org/wiki/Eventual_consistency): queries generally run faster, but may occasionally return stale results
+- Eventually consistent queries may return entities that no longer match the original query criteria
+- **Unit of consistency = entity group**
+
+
+---
+
+title: Replication & Eventual Consistency
+content_class: smaller
+
+<center>![Eventual Consistency](images/eventual-consistency.png)</center>
+
+[Balancing Strong and Eventual Consistency with Google Cloud Datastore](https://cloud.google.com/developers/articles/balancing-strong-and-eventual-consistency-with-google-cloud-datastore)
+
+---
+
+title: Replication & Strong Consistency
+content_class: smaller
+
+<center>![Strong Consistency](images/strong-consistency.png)</center>
+
+[Balancing Strong and Eventual Consistency with Google Cloud Datastore](https://cloud.google.com/developers/articles/balancing-strong-and-eventual-consistency-with-google-cloud-datastore)
+
+---
+
+title: Replication Layout
+content_class: smaller
+
+<center>![Replication Layout](images/replication-layout.png)</center>
+
+[Megastore paper](http://static.googleusercontent.com/media/research.google.com/cs//pubs/archive/36971.pdf)
+
+
+---
+
+title: Data Model & Consistency
+content_class: smaller
+
+- Clever design of entity groups is essential  ([tutorial](https://developers.google.com/appengine/articles/scaling/contention?hl=en), details later)
+- *Facebook exercise:* posts of the same user are strongly consistent 
+	- strictly consistent queries for the user's posts
+	- eventually consistent queries for posts of others 
+- [Structuring Data for Strong Consistency](https://developers.google.com/appengine/docs/python/datastore/structuring_for_strong_consistency)
+- [Balancing Strong and Eventual Consistency with Google Cloud Datastore](https://cloud.google.com/developers/articles/balancing-strong-and-eventual-consistency-with-google-cloud-datastore)
+
+
+---
+
+title: Consistency &mdash; The Commit Process
+content_class: smaller
+
+- [Google IO 2012 Video](https://www.youtube.com/watch?v=xO015C3R6dw)
+- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
+- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
+- Synchronous commit (to a majority of replicas), asynchronous (2-phase) apply
+	- In the apply phase, the entity's data and the index rows are written to disk in parallel
+- Visibility to other workloads
+	- First apply milestone &mdash; entity changes visible
+	- Second apply milestone &mdash; index changes visible
+
+<center>![The Commit Process](images/transaction_iso.png)</center>
 
 ---
 
 title: Entities
 content_class: smaller
 
-- [Doc](https://developers.google.com/appengine/docs/python/datastore/entities)
+- [Doc](https://developers.google.com/appengine/docs/python/ndb/entities)
 - Identifier
 	- User-supplied key name 
-	- Automatically assigned numeric ID
-- Named properties of various [types](https://developers.google.com/appengine/docs/python/datastore/entities#Properties_and_Value_Types)
+	- Automatically assigned or [user-supplied](https://developers.google.com/appengine/docs/python/ndb/entities#numeric_keys) numeric ID
+- Named properties of various [types](https://developers.google.com/appengine/docs/python/ndb/properties#types)
 	- Each can have one or more values 
+	- Can be further [structured](https://developers.google.com/appengine/docs/python/ndb/properties#structured) or [computed from other properties](https://developers.google.com/appengine/docs/python/ndb/properties#computed)
+	- Can be [customized](https://developers.google.com/appengine/docs/python/ndb/subclassprop)
 - Kind: categorizes the entity for the purpose of queries
 	- In python the Model class
 - Model: prescription of an entity ([doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling))
-	- Individual entities of the same kind can have different sets of properties ([doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_Expando_Class))
-	- Models can be hierarchic, allowing queries over a kind and its sub-kinds ([doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_PolyModel_Class))
+	- Individual entities of the same kind can have different sets of properties ([doc](https://developers.google.com/appengine/docs/python/ndb/entities#expando))
+	- Models can be hierarchic, allowing queries over a kind and its sub-kinds ([doc](https://developers.google.com/appengine/docs/python/ndb/polymodelclass), [old doc](https://developers.google.com/appengine/docs/python/datastore/datamodeling#The_PolyModel_Class))
 
 ---
 
@@ -45,8 +117,9 @@ title: Entities II
 content_class: smaller
 
 - Key: enables direct access
+	- Fast acces ([doc](https://developers.google.com/appengine/docs/python/ndb/cache))
 	- Unique for each entity
-	- Includes: entity's kind, identifier, ancestor path (later)
+	- Includes: entity's kind, identifier, ancestor path (below)
 	- Permanent == cannot be changed
 - Parent property
 	- Entities form hierarchically structured space (similar to a file system)
@@ -64,41 +137,44 @@ content_class: smaller
 title: Entities III
 content_class: smaller
 
-- Entity group ([doc](https://developers.google.com/appengine/docs/python/datastore/entities#Transactions_and_Entity_Groups))
+- Entity group ([doc](https://developers.google.com/appengine/docs/python/datastore/entities#Python_Transactions_and_entity_groups))
 	- An entity and its descendants (transitive children)
 	- Unit of transactionality (later)
 		- Transactions can only read/write entities in a single group
-	- Unit of consistency (later)
+	- Unit of consistency
 		- Will always Get an entity once Put
 	- Limitations
+		- Permanent == cannot be changed
 		- Limited throughput 
 			- Max 1 write/s, in reality up to 5-10 writes/s
 		- Write/s != Entity/s
-			- Batch puts count as 1 write ([doc](https://developers.google.com/appengine/docs/python/datastore/entities#Batch_Operations))
+			- Batch puts count as 1 write ([doc](https://developers.google.com/appengine/docs/python/ndb/entities#multiple)) 
+	- Each (even root) entity is its own entity group!
 	- Arbitrary size
 		- 10's of Milions of entities
 		- Better to make small entity groups to avoid write contention ([tutorial](https://developers.google.com/appengine/articles/scaling/contention?hl=en))
-	- Root entities are in separate entity groups
+
 
 ---
 
 title: Queries
 content_class: smaller
 
-- [Doc](https://developers.google.com/appengine/docs/python/datastore/queries)
+- [Doc](https://developers.google.com/appengine/docs/python/ndb/queries)
 - Each query includes:
-	- [Entity kind](https://developers.google.com/appengine/docs/python/datastore/entities#Kinds_and_Identifiers)
-	- Zero or more [filters](https://developers.google.com/appengine/docs/python/datastore/queries#Filters) (based on property values, keys, ancestors)
-		- Property queries may take one of the forms: =, <, <=, ..., !=, IN
-	- Zero or more [sort orders](https://developers.google.com/appengine/docs/python/datastore/queries#Sort_Orders)
+	- [Entity kind](https://developers.google.com/appengine/docs/python/datastore/entities#Python_Kinds_and_identifiers)
+	- Zero or more filters (based on [property values](https://developers.google.com/appengine/docs/python/ndb/queries#filter_by_prop), keys, [ancestors](https://developers.google.com/appengine/docs/python/ndb/queries#ancestor))
+		- Property queries may take one of the forms: ==, <, <=, ..., !=, IN
+	- Zero or more [sort orders](https://developers.google.com/appengine/docs/python/ndb/queries#order)
+- Ancestor query ([doc](https://developers.google.com/appengine/docs/python/ndb/queries#ancestor))
+	- Every query with an ancestor filter
 
 <pre class="prettyprint" data-lang="Python">
 # Query interface constructs a query using instance methods
-q = Person.all()
-q.filter("last_name =", "Smith")
-q.filter("height <=", max_height)
-q.ancestor(ancestor_key)
-q.order("-height")
+q = Person.query(ancestor=ancestor_key)
+          .filter(Person.last_name == 'Smith')
+          .filter(Person.height <= max_height)
+          .order(-Person.height)
 </pre>
 
 ---
@@ -106,17 +182,15 @@ q.order("-height")
 title: Queries II
 content_class: smaller
 
-- Queries are based solely on the indexes
-  ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries)) (details later)
+- Each query is executed on top of an index (details later)
 	- First row of the corresponding index matching the filter is found (fast)
 	- All the consecutive rows matching the filter are returned (up to the limit)
-- Benefits
-	- Scalable with the size of the result set
-- [Restrictions](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries)
+- BUT: **Scalable with the size of the result set**
+- [Restrictions](https://developers.google.com/appengine/docs/python/datastore/queries#Python_Restrictions_on_queries)
 	- A lot of indexes required
 	- Entities lacking a property named in the query are ignored.
 	- Filtering on unindexed properties returns no results.
-	- Inequality filters are limited to at most one property, *but can include equality on another property:*
+	- Inequality filters are limited to at most one property, *but can include equality on another properties:*
 
 <pre class="prettyprint" data-lang="GQL">
 SELECT * FROM Person WHERE last_name = :target_last_name
@@ -131,7 +205,7 @@ SELECT * FROM Person WHERE last_name = :target_last_name
 title: Queries III
 content_class: smaller
 
-- [Restrictions](https://developers.google.com/appengine/docs/python/datastore/queries#Restrictions_on_Queries) cont.
+- [Restrictions](https://developers.google.com/appengine/docs/python/datastore/queries#Python_Restrictions_on_queries) cont.
 	- Ordering of query results is undefined when no sort order is specified.
 	- Sort orders are ignored on properties with equality filters.
 	- Properties used in inequality filters must be sorted first.
@@ -148,20 +222,19 @@ content_class: smaller
 title: Queries IV
 content_class: smaller
 
-- Retrieving data ([doc](https://developers.google.com/appengine/docs/python/datastore/queryclass#Query_run))
+- Retrieving data ([doc](https://developers.google.com/appengine/docs/python/ndb/queryclass#Query_fetch))
 	- Limit on the number of results returned (to conserve resources)
 	- Offset of the first returned entity
-		- Still retrieved internally, better to use a [cursor](https://developers.google.com/appengine/docs/python/datastore/queries#Query_Cursors)
+		- Still retrieved internally, better to use a [cursor](https://developers.google.com/appengine/docs/python/ndb/queries#cursors) (details later)
 	- Internally retrieved in batches (batch size can be set)
-	- Queries can have time-outs (maximum 60sec)
+	- Queries can have time-outs (maximum 60sec, default 5sec)
 		- To ensure fast response
 	
 <pre class="prettyprint" data-lang="Python">
-q = Person.all()
+q = Person.query()
 ...
-
-for p in q.run(offset=5, limit=5, batch_size=50, dealine=10):
-  print "%s %s, %d inches tall" % (p.first_name, p.last_name, p.height)
+for p in q.fetch(1000, <b>offset=100, limit=500, batch_size=50, dealine=10</b>):
+    ...
 </pre>
 
 ---
@@ -169,66 +242,65 @@ for p in q.run(offset=5, limit=5, batch_size=50, dealine=10):
 title: Special Types of Queries
 content_class: smaller
 
-- Projection Query ([doc](https://developers.google.com/appengine/docs/python/datastore/projectionqueries))
-	- Retrieves only selected (indexed) properties
+- Projection Query ([doc](https://developers.google.com/appengine/docs/python/ndb/queries#projection))
+    - Retrieves only selected (indexed) properties
 	- Runs solely on top of indexes (runs faster and costs less than normal query)
 	- Entities returned by a projection query cannot be stored back
 	- For multivalued properties generates all combination of found values (as stored in the index)
-		- Including more than one multi-valued property in a projection requires an [exploding index](https://developers.google.com/appengine/docs/python/datastore/queries#Big_Entities_and_Exploding_Indexes)
-- Keys-Only Query ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Keys_Only_Queries))
+		- Including more than one multi-valued property in a projection requires an [exploding index](https://developers.google.com/appengine/docs/python/datastore/indexes#Python_Index_limits)
+
+<pre class="prettyprint" data-lang="Python">
+Article.query().fetch(10, <b>projection=[Article.author]</b>)
+</pre>
+
+- Keys-Only Query
 	- Returns only keys 
 	- Usually combined with a batch read of the relevant entities
-	- Same advantages/limitations as projection query 
+	- Same advantages/limitations as projection query
+
+<pre class="prettyprint" data-lang="Python">
+q.fetch(10, <b>keys_only=True</b>)
+</pre>
 
 ---
 
 title: Special Types of Queries II
 content_class: smaller
 
-- Kindles Query ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Kindless_Queries))
-	- Cannot include filters or sort orders on property values
-	- Can have filter on keys, `db.Query().filter('__key__ >', last_seen_key)`
-	- Can have ancestor filter
-- Ancestor query
-	- Every query with an ancestor filter
-	- `db.query_descendants()` to return a query for all descendants of a given entity
 
----
-
-title: Cursors
-content_class: smaller
-
-- [Doc](https://developers.google.com/appengine/docs/python/datastore/queries?hl=en#Query_Cursors)
-- For fetching additional results of a query in a subsequent request without offset overhead
-- String-encoded position in the index corresponding to the query
-	- base64-encoded string, may expose the key (app ID, kind, key name or ID, and all ancestor keys) and properties used in the query (including filters and sort orders)
-	- Cursor can be passed as HTTP GET/POST parameter or stored in datastore/memcache
-- Can be used only by the same application to resume the same query
-- A cursor determines an absolute position within an index
-	- NOT a relative position in the result list
-	- Data updates can have impact on the next results returned
-- Both *start* and *end* cursors
-	- You are not guaranteed that the size of the results will be the same as when you generated the cursors
-
-
----
-
-title: Cursors II
-content_class: smaller
+- Filtering properties by string ([doc](https://developers.google.com/appengine/docs/python/ndb/queries#properties_by_string))
+    - Useful for Expandos
 
 <pre class="prettyprint" data-lang="Python">
-people = Person.all()
-
-person_cursor = memcache.get('person_cursor')
-if person_cursor:
-  people<b>.with_cursor(start_cursor=person_cursor)</b>
-
-for person in people:
-  # Do something
-
-person_cursor = people<b>.cursor()</b>
-memcache.set('person_cursor', person_cursor)
+FlexibleEmployee.query(<b>ndb.GenericProperty('location')</b> == 'SF')
 </pre>
+
+- Kindles Query([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Python_Kindless_queries))
+	- For statistics etc.
+	- Cannot include filters or sort orders on property values
+	- Can have filter on keys/ancestor filter
+
+<pre class="prettyprint" data-lang="Python">
+<b>ndb.Query</b>(ancestor=...).filter(<b>ndb.GenericProperty('__key__')</b> > last_seen_key)
+</pre>
+
+- Structured-property filters ([doc](https://developers.google.com/appengine/docs/python/ndb/queries#filtering_structured_properties))
+
+<pre class="prettyprint" data-lang="Python">
+Contact.query(<b>Contact.address.city</b> == 'Amsterdam')
+Contact.query(Contact.address == Address(city='San Francisco', street='Spear St'))
+</pre>
+
+---
+
+title: Query Consistency
+content_class: smaller
+
+
+- Ancestor queries are strongly consistent by default
+	- Can be made eventually consistent Datastore read policy `qry.fetch(read_policy=ndb.EVENTUAL_CONSISTENCY)`
+- Non-ancestor queries are always eventually consistent 
+- Lookup by key is strongly consistent (key-only query is eventually consistent)
 
 
 ---
@@ -245,7 +317,7 @@ content_class: smaller
 	- Automatically updated by the dev. server when a new query is executed
 - An entity is included in the index only if it has a value set for every property used in the index
 	- Can have value `None`
-- A *perfect index* ensures that all results for every possible execution of the query appear in consecutive rows of the index table
+- A *perfect index* ensures that **all results for every possible execution of the query appear in consecutive rows of the index table**
 
 
 ---
@@ -271,15 +343,15 @@ content_class: smaller
 title: Indexes III
 content_class: smaller
 
-- Indexes have [limits](https://developers.google.com/appengine/docs/python/datastore/overview#Quotas_and_Limits)
+- Indexes have [limits](https://developers.google.com/appengine/docs/python/datastore/indexes#Python_Index_limits) ([doc](https://developers.google.com/appengine/docs/python/ndb/#quotas))
 	- Maximum number of index entries for an entity (20000)
 	- Maximum number of bytes in composite indexes for an entity (2 megabytes)
-- [Exploding indexes](https://developers.google.com/appengine/docs/python/datastore/indexes#Index_Limits)
+- [Exploding indexes](https://developers.google.com/appengine/docs/python/datastore/indexes#Python_Index_limits)
 	- For entities with multiple properties where each has multiple values the index must include an entry *for every possible combination* of property values
 	- The number of entries "explodes" combinatorially
 	- For example the entity  
 	<pre class="prettyprint" data-lang="Python">
-		class Widget(db.Expando):
+		class Widget(ndb.Expando):
 		  pass		
 		e2 = Widget()
 		e2.x = [1, 2, 3, 4]
@@ -294,7 +366,7 @@ content_class: smaller
 title: Indexes IV
 content_class: smaller
 
-- The number/type of indexes influences the cost of a single write ([doc](https://developers.google.com/appengine/docs/python/datastore/indexes#Index_Limits), [tutorial](https://developers.google.com/appengine/docs/python/datastore/entities#Understanding_Write_Costs))
+- The number/type of indexes influences the cost of a single write ([doc](https://developers.google.com/appengine/docs/python/datastore/entities#Python_Understanding_write_costs))
 	- 1 + the number of entries in the indexes the entity would appear in 
 	- By default 3 indexes
 		- `EntitiesByKind`
@@ -302,69 +374,81 @@ content_class: smaller
 		- `EntitiesByPropertyDesc`
 		- i.e., 1 for the kind index and then 2 for each property value. 
 	- Exploding indexes slow down entity writes dramatically (and may cause the entity to exceed the index limit)
-- Exploding indexes can be manually avoided ([tutorial](https://developers.google.com/appengine/articles/indexselection))
+- Exploding indexes can be manually avoided ([article](https://developers.google.com/appengine/articles/indexselection))
+
 
 ---
 
-title: Data Consistency
+title: Cursors
 content_class: smaller
 
-- Two consistency levels ([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Data_Consistency))
-	- [Strong consistency](http://en.wikipedia.org/wiki/Strong_consistency): queries guarantee the freshest results, but may take longer to complete
-	- [Eventual consistency](http://en.wikipedia.org/wiki/Eventual_consistency): queries generally run faster, but may occasionally return stale results
-- Eventually consistent queries:
-	- May use stale indexes
-	- May sometimes return entities that no longer match the original query criteria
-- Ancestor queries are strongly consistent by default
-	- Can be made eventually consistent Datastore read policy
-	- `Employee.all()...run(read_policy=db.EVENTUAL_CONSISTENCY)`
-- Non-ancestor queries are always eventually consistent
-- *Facebook exercise:* users own posts are strongly consistent (for the purpose of administration), posts of other users are eventually consistent
-- Further reading: [Structuring Data for Strong Consistency](https://developers.google.com/appengine/docs/python/datastore/structuring_for_strong_consistency)
+- [Doc](https://developers.google.com/appengine/docs/python/ndb/queries#cursors)
+- For fetching additional results of a query in a subsequent request without offset overhead
+- String-encoded position in the index corresponding to the query
+	- base64-encoded string, may expose the key (app ID, kind, key name or ID, and all ancestor keys) and properties used in the query (including filters and sort orders)
+	- Cursor can be passed as HTTP GET/POST parameter or stored in datastore/memcache
+- Can be used only by the same application to resume the same query
+- A cursor determines an absolute position within an index
+	- NOT a relative position in the result list
+	- Data updates can have impact on the next results returned
+- Both *start* and *end* cursors
+	- You are not guaranteed that the size of the results will be the same as when you generated the cursors
+
+
+---
+
+title: Cursors II
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Python">
+q = Person.query()
+
+person_cursor = memcache.get('person_cursor')
+# or
+person_cursor = Cursor(urlsafe=self.request.get('cursor'))
+
+if person_cursor:
+  people = q.fetch(10, start_cursor=person_cursor)
+  # or
+  people, next_cursor, is_more = q.fetch_page(10, start_cursor=person_cursor)
+  # or
+  iterator = q.iter(start_cursor=person_cursor, produce_cursors=True)
+
+for person in iterator:
+    if is_enough:
+        next_cursor = iterator.cursor_after()
+
+memcache.set('person_cursor', next_cursor)
+# or
+self.response.write('...?cursor=%s' % next_curs.urlsafe())
+</pre>
+
 
 ---
 
 title: Transactions
 content_class: smaller
 
-- [Doc](https://developers.google.com/appengine/docs/python/datastore/transactions)
+- [Doc](https://developers.google.com/appengine/docs/python/ndb/transactions)
 - [Transaction Isolation](https://developers.google.com/appengine/articles/transaction_isolation)
 - An operation or set of operations that is atomic
 	- Either all or none operations are applied
 - Defined on *a single entity group*
 	- Recall that each root entity belongs to a separate entity group
-	- Ancestor queries are always run in a transaction
+	- Ancestor queries and updates to a single entity are always run in a transaction
 - Consistency Inside Transactions: Serializable 
 	- In a transaction, all reads reflect the current, consistent state of the Datastore at the time the transaction started.
-	- [Snapshot isolation](http://en.wikipedia.org/wiki/Snapshot_isolation)
-- Consistency Outside Transactions: Read Committed
-	- Entities retrieved from the datastore by queries or gets will only see committed data.
+	- Queries and gets inside a Datastore transaction **do not see the results of previous writes** inside that transaction. ([Snapshot isolation](http://en.wikipedia.org/wiki/Snapshot_isolation))
+		- If an entity is modified or deleted within a transaction, a query or get returns the original version of the entity as of the beginning of the transaction, or nothing if the entity did not exist then
 
 ---
 
 title: Transactions II
 content_class: smaller
 
-- Consistency Outside Transactions cont.
-	- Queries can include entities, whose current data fail to meet the query constraints. 
-	- Queries and gets inside a Datastore transaction **do not see the results of previous writes** inside that transaction.
-		- If an entity is modified or deleted within a transaction, a query or get returns the original version of the entity as of the beginning of the transaction, or nothing if the entity did not exist then
-
----
-
-title: Transactions &mdash; The Commit Process
-content_class: smaller
-
-- [Google IO 2012 Video](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
-- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
-- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
-- Synchronous commit (to a majority of replicas), asynchronous (2-phase) apply
-	- In the apply phase, the entity's data and the index rows are written to disk in parallel
-- Visibility to other transactions
-	- First apply milestone &mdash; entity changes visible
-	- Second apply milestone &mdash; index changes visible
-
-<center>![The Commit Process](images/transaction_iso.png)</center>
+- Consistency Outside Transactions: Read Committed
+	- Entities retrieved from the datastore by queries or gets will only see committed data.
+	- Queries can include entities, whose current data fail to meet the query constraints (due to async. index update). 
 
 ---
 
@@ -374,7 +458,7 @@ content_class: smaller
 - [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
 - If the entity data fails to update in the commit phase, no changes are made. 
 - If the commit phase has succeeded but the apply phase failed
-	- The next time you execute a read or write or start a transaction on this entity group, the datastore will first roll forward and fully apply this committed but unapplied write
+	- The next time you execute a read or write or start a transaction on the same entity group, the datastore will first roll forward and fully apply this committed but unapplied write
 	- The datastore continuously sweeps for partially applied jobs and rolls forward writes to indexes and entities that have not yet received the changes to the entity
 - If your app receives an exception when submitting a transaction, it does not always mean that the transaction failed.
 	- You can receive the following exceptions in cases where transactions have been committed and eventually will be applied successfully
@@ -397,29 +481,22 @@ content_class: smaller
 
 
 <pre class="prettyprint" data-lang="Python">
-from google.appengine.ext import db
+class Accumulator(ndb.Model):
+    counter = ndb.IntegerProperty(default=0)
 
-class Accumulator(db.Model):
-    counter = db.IntegerProperty(default=0)
+key = Acumulator.query.get().key
+amount = 5
 
-<b>@db.transactional
-def increment_counter(key, amount)</b>:
+<b>@ndb.transactional
+def increment_counter()</b>:
     obj = db.get(key)
     obj.counter += amount
     obj.put()
 
-q = db.GqlQuery("SELECT * FROM Accumulator")
-acc = q.get()
-
-<b>increment_counter(acc.key(), 5)</b>
-</pre>
-
-<pre class="prettyprint" data-lang="Python">
-...
+#or
 <b>def increment_counter(key, amount):</b>
-...
-
-<b>db.run_in_transaction(increment_counter, acc.key(), 5)</b>
+    ...
+<b>ndb.transaction(lambda: increment_counter(key, amount))</b>
 </pre>
 
 ---
@@ -484,13 +561,14 @@ content_class: smaller
 	- [Modeling Entity Relationships](https://developers.google.com/appengine/articles/modeling)
 	- [Accessing the Datastore Remotely With remote_api](https://developers.google.com/appengine/articles/remote_api)	
 	- [Best practices for writing scalable applications](https://developers.google.com/appengine/articles/scaling/overview)
+	- [Balancing Strong and Eventual Consistency with Google Cloud Datastore](https://cloud.google.com/developers/articles/balancing-strong-and-eventual-consistency-with-google-cloud-datastore)
 - Datastore internals
 	- [Life of a Datastore Write](https://developers.google.com/appengine/articles/life_of_write)
 	- [Transaction Isolation in App Engine](https://developers.google.com/appengine/articles/transaction_isolation)
 	- [How Entities and Indexes are Stored](https://developers.google.com/appengine/articles/storage_breakdown)
-	- [Life in App Engine Production](http://www.google.com/events/io/2011/sessions/life-in-app-engine-production.html)
-	- [More 9s Please: Under The Covers of the High Replication Datastore](http://www.google.com/events/io/2011/sessions/more-9s-please-under-the-covers-of-the-high-replication-datastore.html)
-	- [Android + App Engine: A Developer's Dream Combination](http://www.google.com/events/io/2011/sessions/android-app-engine-a-developer-s-dream-combination.html)
+	- [Life in App Engine Production](https://www.youtube.com/watch?v=rgQm1KEIIuc)
+	- [More 9s Please: Under The Covers of the High Replication Datastore](https://www.youtube.com/watch?v=xO015C3R6dw)
+	- [Android + App Engine: A Developer's Dream Combination](https://www.youtube.com/watch?v=M7SxNNC429U)
 
 
 ---
@@ -539,7 +617,7 @@ content_class: smaller
 	- Allows configuring processing rate
 - [Pull queues](https://developers.google.com/appengine/docs/python/taskqueue/overview-pull)
 	- Allows to execute (consume) tasks outside the GAE's default taks processing system
-	- In a [backend](https://developers.google.com/appengine/docs/python/backends) (later)
+	- In a [long-running instance](https://developers.google.com/appengine/docs/python/modules/) (later)
 	- Outside GAE ([Task Queue REST API](https://developers.google.com/appengine/docs/python/taskqueue/rest))
 
 ---
@@ -560,7 +638,7 @@ content_class: smaller
 	- Maximum execution rate
 - Can be integrated with [CRON](https://developers.google.com/appengine/docs/python/config/cron)
 - Can be deferred to a [backend](https://developers.google.com/appengine/docs/python/backends) (later) ([doc](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Push_Queues_and_Backends))
-- [Limits](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Quotas_and_Limits_for_Push_Queues)
+- [Limits](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Python_Quotas_and_limits_for_push_queues)
 	- Task size (100KB), number of queues (10), queue execution rate (500 tasks/s)
 
 ---
@@ -572,7 +650,7 @@ content_class: smaller
 - Wrapper on top of Push Task Queues
 	- Automatically packages the function call and its arguments and adds it to a task queue
 	- No more setting up dedicated task handlers and serializing and deserializing parameters
-- Built-in handler ([doc](https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers))
+- Built-in handler ([doc](https://developers.google.com/appengine/docs/python/config/appconfig#Python_app_yaml_Builtin_handlers))
 - Works with any python 'callable', including functions, methods, class methods and callable objects
 
 <pre class="prettyprint" data-lang="Python">
@@ -604,91 +682,6 @@ content_class: smaller
 - Use the Task Queue API if
 	- You need a control over how tasks are queued and executed
 	- You want to manage throughput, minimize overhead, have direct control over tasks and better monitoring
-
----
-
-title: Backends
-content_class: smaller
-
-- [Doc](https://developers.google.com/appengine/docs/python/backends/)
-- Separate Python instances within your GAE app
-	- No request deadlines
-	- Have more resources than normal instances
-	- Manually defined number and resources (do not scale with the app)
-- Resident/Dynamic [types](https://developers.google.com/appengine/docs/python/config/backends#Types_of_Backends)
-- Accessed via HTTP requests ([doc](https://developers.google.com/appengine/docs/python/backends/overview#Addressing_Backends))
-- Pending task queue for incoming traffic
-- Specific request handlers for start/processing ([doc](https://developers.google.com/appengine/docs/python/backends/overview#Backend_States))
-	- Background (start) handler can start a program, that runs indefinitely, without accepting requests ([doc](https://developers.google.com/appengine/docs/python/backends/overview#background_threads))
-
-<pre class="prettyprint" data-lang="Python">
-from google.appengine.api import background_thread
-
-def f(arg1, arg2, *kwargs):
-  ...something useful...
-
-tid = background_thread.start_new_background_thread(f, ["foo", "bar"])
-</pre>
-
-
----
-
-title: Backends &mdash; Types
-content_class: smaller
-
-<table>
-  <tbody><tr>
-    <th></th>
-    <th>Resident</th>
-    <th>Dynamic</th>
-  </tr>
-  <tr>
-    <td>Startup/Shutdown</td>
-    <td>Manual (Admin Console)</td>
-    <td>Upon receipt of HTTP request / after idling a few minutes</td>
-  </tr>
-  <tr>
-    <td>State</td>
-    <td>Preserved</td>
-    <td>Erased when shutdown after idle</td>
-  </tr>
-  <tr>
-    <td>Processing type</td>
-    <td>Continuous or driven by requests</td>
-    <td>Driven by requests</td>
-  </tr>
-  <tr>
-    <td>Cost</td>
-    <td>More (run continuously)</td>
-    <td>Less (shutdown after idle)</td>
-  </tr>
-  <tr>
-    <td>Use</td>
-    <td>
-	Continuous processing or preserving state
-        <ul>
-        <li>Storing a game state in memory</li>
-        <li>Caching a social graph or web index</li>
-        <li>Running a web crawler</li>
-        </ul>
-    </td>
-    <td>
-	Request-based processing
-    <ul>
-      <li>Task queue requests requiring more power, time, or memory to complete.</li>
-      <li>Report generation</li>
-      <li>Large or complex user requests</li>
-      <li>Ad-hoc queries or admin scripts</li>
-    </ul>
-    </td>
-  </tr>
-  <tr>
-    <td>Load balancing</td>
-    <td>Evenly balanced accross all instances</td>
-    <td>Served by minimum number of instances first, new instances allocated as traffic increases</td>
-  </tr>
-</table>
-
 
 ---
 
@@ -777,7 +770,7 @@ content_class: smaller
 
 ---
 
-title: Homework
+title: Homework Reminder
 content_class: smaller
 
 - Should use at least 2 of the advanced datastore-based features
@@ -786,5 +779,4 @@ content_class: smaller
 	- Memcache, Task Queues, Blobstore, Channels, ...
 - Send a description via email for confirmation
 - Work in groups preferred
-- Due in 2 weeks
 
