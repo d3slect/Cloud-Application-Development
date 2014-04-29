@@ -637,7 +637,7 @@ content_class: smaller
 - Queues configured in the `queue.yaml` file ([doc](https://developers.google.com/appengine/docs/python/config/queue))
 	- Maximum execution rate
 - Can be integrated with [CRON](https://developers.google.com/appengine/docs/python/config/cron)
-- Can be deferred to a [backend](https://developers.google.com/appengine/docs/python/backends) (later) ([doc](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Push_Queues_and_Backends))
+- Can be deferred to a [long-running instance](https://developers.google.com/appengine/docs/python/modules/) (later)
 - [Limits](https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Python_Quotas_and_limits_for_push_queues)
 	- Task size (100KB), number of queues (10), queue execution rate (500 tasks/s)
 
