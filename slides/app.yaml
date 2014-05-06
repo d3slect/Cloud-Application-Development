@@ -21,6 +21,11 @@ handlers:
   static_files: lab2.html
   upload: lab2\.html
 
+
+- url: /lab3
+  static_files: lab3.html
+  upload: lab3\.html
+
 - url: /slide_config\.js
   static_files: slide_config.js
   upload: slide_config\.js
