@@ -135,6 +135,9 @@ function prettyName(name, sidebar) {
 
 // Constructs the info div for a stage.
 function constructStageNode(pipelineId, infoMap, sidebar) {
+  if (!infoMap) {
+    return;
+  }
   var containerDiv = $('<div class="status-box">');
   containerDiv.addClass('status-' + infoMap.status);
 
@@ -169,7 +172,7 @@ function constructStageNode(pipelineId, infoMap, sidebar) {
   // Determine timing information based on state.
   var statusTimeLabel = null;
   var statusTimeMs = null;
-  var statusRuntimeDiv = null
+  var statusRuntimeDiv = null;
 
   if (infoMap.status == 'done') {
     statusRuntimeDiv = $('<div class="status-runtime">');
@@ -194,7 +197,8 @@ function constructStageNode(pipelineId, infoMap, sidebar) {
   } else if (infoMap.status == 'finalizing') {
     statusTimeLabel = 'Complete';
     statusTimeMs = infoMap.endTimeMs;
-  } else if (infoMap.status == 'aborted') {
+  } else if (infoMap.status == 'aborted' ||
+             infoMap.status == 'canceled') {
     statusTimeLabel = 'Aborted';
     statusTimeMs = infoMap.endTimeMs;
   } else if (infoMap.status == 'waiting') {
@@ -589,23 +593,24 @@ function generateSidebar(statusMap, nextPipelineId, rootElement) {
   currentElement.append(
       constructStageNode(nextPipelineId, parentInfoMap, true));
 
-  var children = statusMap.pipelines[nextPipelineId].children;
-  if (children.length > 0) {
-    var treeElement = null;
-    if (rootElement) {
-      treeElement =
-          $('<ul id="pipeline-tree" class="treeview-black treeview">');
-    } else {
-      treeElement = $('<ul>');
+  if (statusMap.pipelines[nextPipelineId]) {
+    var children = statusMap.pipelines[nextPipelineId].children;
+    if (children.length > 0) {
+      var treeElement = null;
+      if (rootElement) {
+        treeElement =
+            $('<ul id="pipeline-tree" class="treeview-black treeview">');
+      } else {
+        treeElement = $('<ul>');
+      }
+
+      $.each(children, function(index, childPipelineId) {
+        var childElement = generateSidebar(statusMap, childPipelineId);
+        treeElement.append(childElement);
+      });
+      currentElement.append(treeElement);
     }
-
-    $.each(children, function(index, childPipelineId) {
-      var childElement = generateSidebar(statusMap, childPipelineId);
-      treeElement.append(childElement);
-    });
-    currentElement.append(treeElement);
   }
-
   return currentElement;
 }
 
@@ -644,7 +649,7 @@ function findActivePipeline(pipelineId, isRoot) {
     } else {
       return 0;
     }
-  })
+  });
 
   for (var i = 0; i < children.length; ++i) {
     var foundPipelineId = findActivePipeline(children[i], false);
@@ -736,7 +741,7 @@ function handleHashChange() {
   // Update the detail status frame.
   var stageNode = constructStageNode(pipelineId, infoMap, false);
   $('#overview').remove();
-  stageNode.attr('id', 'overview')
+  stageNode.attr('id', 'overview');
   $('#detail').append(stageNode);
 
   // Make sure everything is the right size.
@@ -788,17 +793,45 @@ function initStatus() {
         AUTO_REFRESH = false;
       } else if (mapping[0] == 'root') {
         ROOT_PIPELINE_ID = mapping[1];
+        if (ROOT_PIPELINE_ID.match(/^pipeline-/)) {
+          ROOT_PIPELINE_ID = ROOT_PIPELINE_ID.substring(9);
+        }
       }
     });
   }
 
-  setButter('Loading... #' + ROOT_PIPELINE_ID);
-  $.ajax({
+  if (!Boolean(ROOT_PIPELINE_ID)) {
+    setButter('Missing root param' +
+        '. For a job list click <a href="list">here</a>.',
+        true, null, true);
+    return;
+  }
+
+  var loadingMsg = 'Loading... #' + ROOT_PIPELINE_ID;
+  var attempts = 1;
+  var ajaxRequest = {
     type: 'GET',
     url: 'rpc/tree?root_pipeline_id=' + ROOT_PIPELINE_ID,
     dataType: 'text',
     error: function(request, textStatus) {
-      getResponseDataJson(textStatus);
+      if (request.status == 404) {
+        if (++attempts <= 5) {
+          setButter(loadingMsg + ' [attempt #' + attempts + ']');
+          window.setTimeout(function() {
+            $.ajax(jQuery.extend({}, ajaxRequest));
+          }, 2000);
+        } else {
+          setButter('Could not find pipeline #' + ROOT_PIPELINE_ID +
+              '. For a job list click <a href="list">here</a>.',
+              true, null, true);
+        }
+      } else if (request.status == 449) {
+        var root = request.getResponseHeader('root_pipeline_id');
+        var newURL = '?root=' + root + '#pipeline-' + ROOT_PIPELINE_ID;
+        window.location.replace(newURL);
+      } else {
+        getResponseDataJson(textStatus);
+      }
     },
     success: function(data, textStatus, request) {
       var response = getResponseDataJson(null, data);
@@ -808,12 +841,19 @@ function initStatus() {
         initStatusDone();
       }
     }
-  });
+  };
+  setButter(loadingMsg);
+  $.ajax(jQuery.extend({}, ajaxRequest));
 }
 
 
 function initStatusDone() {
   jQuery.timeago.settings.allowFuture = true;
+
+  // Update the root pipeline ID to match what the server returns. This handles
+  // the case where the ID specified is for a child node. We always want to
+  // show status up to the root.
+  ROOT_PIPELINE_ID = STATUS_MAP.rootPipelineId;
 
   // Generate the sidebar.
   generateSidebar(STATUS_MAP, null, $('#sidebar'));
@@ -823,7 +863,7 @@ function initStatusDone() {
     collapsed: true,
     unique: false,
     cookieId: 'pipeline Id here',
-    toggle: handleTreeToggle,
+    toggle: handleTreeToggle
   });
   $('#sidebar').show();
 
@@ -833,7 +873,9 @@ function initStatusDone() {
     $('#auto-refresh').attr('checked', '');
   } else {
     var rootStatus = STATUS_MAP.pipelines[STATUS_MAP.rootPipelineId].status;
-    if (rootStatus != 'done' && rootStatus != 'aborted') {
+    if (!(rootStatus == 'done' ||
+          rootStatus == 'aborted' ||
+          rootStatus == 'canceled')) {
       // Only do auto-refresh behavior if we're not in a terminal state.
       window.setTimeout(function() {
         var loc = window.location;

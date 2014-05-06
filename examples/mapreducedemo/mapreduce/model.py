@@ -22,279 +22,206 @@ serialized to/from json and passed around with other means.
 """
 
 # Disable "Invalid method name"
-# pylint: disable-msg=C6409
+# pylint: disable=g-bad-name
 
 
 
-__all__ = ["JsonEncoder",
-           "JsonDecoder",
-           "JSON_DEFAULTS",
-           "JsonMixin",
-           "JsonProperty",
-           "MapreduceState",
+__all__ = ["MapreduceState",
            "MapperSpec",
            "MapreduceControl",
            "MapreduceSpec",
            "ShardState",
            "CountersMap",
            "TransientShardState",
-           "QuerySpec"]
+           "QuerySpec",
+           "HugeTask"]
 
-import copy
+import cgi
 import datetime
-import logging
-import os
-import random
-from mapreduce.lib import simplejson
-import time
+import urllib
+import zlib
 
-from google.appengine.api import datastore_errors
-from google.appengine.api import datastore_types
+from mapreduce.lib.graphy.backends import google_chart_api
+from mapreduce.lib import simplejson
+
+from google.appengine.api import memcache
+from google.appengine.api import taskqueue
+from google.appengine.datastore import datastore_rpc
 from google.appengine.ext import db
 from mapreduce import context
 from mapreduce import hooks
+from mapreduce import json_util
 from mapreduce import util
-from mapreduce.lib.graphy.backends import google_chart_api
 
 
-# Default rate of processed entities per second.
-# Make this high, because too many people are confused when mapper is too slow.
-_DEFAULT_PROCESSING_RATE_PER_SEC = 1000000
-
-# Default number of shards to have.
-_DEFAULT_SHARD_COUNT = 8
+# pylint: disable=protected-access
 
 
-class JsonEncoder(simplejson.JSONEncoder):
-  """MR customized json encoder."""
-
-  TYPE_ID = "__mr_json_type"
-
-  def default(self, o):
-    """Inherit docs."""
-    if type(o) in JSON_DEFAULTS:
-      encoder = JSON_DEFAULTS[type(o)][0]
-      json_struct = encoder(o)
-      json_struct[self.TYPE_ID] = type(o).__name__
-      return json_struct
-    return super(JsonEncoder, self).default(o)
+# Special datastore kinds for MR.
+_MAP_REDUCE_KINDS = ("_AE_MR_MapreduceControl",
+                     "_AE_MR_MapreduceState",
+                     "_AE_MR_ShardState",
+                     "_AE_MR_TaskPayload")
 
 
-class JsonDecoder(simplejson.JSONDecoder):
-  """MR customized json decoder."""
+class _HugeTaskPayload(db.Model):
+  """Model object to store task payload."""
 
-  def __init__(self, **kwargs):
-    if "object_hook" not in kwargs:
-      kwargs["object_hook"] = self._dict_to_obj
-    super(JsonDecoder, self).__init__(**kwargs)
-
-  def _dict_to_obj(self, d):
-    """Converts a dictionary of json object to a Python object."""
-    if JsonEncoder.TYPE_ID not in d:
-      return d
-
-    obj_type = d.pop(JsonEncoder.TYPE_ID)
-    if obj_type in _TYPE_IDS:
-      decoder = JSON_DEFAULTS[_TYPE_IDS[obj_type]][1]
-      return decoder(d)
-    else:
-      raise TypeError("Invalid type %s.", obj_type)
-
-
-_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
-
-
-def _json_encode_datetime(o):
-  """Json encode a datetime object.
-
-  Args:
-    o: a datetime object.
-
-  Returns:
-    A dict of json primitives.
-  """
-  return {"isostr": o.strftime(_DATETIME_FORMAT)}
-
-
-def _json_decode_datetime(d):
-  """Converts a dict of json primitives to a datetime object."""
-  return datetime.datetime.strptime(d["isostr"], _DATETIME_FORMAT)
-
-
-# To extend what Pipeline can json serialize, add to this where
-# key is the type and value is a tuple of encoder and decoder function.
-JSON_DEFAULTS = {
-    datetime.datetime: (_json_encode_datetime, _json_decode_datetime),
-}
-
-
-_TYPE_IDS = dict(zip([_cls.__name__ for _cls in JSON_DEFAULTS],
-                     JSON_DEFAULTS.keys()))
-
-
-class JsonMixin(object):
-  """Simple, stateless json utilities mixin.
-
-  Requires class to implement two methods:
-    to_json(self): convert data to json-compatible datastructure (dict,
-      list, strings, numbers)
-    @classmethod from_json(cls, json): load data from json-compatible structure.
-  """
-
-  def to_json_str(self):
-    """Convert data to json string representation.
-
-    Returns:
-      json representation as string.
-    """
-    json = self.to_json()
-    try:
-      return simplejson.dumps(json, sort_keys=True, cls=JsonEncoder)
-    except:
-      logging.exception("Could not serialize JSON: %r", json)
-      raise
+  payload = db.BlobProperty()
 
   @classmethod
-  def from_json_str(cls, json_str):
-    """Convert json string representation into class instance.
-
-    Args:
-      json_str: json representation as string.
-
-    Returns:
-      New instance of the class with data loaded from json string.
-    """
-    return cls.from_json(simplejson.loads(json_str, cls=JsonDecoder))
+  def kind(cls):
+    """Returns entity kind."""
+    return "_AE_MR_TaskPayload"
 
 
-class JsonProperty(db.UnindexedProperty):
-  """Property type for storing json representation of data.
+class HugeTask(object):
+  """HugeTask is a taskqueue.Task-like class that can store big payloads.
 
-  Requires data types to implement two methods:
-    to_json(self): convert data to json-compatible datastructure (dict,
-      list, strings, numbers)
-    @classmethod from_json(cls, json): load data from json-compatible structure.
+  Payloads are stored either in the task payload itself or in the datastore.
+  Task handlers should inherit from base_handler.HugeTaskHandler class.
   """
 
-  def __init__(self, data_type, default=None, **kwargs):
-    """Constructor.
+  PAYLOAD_PARAM = "__payload"
+  PAYLOAD_KEY_PARAM = "__payload_key"
+
+  # Leave some wiggle room for headers and other fields.
+  MAX_TASK_PAYLOAD = taskqueue.MAX_PUSH_TASK_SIZE_BYTES - 1024
+  MAX_DB_PAYLOAD = datastore_rpc.BaseConnection.MAX_RPC_BYTES
+
+  PAYLOAD_VERSION_HEADER = "AE-MR-Payload-Version"
+  # Update version when payload handling is changed
+  # in a backward incompatible way.
+  PAYLOAD_VERSION = "1"
+
+  def __init__(self,
+               url,
+               params,
+               name=None,
+               eta=None,
+               countdown=None,
+               parent=None,
+               headers=None):
+    """Init.
 
     Args:
-      data_type: underlying data type as class.
-      default: default value for the property. The value is deep copied
-        fore each model instance.
-      kwargs: remaining arguments.
-    """
-    kwargs["default"] = default
-    super(JsonProperty, self).__init__(**kwargs)
-    self.data_type = data_type
-
-  def get_value_for_datastore(self, model_instance):
-    """Gets value for datastore.
-
-    Args:
-      model_instance: instance of the model class.
-
-    Returns:
-      datastore-compatible value.
-    """
-    value = super(JsonProperty, self).get_value_for_datastore(model_instance)
-    if not value:
-      return None
-    json_value = value
-    if not isinstance(value, dict):
-      json_value = value.to_json()
-    if not json_value:
-      return None
-    return datastore_types.Text(simplejson.dumps(
-        json_value, sort_keys=True, cls=JsonEncoder))
-
-  def make_value_from_datastore(self, value):
-    """Convert value from datastore representation.
-
-    Args:
-      value: datastore value.
-
-    Returns:
-      value to store in the model.
-    """
-
-    if value is None:
-      return None
-    json = simplejson.loads(value, cls=JsonDecoder)
-    if self.data_type == dict:
-      return json
-    return self.data_type.from_json(json)
-
-  def validate(self, value):
-    """Validate value.
-
-    Args:
-      value: model value.
-
-    Returns:
-      Whether the specified value is valid data type value.
+      url: task url in str.
+      params: a dict from str to str.
+      name: task name.
+      eta: task eta.
+      countdown: task countdown.
+      parent: parent entity of huge task's payload.
+      headers: a dict of headers for the task.
 
     Raises:
-      BadValueError: when value is not of self.data_type type.
+      ValueError: when payload is too big even for datastore, or parent is
+    not specified when payload is stored in datastore.
     """
-    if value is not None and not isinstance(value, self.data_type):
-      raise datastore_errors.BadValueError(
-          "Property %s must be convertible to a %s instance (%s)" %
-          (self.name, self.data_type, value))
-    return super(JsonProperty, self).validate(value)
+    self.url = url
+    self.name = name
+    self.eta = eta
+    self.countdown = countdown
+    self._headers = {
+        "Content-Type": "application/octet-stream",
+        self.PAYLOAD_VERSION_HEADER: self.PAYLOAD_VERSION
+    }
+    if headers:
+      self._headers.update(headers)
 
-  def empty(self, value):
-    """Checks if value is empty.
+    # TODO(user): Find a more space efficient way than urlencoding.
+    payload_str = urllib.urlencode(params)
+    compressed_payload = ""
+    if len(payload_str) > self.MAX_TASK_PAYLOAD:
+      compressed_payload = zlib.compress(payload_str)
+
+    # Payload is small. Don't bother with anything.
+    if not compressed_payload:
+      self._payload = payload_str
+    # Compressed payload is small. Don't bother with datastore.
+    elif len(compressed_payload) < self.MAX_TASK_PAYLOAD:
+      self._payload = self.PAYLOAD_PARAM + compressed_payload
+    elif len(compressed_payload) > self.MAX_DB_PAYLOAD:
+      raise ValueError(
+          "Payload from %s to big to be stored in database: %s" %
+          (self.name, len(compressed_payload)))
+    # Store payload in the datastore.
+    else:
+      if not parent:
+        raise ValueError("Huge tasks should specify parent entity.")
+
+      payload_entity = _HugeTaskPayload(payload=compressed_payload,
+                                        parent=parent)
+      payload_key = payload_entity.put()
+      self._payload = self.PAYLOAD_KEY_PARAM + str(payload_key)
+
+  def add(self, queue_name, transactional=False):
+    """Add task to the queue."""
+    task = self.to_task()
+    task.add(queue_name, transactional)
+
+  def to_task(self):
+    """Convert to a taskqueue task."""
+    # Never pass params to taskqueue.Task. Use payload instead. Otherwise,
+    # it's up to a particular taskqueue implementation to generate
+    # payload from params. It could blow up payload size over limit.
+    return taskqueue.Task(
+        url=self.url,
+        payload=self._payload,
+        name=self.name,
+        eta=self.eta,
+        countdown=self.countdown,
+        headers=self._headers)
+
+  @classmethod
+  def decode_payload(cls, request):
+    """Decode task payload.
+
+    HugeTask controls its own payload entirely including urlencoding.
+    It doesn't depend on any particular web framework.
 
     Args:
-      value: model value.
+      request: a webapp Request instance.
 
     Returns:
-      True passed value is empty.
+      A dict of str to str. The same as the params argument to __init__.
+
+    Raises:
+      DeprecationWarning: When task payload constructed from an older
+        incompatible version of mapreduce.
     """
-    return not value
+    # TODO(user): Pass mr_id into headers. Otherwise when payload decoding
+    # failed, we can't abort a mr.
+    if request.headers.get(cls.PAYLOAD_VERSION_HEADER) != cls.PAYLOAD_VERSION:
+      raise DeprecationWarning(
+          "Task is generated by an older incompatible version of mapreduce. "
+          "Please kill this job manually")
+    return cls._decode_payload(request.body)
 
-  def default_value(self):
-    """Create default model value.
+  @classmethod
+  def _decode_payload(cls, body):
+    compressed_payload_str = None
+    if body.startswith(cls.PAYLOAD_KEY_PARAM):
+      payload_key = body[len(cls.PAYLOAD_KEY_PARAM):]
+      payload_entity = _HugeTaskPayload.get(payload_key)
+      compressed_payload_str = payload_entity.payload
+    elif body.startswith(cls.PAYLOAD_PARAM):
+      compressed_payload_str = body[len(cls.PAYLOAD_PARAM):]
 
-    If default option was specified, then it will be deeply copied.
-    None otherwise.
-
-    Returns:
-      default model value.
-    """
-    if self.default:
-      return copy.deepcopy(self.default)
+    if compressed_payload_str:
+      payload_str = zlib.decompress(compressed_payload_str)
     else:
-      return None
+      payload_str = body
+
+    result = {}
+    for (name, value) in cgi.parse_qs(payload_str).items():
+      if len(value) == 1:
+        result[name] = value[0]
+      else:
+        result[name] = value
+    return result
 
 
-# Ridiculous future UNIX epoch time, 500 years from now.
-_FUTURE_TIME = 2**34
-
-
-def _get_descending_key(gettime=time.time):
-  """Returns a key name lexically ordered by time descending.
-
-  This lets us have a key name for use with Datastore entities which returns
-  rows in time descending order when it is scanned in lexically ascending order,
-  allowing us to bypass index building for descending indexes.
-
-  Args:
-    gettime: Used for testing.
-
-  Returns:
-    A string with a time descending key.
-  """
-  now_descending = int((_FUTURE_TIME - gettime()) * 100)
-  request_id_hash = os.environ.get("REQUEST_ID_HASH")
-  if not request_id_hash:
-    request_id_hash = str(random.getrandbits(32))
-  return "%d%s" % (now_descending, request_id_hash)
-
-
-class CountersMap(JsonMixin):
+class CountersMap(json_util.JsonMixin):
   """Maintains map from counter name to counter value.
 
   The class is used to provide basic arithmetics of counter values (buil
@@ -402,7 +329,7 @@ class CountersMap(JsonMixin):
     return self.counters
 
 
-class MapperSpec(JsonMixin):
+class MapperSpec(json_util.JsonMixin):
   """Contains a specification for the mapper phase of the mapreduce.
 
   MapperSpec instance can be changed only during mapreduce starting process,
@@ -443,11 +370,16 @@ class MapperSpec(JsonMixin):
     self.handler_spec = handler_spec
     self.input_reader_spec = input_reader_spec
     self.output_writer_spec = output_writer_spec
-    self.shard_count = shard_count
+    self.shard_count = int(shard_count)
     self.params = params
 
   def get_handler(self):
     """Get mapper handler instance.
+
+    This always creates a new instance of the handler. If the handler is a
+    callable instance, MR only wants to create a new instance at the
+    beginning of a shard or shard retry. The pickled callable instance
+    should be accessed from TransientShardState.
 
     Returns:
       handler instance as callable.
@@ -499,8 +431,13 @@ class MapperSpec(JsonMixin):
                json.get("mapper_output_writer")
               )
 
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+    return self.to_json() == other.to_json()
 
-class MapreduceSpec(JsonMixin):
+
+class MapreduceSpec(json_util.JsonMixin):
   """Contains a specification for the whole mapreduce.
 
   MapreduceSpec instance can be changed only during mapreduce starting process,
@@ -589,6 +526,27 @@ class MapreduceSpec(JsonMixin):
                          json.get("hooks_class_name"))
     return mapreduce_spec
 
+  def __str__(self):
+    return str(self.to_json())
+
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+    return self.to_json() == other.to_json()
+
+  @classmethod
+  def _get_mapreduce_spec(cls, mr_id):
+    """Get Mapreduce spec from mr id."""
+    key = 'GAE-MR-spec: %s' % mr_id
+    spec_json = memcache.get(key)
+    if spec_json:
+      return cls.from_json(spec_json)
+    state = MapreduceState.get_by_job_id(mr_id)
+    spec = state.mapreduce_spec
+    spec_json = spec.to_json()
+    memcache.set(key, spec_json)
+    return spec
+
 
 class MapreduceState(db.Model):
   """Holds accumulated state of mapreduce execution.
@@ -598,7 +556,7 @@ class MapreduceState(db.Model):
 
   Properties:
     mapreduce_spec: cached deserialized MapreduceSpec instance. read-only
-    active: if we have this mapreduce running right now
+    active: if this MR is still running.
     last_poll_time: last time controller job has polled this mapreduce.
     counters_map: shard's counters map as CountersMap. Mirrors
       counters_map_json.
@@ -606,10 +564,14 @@ class MapreduceState(db.Model):
       progress of all the shards the best way it can.
     sparkline_url: last computed mapreduce status chart url in small format.
     result_status: If not None, the final status of the job.
-    active_shards: How many shards are still processing.
+    active_shards: How many shards are still processing. This starts as 0,
+      then set by KickOffJob handler to be the actual number of input
+      readers after input splitting, and is updated by Controller task
+      as shards finish.
     start_time: When the job started.
     writer_state: Json property to be used by writer to store its state.
       This is filled when single output per job. Will be deprecated.
+      Use OutputWriter.get_filenames instead.
   """
 
   RESULT_SUCCESS = "success"
@@ -619,21 +581,23 @@ class MapreduceState(db.Model):
   _RESULTS = frozenset([RESULT_SUCCESS, RESULT_FAILED, RESULT_ABORTED])
 
   # Functional properties.
-  mapreduce_spec = JsonProperty(MapreduceSpec, indexed=False)
+  # TODO(user): Replace mapreduce_spec with job_config.
+  mapreduce_spec = json_util.JsonProperty(MapreduceSpec, indexed=False)
   active = db.BooleanProperty(default=True, indexed=False)
   last_poll_time = db.DateTimeProperty(required=True)
-  counters_map = JsonProperty(CountersMap, default=CountersMap(), indexed=False)
+  counters_map = json_util.JsonProperty(
+      CountersMap, default=CountersMap(), indexed=False)
   app_id = db.StringProperty(required=False, indexed=True)
-  writer_state = JsonProperty(dict, indexed=False)
+  writer_state = json_util.JsonProperty(dict, indexed=False)
+  active_shards = db.IntegerProperty(default=0, indexed=False)
+  failed_shards = db.IntegerProperty(default=0, indexed=False)
+  aborted_shards = db.IntegerProperty(default=0, indexed=False)
+  result_status = db.StringProperty(required=False, choices=_RESULTS)
 
   # For UI purposes only.
   chart_url = db.TextProperty(default="")
   chart_width = db.IntegerProperty(default=300, indexed=False)
   sparkline_url = db.TextProperty(default="")
-  result_status = db.StringProperty(required=False, choices=_RESULTS)
-  active_shards = db.IntegerProperty(default=0, indexed=False)
-  failed_shards = db.IntegerProperty(default=0, indexed=False)
-  aborted_shards = db.IntegerProperty(default=0, indexed=False)
   start_time = db.DateTimeProperty(auto_now_add=True)
 
   @classmethod
@@ -685,7 +649,7 @@ class MapreduceState(db.Model):
           chart.bottom.labels.append(x)
         else:
           chart.bottom.labels.append("")
-      chart.left.labels = ['0', str(max(shards_processed))]
+      chart.left.labels = ["0", str(max(shards_processed))]
       chart.left.min = 0
 
     self.chart_width = min(700, max(300, shard_count * 20))
@@ -720,14 +684,22 @@ class MapreduceState(db.Model):
   @staticmethod
   def new_mapreduce_id():
     """Generate new mapreduce id."""
-    return _get_descending_key()
+    return util._get_descending_key()
+
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+    return self.properties() == other.properties()
 
 
 class TransientShardState(object):
-  """Shard's state kept in task payload.
+  """A shard's states that are kept in task payload.
 
-  TransientShardState holds a port of all shard processing state, which is not
-  saved in datastore, but rather is passed in task payload.
+  TransientShardState holds two types of states:
+  1. Some states just don't need to be saved to datastore. e.g.
+     serialized input reader and output writer instances.
+  2. Some states are duplicated from datastore, e.g. slice_id, shard_id.
+     These are used to validate the task.
   """
 
   def __init__(self,
@@ -743,7 +715,7 @@ class TransientShardState(object):
     """Init.
 
     Args:
-      base_path: base path of this mapreduce job.
+      base_path: base path of this mapreduce job. Deprecated.
       mapreduce_spec: an instance of MapReduceSpec.
       shard_id: shard id.
       slice_id: slice id. When enqueuing task for the next slice, this number
@@ -765,6 +737,7 @@ class TransientShardState(object):
     self.output_writer = output_writer
     self.retries = retries
     self.handler = handler
+    self._input_reader_json = self.input_reader.to_json()
 
   def reset_for_retry(self, output_writer):
     """Reset self for shard retry.
@@ -776,11 +749,22 @@ class TransientShardState(object):
     self.slice_id = 0
     self.retries += 1
     self.output_writer = output_writer
-    self.handler = None
+    self.handler = self.mapreduce_spec.mapper.handler
 
-  def advance_for_next_slice(self):
-    """Advance relavent states for next slice."""
-    self.slice_id += 1
+  def advance_for_next_slice(self, recovery_slice=False):
+    """Advance relavent states for next slice.
+
+    Args:
+      recovery_slice: True if this slice is running recovery logic.
+        See handlers.MapperWorkerCallbackHandler._attempt_slice_recovery
+        for more info.
+    """
+    if recovery_slice:
+      self.slice_id += 2
+      # Restore input reader to the beginning of the slice.
+      self.input_reader = self.input_reader.from_json(self._input_reader_json)
+    else:
+      self.slice_id += 1
 
   def to_dict(self):
     """Convert state to dictionary to save in task payload."""
@@ -804,11 +788,11 @@ class TransientShardState(object):
     mapreduce_spec = MapreduceSpec.from_json_str(request.get("mapreduce_spec"))
     mapper_spec = mapreduce_spec.mapper
     input_reader_spec_dict = simplejson.loads(request.get("input_reader_state"),
-                                              cls=JsonDecoder)
+                                              cls=json_util.JsonDecoder)
     input_reader = mapper_spec.input_reader_class().from_json(
         input_reader_spec_dict)
     initial_input_reader_spec_dict = simplejson.loads(
-        request.get("initial_input_reader_state"), cls=JsonDecoder)
+        request.get("initial_input_reader_state"), cls=json_util.JsonDecoder)
     initial_input_reader = mapper_spec.input_reader_class().from_json(
         initial_input_reader_spec_dict)
 
@@ -816,20 +800,17 @@ class TransientShardState(object):
     if mapper_spec.output_writer_class():
       output_writer = mapper_spec.output_writer_class().from_json(
           simplejson.loads(request.get("output_writer_state", "{}"),
-                           cls=JsonDecoder))
+                           cls=json_util.JsonDecoder))
       assert isinstance(output_writer, mapper_spec.output_writer_class()), (
           "%s.from_json returned an instance of wrong class: %s" % (
               mapper_spec.output_writer_class(),
               output_writer.__class__))
 
-    request_path = request.path
-    base_path = request_path[:request_path.rfind("/")]
-
     handler = util.try_deserialize_handler(request.get("serialized_handler"))
     if not handler:
       handler = mapreduce_spec.mapper.handler
 
-    return cls(base_path,
+    return cls(mapreduce_spec.params["base_path"],
                mapreduce_spec,
                str(request.get("shard_id")),
                int(request.get("slice_id")),
@@ -844,40 +825,58 @@ class ShardState(db.Model):
   """Single shard execution state.
 
   The shard state is stored in the datastore and is later aggregated by
-  controller task. Shard key_name is equal to shard_id.
+  controller task. ShardState key_name is equal to shard_id.
 
-  Properties:
+  Shard state contains critical state to ensure the correctness of
+  shard execution. It is the single source of truth about a shard's
+  progress. For example:
+  1. A slice is allowed to run only if its payload matches shard state's
+     expectation.
+  2. A slice is considered running only if it has acquired the shard's lock.
+  3. A slice is considered done only if it has successfully committed shard
+     state to db.
+
+  Properties about the shard:
     active: if we have this shard still running as boolean.
-    counters_map: shard's counters map as CountersMap. Mirrors
-      counters_map_json.
+    counters_map: shard's counters map as CountersMap. All counters yielded
+      within mapreduce are stored here.
     mapreduce_id: unique id of the mapreduce.
     shard_id: unique id of this shard as string.
     shard_number: ordered number for this shard.
+    retries: the number of times this shard has been retried.
     result_status: If not None, the final status of this shard.
     update_time: The last time this shard state was updated.
     shard_description: A string description of the work this shard will do.
     last_work_item: A string description of the last work item processed.
-    writer_state: writer state for this shard. This is filled when a job
-      has one output per shard by OutputWriter's create method.
-    slice_id: slice id of current executing slice. A task
+    writer_state: writer state for this shard. The shard's output writer
+      instance can save in-memory output references to this field in its
+      "finalize" method.
+
+   Properties about slice management:
+    slice_id: slice id of current executing slice. A slice's task
       will not run unless its slice_id matches this. Initial
       value is 0. By the end of slice execution, this number is
       incremented by 1.
     slice_start_time: a slice updates this to now at the beginning of
-      execution transactionally. If transaction succeeds, the current task holds
+      execution. If the transaction succeeds, the current task holds
       a lease of slice duration + some grace period. During this time, no
       other task with the same slice_id will execute. Upon slice failure,
       the task should try to unset this value to allow retries to carry on
-      ASAP. slice_start_time is only meaningful when slice_id is the same.
+      ASAP.
     slice_request_id: the request id that holds/held the lease. When lease has
       expired, new request needs to verify that said request has indeed
       ended according to logs API. Do this only when lease has expired
       because logs API is expensive. This field should always be set/unset
-      with slice_start_time.
+      with slice_start_time. It is possible Logs API doesn't log a request
+      at all or doesn't log the end of a request. So a new request can
+      proceed after a long conservative timeout.
     slice_retries: the number of times a slice has been retried due to
-      data processing error (non taskqueue/datastore). This count is
+      processing data when lock is held. Taskqueue/datastore errors
+      related to slice/shard management are not counted. This count is
       only a lower bound and is used to determined when to fail a slice
       completely.
+    acquired_once: whether the lock for this slice has been acquired at
+      least once. When this is True, duplicates in outputs are possible.
   """
 
   RESULT_SUCCESS = "success"
@@ -888,19 +887,24 @@ class ShardState(db.Model):
 
   _RESULTS = frozenset([RESULT_SUCCESS, RESULT_FAILED, RESULT_ABORTED])
 
+  # Maximum number of shard states to hold in memory at any time.
+  _MAX_STATES_IN_MEMORY = 10
+
   # Functional properties.
+  mapreduce_id = db.StringProperty(required=True)
   active = db.BooleanProperty(default=True, indexed=False)
-  counters_map = JsonProperty(CountersMap, default=CountersMap(), indexed=False)
+  counters_map = json_util.JsonProperty(
+      CountersMap, default=CountersMap(), indexed=False)
   result_status = db.StringProperty(choices=_RESULTS, indexed=False)
   retries = db.IntegerProperty(default=0, indexed=False)
-  writer_state = JsonProperty(dict, indexed=False)
+  writer_state = json_util.JsonProperty(dict, indexed=False)
   slice_id = db.IntegerProperty(default=0, indexed=False)
   slice_start_time = db.DateTimeProperty(indexed=False)
   slice_request_id = db.ByteStringProperty(indexed=False)
   slice_retries = db.IntegerProperty(default=0, indexed=False)
+  acquired_once = db.BooleanProperty(default=False, indexed=False)
 
   # For UI purposes only.
-  mapreduce_id = db.StringProperty(required=True)
   update_time = db.DateTimeProperty(auto_now=True, indexed=False)
   shard_description = db.TextProperty(default="")
   last_work_item = db.TextProperty(default="")
@@ -920,6 +924,8 @@ class ShardState(db.Model):
       kv["slice_retries"] = self.slice_retries
     if self.slice_request_id:
       kv["slice_request_id"] = self.slice_request_id
+    if self.acquired_once:
+      kv["acquired_once"] = self.acquired_once
     keys = kv.keys()
     keys.sort()
 
@@ -940,18 +946,50 @@ class ShardState(db.Model):
     self.slice_start_time = None
     self.slice_request_id = None
     self.slice_retries = 0
+    self.acquired_once = False
 
-  def advance_for_next_slice(self):
-    """Advance self for next slice."""
-    self.slice_id += 1
+  def advance_for_next_slice(self, recovery_slice=False):
+    """Advance self for next slice.
+
+    Args:
+      recovery_slice: True if this slice is running recovery logic.
+        See handlers.MapperWorkerCallbackHandler._attempt_slice_recovery
+        for more info.
+    """
     self.slice_start_time = None
     self.slice_request_id = None
     self.slice_retries = 0
+    self.acquired_once = False
+    if recovery_slice:
+      self.slice_id += 2
+    else:
+      self.slice_id += 1
+
+  def set_for_failure(self):
+    self.active = False
+    self.result_status = self.RESULT_FAILED
+
+  def set_for_abort(self):
+    self.active = False
+    self.result_status = self.RESULT_ABORTED
+
+  def set_for_success(self):
+    self.active = False
+    self.result_status = self.RESULT_SUCCESS
+    self.slice_start_time = None
+    self.slice_request_id = None
+    self.slice_retries = 0
+    self.acquired_once = False
 
   def copy_from(self, other_state):
     """Copy data from another shard state entity to self."""
     for prop in self.properties().values():
       setattr(self, prop.name, getattr(other_state, prop.name))
+
+  def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+    return self.properties() == other.properties()
 
   def get_shard_number(self):
     """Gets the shard number from the key name."""
@@ -1011,14 +1049,43 @@ class ShardState(db.Model):
   def find_by_mapreduce_state(cls, mapreduce_state):
     """Find all shard states for given mapreduce.
 
+    Deprecated. Use find_all_by_mapreduce_state.
+    This will be removed after 1.8.9 release.
+
     Args:
       mapreduce_state: MapreduceState instance
 
     Returns:
-      iterable of all ShardState for given mapreduce.
+      A list of ShardStates.
+    """
+    return list(cls.find_all_by_mapreduce_state(mapreduce_state))
+
+  @classmethod
+  def find_all_by_mapreduce_state(cls, mapreduce_state):
+    """Find all shard states for given mapreduce.
+
+    Never runs within a transaction since it may touch >5 entity groups (one
+    for each shard).
+
+    Args:
+      mapreduce_state: MapreduceState instance
+
+    Yields:
+      shard states sorted by shard id.
     """
     keys = cls.calculate_keys_by_mapreduce_state(mapreduce_state)
-    return [state for state in db.get(keys) if state]
+    i = 0
+    while i < len(keys):
+      @db.non_transactional
+      def no_tx_get(i):
+        return db.get(keys[i:i+cls._MAX_STATES_IN_MEMORY])
+      # We need a separate function to so that we can mix non-transactional and
+      # use be a generator
+      states = no_tx_get(i)
+      for s in states:
+        i += 1
+        if s is not None:
+          yield s
 
   @classmethod
   def calculate_keys_by_mapreduce_state(cls, mapreduce_state):
@@ -1028,22 +1095,17 @@ class ShardState(db.Model):
       mapreduce_state: MapreduceState instance
 
     Returns:
-      A list of keys for shard states. The corresponding shard states
-      may not exist.
+      A list of keys for shard states, sorted by shard id.
+      The corresponding shard states may not exist.
     """
+    if mapreduce_state is None:
+      return []
+
     keys = []
     for i in range(mapreduce_state.mapreduce_spec.mapper.shard_count):
       shard_id = cls.shard_id_from_number(mapreduce_state.key().name(), i)
       keys.append(cls.get_key_by_shard_id(shard_id))
     return keys
-
-  @classmethod
-  def find_by_mapreduce_id(cls, mapreduce_id):
-    logging.error(
-        "ShardState.find_by_mapreduce_id method may be inconsistent. " +
-        "ShardState.find_by_mapreduce_state should be used instead.")
-    return cls.all().filter(
-        "mapreduce_id =", mapreduce_id).fetch(99999)
 
   @classmethod
   def create_new(cls, mapreduce_id, shard_number):

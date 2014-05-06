@@ -8,7 +8,8 @@
 from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_rpc
 from google.appengine.ext import db
-from mapreduce.lib import key_range
+from google.appengine.ext import key_range
+from mapreduce import json_util
 from mapreduce import key_ranges
 from mapreduce import model
 from mapreduce import namespace_range
@@ -27,14 +28,14 @@ __all__ = [
 
 
 class RangeIteratorFactory(object):
-  """Factory to create RangeIterators."""
+  """Factory to create RangeIterator."""
 
   @classmethod
   def create_property_range_iterator(cls,
                                      p_range,
                                      ns_range,
                                      query_spec):
-    """Create a RangeIterator.
+    """Create a _PropertyRangeModelIterator.
 
     Args:
       p_range: a property_range.PropertyRange object that defines the
@@ -56,7 +57,7 @@ class RangeIteratorFactory(object):
                                  k_ranges,
                                  query_spec,
                                  key_range_iter_cls):
-    """Create a RangeIterator.
+    """Create a _KeyRangesIterator.
 
     Args:
       k_ranges: a key_ranges._KeyRanges object.
@@ -75,14 +76,19 @@ class RangeIteratorFactory(object):
     return _RANGE_ITERATORS[json["name"]].from_json(json)
 
 
-class RangeIterator(model.JsonMixin):
-  """Interface for DatastoreInputReader helper iterators.
+class RangeIterator(json_util.JsonMixin):
+  """Interface for DatastoreInputReader helpers.
 
-  RangeIterator defines Python's generator interface and additional
-  marshaling functionality. Marshaling saves the state of the generator.
-  Unmarshaling guarantees any new generator created can resume where the
-  old generator left off. When the produced generator raises StopIteration,
-  the behavior of marshaling/unmarshaling is NOT defined.
+  Technically, RangeIterator is a container. It contains all datastore
+  entities that fall under a certain range (key range or proprety range).
+  It implements __iter__, which returns a generator that can iterate
+  through entities. It also implements marshalling logics. Marshalling
+  saves the state of the container so that any new generator created
+  can resume where the old generator left off.
+
+  Caveats:
+    1. Calling next() on the generators may also modify the container.
+    2. Marshlling after StopIteration is raised has undefined behavior.
   """
 
   def __iter__(self):
@@ -162,19 +168,22 @@ class _PropertyRangeModelIterator(RangeIterator):
 
   def to_json(self):
     """Inherit doc."""
-    cursor_object = False
+    cursor = self._cursor
     if self._query is not None:
       if isinstance(self._query, db.Query):
-        self._cursor = self._query.cursor()
+        cursor = self._query.cursor()
       else:
-        cursor_object = True
-        self._cursor = self._query.cursor_after().to_websafe_string()
+        cursor = self._query.cursor_after()
+
+    if isinstance(cursor, basestring):
+      cursor_object = False
     else:
-      self._cursor = None
+      cursor_object = True
+      cursor = cursor.to_websafe_string()
 
     return {"property_range": self._property_range.to_json(),
             "query_spec": self._query_spec.to_json(),
-            "cursor": self._cursor,
+            "cursor": cursor,
             "ns_range": self._ns_range.to_json_object(),
             "name": self.__class__.__name__,
             "cursor_object": cursor_object}
@@ -272,8 +281,13 @@ _RANGE_ITERATORS = {
     }
 
 
-class AbstractKeyRangeIterator(model.JsonMixin):
-  """Iterates over a single key_range.KeyRange and yields value for each key."""
+class AbstractKeyRangeIterator(json_util.JsonMixin):
+  """Iterates over a single key_range.KeyRange and yields value for each key.
+
+  All subclasses do the same thing: iterate over a single KeyRange.
+  They do so using different APIs (db, ndb, datastore) to return entities
+  of different types (db model, ndb model, datastore entity, raw proto).
+  """
 
   def __init__(self, k_range, query_spec):
     """Init.
@@ -352,11 +366,13 @@ class KeyRangeModelIterator(AbstractKeyRangeIterator):
         yield model_instance
 
   def _get_cursor(self):
-    if self._query is not None:
-      if isinstance(self._query, db.Query):
-        return self._query.cursor()
-      else:
-        return self._query.cursor_after()
+    if self._query is None:
+      return self._cursor
+
+    if isinstance(self._query, db.Query):
+      return self._query.cursor()
+    else:
+      return self._query.cursor_after()
 
 
 class KeyRangeEntityIterator(AbstractKeyRangeIterator):
@@ -374,8 +390,9 @@ class KeyRangeEntityIterator(AbstractKeyRangeIterator):
       yield entity
 
   def _get_cursor(self):
-    if self._query is not None:
-      return self._query.GetCursor()
+    if self._query is None:
+      return self._cursor
+    return self._query.GetCursor()
 
 
 class KeyRangeKeyIterator(KeyRangeEntityIterator):
@@ -406,8 +423,9 @@ class KeyRangeEntityProtoIterator(AbstractKeyRangeIterator):
       yield entity_proto
 
   def _get_cursor(self):
-    if self._query is not None:
-      return self._query.cursor()
+    if self._query is None:
+      return self._cursor
+    return self._query.cursor()
 
 
 # TODO(user): update this map automatically using metaclass if needed.

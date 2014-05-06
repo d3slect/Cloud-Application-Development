@@ -23,27 +23,153 @@
 __all__ = [
     "create_datastore_write_config",
     "for_name",
+    "get_queue_name",
     "get_short_name",
     "handler_for_name",
     "is_generator",
     "parse_bool",
-    "HugeTask",
+    "total_seconds",
     "try_serialize_handler",
     "try_deserialize_handler",
+    "CALLBACK_MR_ID_TASK_HEADER",
     ]
 
-
-import base64
-import cgi
 import inspect
+import os
 import pickle
+import random
+import sys
+import time
 import types
-import urllib
-import zlib
 
-from google.appengine.api import taskqueue
-from google.appengine.ext import db
+from google.appengine.ext import ndb
+
 from google.appengine.datastore import datastore_rpc
+from mapreduce import parameters
+
+# Taskqueue task header for mr id. Use internal by MR.
+_MR_ID_TASK_HEADER = "AE-MR-ID"
+_MR_SHARD_ID_TASK_HEADER = "AE-MR-SHARD-ID"
+
+# Callback task MR ID task header
+CALLBACK_MR_ID_TASK_HEADER = "Mapreduce-Id"
+
+
+# Ridiculous future UNIX epoch time, 500 years from now.
+_FUTURE_TIME = 2**34
+
+
+def _get_descending_key(gettime=time.time):
+  """Returns a key name lexically ordered by time descending.
+
+  This lets us have a key name for use with Datastore entities which returns
+  rows in time descending order when it is scanned in lexically ascending order,
+  allowing us to bypass index building for descending indexes.
+
+  Args:
+    gettime: Used for testing.
+
+  Returns:
+    A string with a time descending key.
+  """
+  now_descending = int((_FUTURE_TIME - gettime()) * 100)
+  request_id_hash = os.environ.get("REQUEST_ID_HASH")
+  if not request_id_hash:
+    request_id_hash = str(random.getrandbits(32))
+  return "%d%s" % (now_descending, request_id_hash)
+
+
+def _get_task_host():
+  """Get the Host header value for all mr tasks.
+
+  Task Host header determines which instance this task would be routed to.
+
+  Current version id format is: v7.368834058928280579
+  Current module id is just the module's name. It could be "default"
+  Default version hostname is app_id.appspot.com
+
+  Returns:
+    A complete host name is of format version.module.app_id.appspot.com
+  If module is the default module, just version.app_id.appspot.com. The reason
+  is if an app doesn't have modules enabled and the url is
+  "version.default.app_id", "version" is ignored and "default" is used as
+  version. If "default" version doesn't exist, the url is routed to the
+  default version.
+  """
+  version = os.environ["CURRENT_VERSION_ID"].split(".")[0]
+  default_host = os.environ["DEFAULT_VERSION_HOSTNAME"]
+  module = os.environ["CURRENT_MODULE_ID"]
+  if os.environ["CURRENT_MODULE_ID"] == "default":
+    return "%s.%s" % (version, default_host)
+  return "%s.%s.%s" % (version, module, default_host)
+
+
+def _get_task_headers(map_job_id,
+                      mr_id_header_key=_MR_ID_TASK_HEADER):
+  """Get headers for all mr tasks.
+
+  Args:
+    map_job_id: map job id.
+    mr_id_header_key: the key to set mr id with.
+
+  Returns:
+    A dictionary of all headers.
+  """
+  return {mr_id_header_key: map_job_id,
+          "Host": _get_task_host()}
+
+
+def _enum(**enums):
+  """Helper to create enum."""
+  return type("Enum", (), enums)
+
+
+def get_queue_name(queue_name):
+  """Determine which queue MR should run on.
+
+  How to choose the queue:
+  1. If user provided one, use that.
+  2. If we are starting a mr from taskqueue, inherit that queue.
+     If it's a special queue, fall back to the default queue.
+  3. Default queue.
+
+  If user is using any MR pipeline interface, pipeline.start takes a
+  "queue_name" argument. The pipeline will run on that queue and MR will
+  simply inherit the queue_name.
+
+  Args:
+    queue_name: queue_name from user. Maybe None.
+
+  Returns:
+    The queue name to run on.
+  """
+  if queue_name:
+    return queue_name
+  queue_name = os.environ.get("HTTP_X_APPENGINE_QUEUENAME",
+                              parameters.config.QUEUE_NAME)
+  if len(queue_name) > 1 and queue_name[0:2] == "__":
+    # We are currently in some special queue. E.g. __cron.
+    return parameters.config.QUEUE_NAME
+  else:
+    return queue_name
+
+
+def total_seconds(td):
+  """convert a timedelta to seconds.
+
+  This is patterned after timedelta.total_seconds, which is only
+  available in python 27.
+
+  Args:
+    td: a timedelta object.
+
+  Returns:
+    total seconds within a timedelta. Rounded up to seconds.
+  """
+  secs = td.seconds + td.days * 24 * 3600
+  if td.microseconds:
+    secs += 1
+  return secs
 
 
 def for_name(fq_name, recursive=False):
@@ -63,7 +189,7 @@ def for_name(fq_name, recursive=False):
     fq_name: fully qualified name of something to find
 
   Returns:
-    class object.
+    class object or None if fq_name is None.
 
   Raises:
     ImportError: when specified module could not be loaded or the class
@@ -71,6 +197,9 @@ def for_name(fq_name, recursive=False):
   """
 #  if "." not in fq_name:
 #    raise ImportError("'%s' is not a full-qualified name" % fq_name)
+
+  if fq_name is None:
+    return
 
   fq_name = str(fq_name)
   module_name = __name__
@@ -240,113 +369,40 @@ def create_datastore_write_config(mapreduce_spec):
     return datastore_rpc.Configuration()
 
 
-class _HugeTaskPayload(db.Model):
-  """Model object to store task payload."""
+def _set_ndb_cache_policy():
+  """Tell NDB to never cache anything in memcache or in-process.
 
-  payload = db.TextProperty()
-
-  @classmethod
-  def kind(cls):
-    """Returns entity kind."""
-    return "_AE_MR_TaskPayload"
-
-
-class HugeTask(object):
-  """HugeTask is a taskqueue.Task-like class that can store big payloads.
-
-  Payloads are stored either in the task payload itself or in the datastore.
-  Task handlers should inherit from HugeTaskHandler class.
+  This ensures that entities fetched from Datastore input_readers via NDB
+  will not bloat up the request memory size and Datastore Puts will avoid
+  doing calls to memcache. Without this you get soft memory limit exits,
+  which hurts overall throughput.
   """
+  ndb_ctx = ndb.get_context()
+  ndb_ctx.set_cache_policy(lambda key: False)
+  ndb_ctx.set_memcache_policy(lambda key: False)
 
-  PAYLOAD_PARAM = "__payload"
-  PAYLOAD_KEY_PARAM = "__payload_key"
 
-  MAX_TASK_PAYLOAD = 100000
-  MAX_DB_PAYLOAD = 1000000
+def _obj_to_path(obj):
+  """Returns the fully qualified path to the object.
 
-  def __init__(self,
-               url,
-               params,
-               name=None,
-               eta=None,
-               countdown=None):
-    self.url = url
-    self.params = params
-    self.compressed_payload = None
-    self.name = name
-    self.eta = eta
-    self.countdown = countdown
+  Args:
+    obj: obj must be a new style top level class, or a top level function.
+      No inner function or static method.
 
-    payload_str = urllib.urlencode(self.params)
-    if len(payload_str) > self.MAX_TASK_PAYLOAD:
-      compressed_payload = base64.b64encode(zlib.compress(payload_str))
-      if len(compressed_payload) > self.MAX_DB_PAYLOAD:
-        raise Exception("Payload from %s to big to be stored in database: %s",
-                        self.name, len(compressed_payload))
-      self.compressed_payload = compressed_payload
+  Returns:
+    Fully qualified path to the object.
 
-  def add(self, queue_name, transactional=False, parent=None):
-    """Add task to the queue."""
-    if self.compressed_payload is None:
-      # Payload is small. Don't bother with anything.
-      task = self.to_task()
-      task.add(queue_name, transactional)
-      return
+  Raises:
+    TypeError: when argument obj has unsupported type.
+    ValueError: when obj can't be discovered on the top level.
+  """
+  if obj is None:
+    return obj
 
-    if len(self.compressed_payload) < self.MAX_TASK_PAYLOAD:
-      # Compressed payload is small. Don't bother with datastore.
-      task = taskqueue.Task(
-          url=self.url,
-          params={self.PAYLOAD_PARAM: self.compressed_payload},
-          name=self.name,
-          eta=self.eta,
-          countdown=self.countdown)
-      task.add(queue_name, transactional)
-      return
-
-    # Store payload in the datastore.
-    if not parent:
-      raise Exception("Huge tasks should specify parent entity.")
-
-    payload_entity = _HugeTaskPayload(payload=self.compressed_payload,
-                                      parent=parent)
-
-    payload_key = payload_entity.put()
-    task = taskqueue.Task(
-        url=self.url,
-        params={self.PAYLOAD_KEY_PARAM: str(payload_key)},
-        name=self.name,
-        eta=self.eta,
-        countdown=self.countdown)
-    task.add(queue_name, transactional)
-
-  def to_task(self):
-    """Convert to a taskqueue task without doing any kind of encoding."""
-    return taskqueue.Task(
-        url=self.url,
-        params=self.params,
-        name=self.name,
-        eta=self.eta,
-        countdown=self.countdown)
-
-  @classmethod
-  def decode_payload(cls, payload_dict):
-    if (not payload_dict.get(cls.PAYLOAD_PARAM) and
-        not payload_dict.get(cls.PAYLOAD_KEY_PARAM)):
-        return payload_dict
-
-    if payload_dict.get(cls.PAYLOAD_PARAM):
-      payload = payload_dict.get(cls.PAYLOAD_PARAM)
-    else:
-      payload_key = payload_dict.get(cls.PAYLOAD_KEY_PARAM)
-      payload_entity = _HugeTaskPayload.get(payload_key)
-      payload = payload_entity.payload
-    payload_str = zlib.decompress(base64.b64decode(payload))
-
-    result = {}
-    for (name, value) in cgi.parse_qs(payload_str).items():
-      if len(value) == 1:
-        result[name] = value[0]
-      else:
-        result[name] = value
-    return result
+  if inspect.isclass(obj) or inspect.isfunction(obj):
+    fetched = getattr(sys.modules[obj.__module__], obj.__name__, None)
+    if fetched is None:
+      raise ValueError(
+          "Object %r must be defined on the top level of a module." % obj)
+    return "%s.%s" % (obj.__module__, obj.__name__)
+  raise TypeError("Unexpected type %s." % type(obj))
