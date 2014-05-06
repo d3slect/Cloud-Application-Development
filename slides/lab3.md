@@ -2,9 +2,10 @@
 title: Agenda
 content_class: smaller
 
-- Other GAE Services
+- Other GAE Topics
+    - Modules
 	- MapReduce & GAE MapReduce API
-	- Google Big Query service
+	- Google Cloud Endpoints
 - Organizational
 	- Discussion on HWs.
 	- Concluding remarks
@@ -15,9 +16,174 @@ title: Other GAE Services
 subtitle: What else can be done with GAE	
 class: segue dark nobackground
 
+
 ---
 
-title: MapReduce 
+title: Modules
+content_class: smaller
+
+- [doc](https://developers.google.com/appengine/docs/python/modules/)
+- Decomposition of GAE App
+- Separate source code, configuration (security, libraries, versioning, ...), and URL
+    - One 'default' - handles web requests
+- Multiple running instances -> **different scaling options**
+- Stateful services (e.g., Memcache, Datastore, and Task Queues) are shared by all the modules in an application
+
+<center>
+![ModulesOverview](https://developers.google.com/appengine/docs/images/modules_hierarchy.png)
+</center>
+
+---
+
+title: Modules: Scaling
+content_class: smaller
+
+- **Manual**
+    - long-running task with complex initialization, maintaining memory state
+    - fixed number of instances
+    - explicit URL: `http://instance.version.module.app_id.appspot.com`
+- **Basic**
+    - creates an instance based on requests
+    - max instance limit
+    - no finish deadline (long-running requests), idle timeout
+    - explicit URL as previous
+- **Automatic**
+    - original GAE scaling
+    - creates instances based on request rate, response latencies
+        - min/max idle instances
+        - min/max pending latency
+        - max concurrent requests (max 80!)
+
+
+
+---
+
+title: Modules: Config
+content_class: smaller
+
+<pre class="prettyprint" data-lang="Yaml">
+application: simple-sample
+<b>module: backend</b>
+version: uno
+runtime: python27
+instance_class: B8
+<b>manual_scaling:
+  instances: 5</b>
+</pre>
+
+
+<pre class="prettyprint" data-lang="Yaml">
+application: simple-sample
+<b>module: mobile-frontend</b>
+...
+<b>automatic_scaling:
+  min_idle_instances: 2
+  max_pending_latency: 1s</b>
+</pre>
+
+
+---
+
+title: Modules: Communication
+content_class: smaller
+
+- Explicit requests
+    - validation of requests ([AppIdentity](https://developers.google.com/appengine/docs/python/appidentity),
+    [OAuth](https://developers.google.com/appengine/docs/python/oauth),
+    [GAE admin status](https://developers.google.com/appengine/docs/python/config/appconfig#Python_app_yaml_Requiring_login_or_administrator_status))
+
+<pre class="prettyprint" data-lang="Python">
+import urllib2
+<b>from google.appengine.api import modules</b>
+
+<b>url = "http://%s/" % modules.get_hostname(module="my-backend")</b>
+try:
+  <b>result = urllib2.urlopen(url)</b>
+  doSomethingWithResult(result)
+except urllib2.URLError, e:
+  handleError(e)
+</pre>
+
+
+---
+
+title: Modules: Communication II
+content_class: smaller
+
+- [Push Queues](https://developers.google.com/appengine/docs/python/taskqueue/overview-push)
+
+
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.api import taskqueue
+# ...
+    def post(self):
+        payload = self.request.get('payload')
+
+        # Add the task to the default queue.
+        taskqueue.add(url='/path/to/my/handler/', params={'payload': payload},
+                      target='my-version.my-module')
+</pre>
+
+
+---
+
+title: Modules: Communication III
+content_class: smaller
+
+- [Pull Queues](https://developers.google.com/appengine/docs/python/taskqueue/overview-pull)
+
+
+<pre class="prettyprint" data-lang="Python">
+# one module
+from google.appengine.api import taskqueue
+
+q = taskqueue.Queue('pull-queue')
+tasks = []
+payload_str = 'hello world'
+tasks.append(taskqueue.Task(payload=payload_str, method='PULL'))
+q.add(tasks)
+
+
+# another module
+from google.appengine.api import taskqueue
+
+q = taskqueue.Queue('pull-queue')
+tasks = q.lease_tasks(3600, 100)
+# Perform some work with the tasks here
+q.delete_tasks(tasks)
+</pre>
+
+
+---
+
+title: Modules: Routing
+content_class: smaller
+
+- `dispatch.yaml` ([doc](https://developers.google.com/appengine/docs/python/modules/routing))
+
+<pre class="prettyprint" data-lang="Yaml">
+dispatch:
+  # Default module serves the typical web resources and all static resources.
+  - url: "*/favicon.ico"
+    module: default
+
+  # Default module serves simple hostname request.
+  - url: "simple-sample.appspot.com/"
+    module: default
+
+  # Send all mobile traffic to the mobile frontend.
+  - url: "*/mobile/*"
+    module: mobile-frontend
+
+  # Send all work to the one static backend.
+  - url: "*/work/*"
+    module: static-backend
+</pre>
+
+
+---
+
+title: MapReduce
 content_class: smaller
 
 - [wiki](http://en.wikipedia.org/wiki/MapReduce), [paper](http://research.google.com/archive/mapreduce.html)
@@ -200,9 +366,10 @@ content_class: smaller
 
 - [doc](https://developers.google.com/appengine/docs/python/dataprocessing/overview), 
 [sources](https://code.google.com/p/appengine-mapreduce/),
-[demo app](http://nswi152-mapreducedemo.appspot.com/), TODO: update
+[demo app](http://nswi152-mapreducedemo.appspot.com/),
 [demo app sources](https://code.google.com/p/appengine-mapreduce/wiki/MapReduceDemoApp),
-[Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html)
+[Google IO 2011](https://www.youtube.com/watch?v=EIxelKcyCC0&list=PLD480D69728D72515),
+[Google IO 2012](https://www.youtube.com/watch?v=lqQ6VFd3Tnw)
 - Problems of running the general MapReduce on GAE
 	- Performance isolation
 		- A lot of MRs will be running at the same time
@@ -223,14 +390,13 @@ content_class: smaller
 - Processing rate limiting
 - Automatic sharding
 - Predefined standard data input readers/writers
-	- Datastore entities, blobstore plain/zip files
+	- Datastore entities, [Cloud Storage](https://developers.google.com/appengine/docs/java/googlecloudstorageclient/), [Log store](https://developers.google.com/appengine/docs/java/logs/),
+	 blobstore plain/zip files
 - Pipeline API
 	- Wires all MR phases together
-	- Generic API for asynchronous data processing
-	- [sources](https://code.google.com/p/appengine-pipeline/), [Google IO 2011 talk](http://www.google.com/events/io/2011/sessions/large-scale-data-analysis-using-the-app-engine-pipeline-api.html), [Google IO 2012 talk](https://developers.google.com/events/io/2012/sessions/gooio2012/307/)
-- Files API
-	- Persistent/Intermediate storage for MR data
-	- Generic API for high-performance write-only/read-only file storage
+	- Generic API for asynchronous data processing (goes well with custom modules)
+	- [sources](https://code.google.com/p/appengine-pipeline/), [Google IO 2011](https://www.youtube.com/watch?v=Rsfy_TYA2ZY),
+	[Google IO 2012](https://www.youtube.com/watch?v=lqQ6VFd3Tnw)
 - Status and management pages
 - Open source &mdash; get involved!
 
@@ -294,6 +460,7 @@ class StartAndStatusHandler(webapp2.RequestHandler):
 
     if self.request.get("word_count"):
       <b>pipeline = WordCountPipeline(filekey, blob_key)</b>
+      <b>pipeline.with_params(target="my-version.my-module")</b>
       <b>pipeline.start()</b>
     
       self.redirect(<b>pipeline.base_path + "/status?root=" + pipeline.pipeline_id</b>)
@@ -337,17 +504,76 @@ content_class: smaller
 
 <iframe data-src="http://nswi152-mapreducedemo.appspot.com/"></iframe>
 
+
+---
+
+title: Google Cloud Endpoints: API definition
+content_class: smaller
+
+- [doc](https://developers.google.com/appengine/docs/python/endpoints/)
+
+
+<pre class="prettyprint" data-lang="Python">
+@endpoints.api(name='yourApi',version='v1',
+               description='Tic Tac Toe API')
+class TicTacToeApi(remote.Service):
+ ...
+
+class YourResponseMessageClass(messages.Message):
+    message = messages.StringField(1)
+
+class YourRequestMessageClass(messages.Message):
+    message = messages.StringField(1)
+
+@endpoints.method(YourRequestMessageClass,
+                  YourResponseMessageClass,
+                  name='foo.bar', ...)
+def bar(self, request):
+...
+
+</pre>
+
+---
+
+title: Google Cloud Endpoints: Server side
+content_class: smaller
+
+- `services.py`
+
+<pre class="prettyprint" data-lang="Python">
+import endpoints
+import TicTacToeApi
+
+application = endpoints.api_server([TicTacToeApi])
+</pre>
+
+- `app.yaml`
+
+<pre class="prettyprint" data-lang="Yaml">
+...
+handlers:
+# Endpoints handler
+- url: /_ah/spi/.*
+  script: services.application
+...
+libraries:
+- name: endpoints
+  version: 1.0
+</pre>
+
+- Explore at `/_ah/api/explorer`
+
 ---
 
 title: Further Reading
 content_class: smaller
 
-- [Google IO 2011](http://www.google.com/events/io/2011/sessions.html)
-	- Filter By: App Engine	
-- [Google IO 2012](https://developers.google.com/events/io/2012/sessions#cloud-platform)
-- Big Query ([talk 1](https://developers.google.com/events/io/2012/sessions/gooio2012/312/)), ([talk 2](https://developers.google.com/events/io/2012/sessions/gooio2012/307)), ([doc](https://developers.google.com/bigquery/)),
+- [Google I/O 2012 - Optimizing Your Google App Engine App](https://www.youtube.com/watch?v=zQ5_47zy4bY)
+- [Google I/O 2013 - Building developers.google.com on App Engine](https://developers.google.com/events/io/sessions/333307296)
+- [Google I/O 2012](https://developers.google.com/events/io/2012/sessions#cloud-platform)
+- Big Query ([GCPLive 2014](https://www.youtube.com/watch?v=GrD7ymUPt3M), [Google I/O 2012 talk](https://www.youtube.com/watch?v=QI8623HlYd4)), ([doc](https://developers.google.com/bigquery/)),
 ([tutorial](https://developers.google.com/bigquery/articles/datastoretobigquery))
-- Google Compute Engine ([talk](https://developers.google.com/events/io/2012/sessions/gooio2012/302/)), ([doc](https://cloud.google.com/products/compute-engine))
+- Google Compute Engine ([doc](https://cloud.google.com/products/compute-engine))
 - Google Cloud SQL ([doc](https://developers.google.com/cloud-sql/))
 
 ---
@@ -360,15 +586,23 @@ class: segue dark nobackground
 title: Homeworks
 content_class: smaller
 
-- Homework submissions accepted till the end of the week (5.5.2013)
-- Some already submited (not quite all)
+- Homework submissions accepted till 19.5.2014
+
+#Evaluation
+
+- Should use at least 2 of the advanced datastore-based features
+	- Transactions, consistency, sharding, cursors, special types of queries, asynchronous operations
+- Should use at least 2 service APIs
+	- Memcache, Task Queues, Blobstore, Channels, Endpoints, BigQuery, ...
+- Send a description via email for confirmation
+- Work in groups preferred
+- Don't worry
 
 #Discussion
 
 - What problem/domain did you choose?
 - What was interesting?
 - What services did you use?
-
 
 ---
 

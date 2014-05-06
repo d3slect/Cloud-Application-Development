@@ -50,9 +50,10 @@ URL: https://code.google.com/p/io-2012-slides
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Other GAE Services<ul>
+<li>Other GAE Topics<ul>
+<li>Modules</li>
 <li>MapReduce &amp; GAE MapReduce API</li>
-<li>Google Big Query service</li>
+<li>Google Cloud Endpoints</li>
 </ul>
 </li>
 <li>Organizational<ul>
@@ -72,6 +73,200 @@ URL: https://code.google.com/p/io-2012-slides
       <h3>What else can be done with GAE</h3>
     </hgroup>
   
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/modules/">doc</a></li>
+<li>Decomposition of GAE App</li>
+<li>Separate source code, configuration (security, libraries, versioning, ...), and URL<ul>
+<li>One 'default' - handles web requests</li>
+</ul>
+</li>
+<li>Multiple running instances -&gt; <strong>different scaling options</strong></li>
+<li>Stateful services (e.g., Memcache, Datastore, and Task Queues) are shared by all the modules in an application</li>
+</ul>
+<p><center>
+<img alt="ModulesOverview" src="https://developers.google.com/appengine/docs/images/modules_hierarchy.png" />
+</center></p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules: Scaling</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><strong>Manual</strong><ul>
+<li>long-running task with complex initialization, maintaining memory state</li>
+<li>fixed number of instances</li>
+<li>explicit URL: <code>http://instance.version.module.app_id.appspot.com</code></li>
+</ul>
+</li>
+<li><strong>Basic</strong><ul>
+<li>creates an instance based on requests</li>
+<li>max instance limit</li>
+<li>no finish deadline (long-running requests), idle timeout</li>
+<li>explicit URL as previous</li>
+</ul>
+</li>
+<li><strong>Automatic</strong><ul>
+<li>original GAE scaling</li>
+<li>creates instances based on request rate, response latencies<ul>
+<li>min/max idle instances</li>
+<li>min/max pending latency</li>
+<li>max concurrent requests (max 80!)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules: Config</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><pre class="prettyprint" data-lang="Yaml">
+application: simple-sample
+<b>module: backend</b>
+version: uno
+runtime: python27
+instance_class: B8
+<b>manual_scaling:
+  instances: 5</b>
+</pre>
+
+<pre class="prettyprint" data-lang="Yaml">
+application: simple-sample
+<b>module: mobile-frontend</b>
+...
+<b>automatic_scaling:
+  min_idle_instances: 2
+  max_pending_latency: 1s</b>
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules: Communication</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Explicit requests<ul>
+<li>validation of requests (<a href="https://developers.google.com/appengine/docs/python/appidentity">AppIdentity</a>,
+<a href="https://developers.google.com/appengine/docs/python/oauth">OAuth</a>,
+<a href="https://developers.google.com/appengine/docs/python/config/appconfig#Python_app_yaml_Requiring_login_or_administrator_status">GAE admin status</a>)</li>
+</ul>
+</li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+import urllib2
+<b>from google.appengine.api import modules</b>
+
+<b>url = "http://%s/" % modules.get_hostname(module="my-backend")</b>
+try:
+  <b>result = urllib2.urlopen(url)</b>
+  doSomethingWithResult(result)
+except urllib2.URLError, e:
+  handleError(e)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules: Communication II</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-push">Push Queues</a></li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+from google.appengine.api import taskqueue
+# ...
+    def post(self):
+        payload = self.request.get('payload')
+
+        # Add the task to the default queue.
+        taskqueue.add(url='/path/to/my/handler/', params={'payload': payload},
+                      target='my-version.my-module')
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules: Communication III</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/taskqueue/overview-pull">Pull Queues</a></li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+# one module
+from google.appengine.api import taskqueue
+
+q = taskqueue.Queue('pull-queue')
+tasks = []
+payload_str = 'hello world'
+tasks.append(taskqueue.Task(payload=payload_str, method='PULL'))
+q.add(tasks)
+
+
+# another module
+from google.appengine.api import taskqueue
+
+q = taskqueue.Queue('pull-queue')
+tasks = q.lease_tasks(3600, 100)
+# Perform some work with the tasks here
+q.delete_tasks(tasks)
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Modules: Routing</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><code>dispatch.yaml</code> (<a href="https://developers.google.com/appengine/docs/python/modules/routing">doc</a>)</li>
+</ul>
+<pre class="prettyprint" data-lang="Yaml">
+dispatch:
+  # Default module serves the typical web resources and all static resources.
+  - url: "*/favicon.ico"
+    module: default
+
+  # Default module serves simple hostname request.
+  - url: "simple-sample.appspot.com/"
+    module: default
+
+  # Send all mobile traffic to the mobile frontend.
+  - url: "*/mobile/*"
+    module: mobile-frontend
+
+  # Send all work to the one static backend.
+  - url: "*/work/*"
+    module: static-backend
+</pre></article>
+ 
 </slide>
 
 <slide  >
@@ -324,7 +519,8 @@ def reduce(phrase, filenames):
 <a href="https://code.google.com/p/appengine-mapreduce/">sources</a>,
 <a href="http://nswi152-mapreducedemo.appspot.com/">demo app</a>,
 <a href="https://code.google.com/p/appengine-mapreduce/wiki/MapReduceDemoApp">demo app sources</a>,
-<a href="http://www.google.com/events/io/2011/sessions/app-engine-mapreduce.html">Google IO 2011 talk</a></li>
+<a href="https://www.youtube.com/watch?v=EIxelKcyCC0&amp;list=PLD480D69728D72515">Google IO 2011</a>,
+<a href="https://www.youtube.com/watch?v=lqQ6VFd3Tnw">Google IO 2012</a></li>
 <li>Problems of running the general MapReduce on GAE<ul>
 <li>Performance isolation<ul>
 <li>A lot of MRs will be running at the same time</li>
@@ -358,18 +554,15 @@ def reduce(phrase, filenames):
 <li>Processing rate limiting</li>
 <li>Automatic sharding</li>
 <li>Predefined standard data input readers/writers<ul>
-<li>Datastore entities, blobstore plain/zip files</li>
+<li>Datastore entities, <a href="https://developers.google.com/appengine/docs/java/googlecloudstorageclient/">Cloud Storage</a>, <a href="https://developers.google.com/appengine/docs/java/logs/">Log store</a>,
+ blobstore plain/zip files</li>
 </ul>
 </li>
 <li>Pipeline API<ul>
 <li>Wires all MR phases together</li>
-<li>Generic API for asynchronous data processing</li>
-<li><a href="https://code.google.com/p/appengine-pipeline/">sources</a>, <a href="http://www.google.com/events/io/2011/sessions/large-scale-data-analysis-using-the-app-engine-pipeline-api.html">Google IO 2011 talk</a>, <a href="https://developers.google.com/events/io/2012/sessions/gooio2012/307/">Google IO 2012 talk</a></li>
-</ul>
-</li>
-<li>Files API<ul>
-<li>Persistent/Intermediate storage for MR data</li>
-<li>Generic API for high-performance write-only/read-only file storage</li>
+<li>Generic API for asynchronous data processing (goes well with custom modules)</li>
+<li><a href="https://code.google.com/p/appengine-pipeline/">sources</a>, <a href="https://www.youtube.com/watch?v=Rsfy_TYA2ZY">Google IO 2011</a>,
+<a href="https://www.youtube.com/watch?v=lqQ6VFd3Tnw">Google IO 2012</a></li>
 </ul>
 </li>
 <li>Status and management pages</li>
@@ -443,6 +636,7 @@ class StartAndStatusHandler(webapp2.RequestHandler):
 
     if self.request.get("word_count"):
       <b>pipeline = WordCountPipeline(filekey, blob_key)</b>
+      <b>pipeline.with_params(target="my-version.my-module")</b>
       <b>pipeline.start()</b>
 
       self.redirect(<b>pipeline.base_path + "/status?root=" + pipeline.pipeline_id</b>)
@@ -498,18 +692,84 @@ includes:
 <slide  >
   
     <hgroup>
+      <h2>Google Cloud Endpoints: API definition</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://developers.google.com/appengine/docs/python/endpoints/">doc</a></li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+@endpoints.api(name='yourApi',version='v1',
+               description='Tic Tac Toe API')
+class TicTacToeApi(remote.Service):
+ ...
+
+class YourResponseMessageClass(messages.Message):
+    message = messages.StringField(1)
+
+class YourRequestMessageClass(messages.Message):
+    message = messages.StringField(1)
+
+@endpoints.method(YourRequestMessageClass,
+                  YourResponseMessageClass,
+                  name='foo.bar', ...)
+def bar(self, request):
+...
+
+</pre></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Google Cloud Endpoints: Server side</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><code>services.py</code></li>
+</ul>
+<pre class="prettyprint" data-lang="Python">
+import endpoints
+import TicTacToeApi
+
+application = endpoints.api_server([TicTacToeApi])
+</pre>
+
+<ul>
+<li><code>app.yaml</code></li>
+</ul>
+<pre class="prettyprint" data-lang="Yaml">
+...
+handlers:
+# Endpoints handler
+- url: /_ah/spi/.*
+  script: services.application
+...
+libraries:
+- name: endpoints
+  version: 1.0
+</pre>
+
+<ul>
+<li>Explore at <code>/_ah/api/explorer</code></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
       <h2>Further Reading</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li><a href="http://www.google.com/events/io/2011/sessions.html">Google IO 2011</a><ul>
-<li>Filter By: App Engine </li>
-</ul>
-</li>
-<li><a href="https://developers.google.com/events/io/2012/sessions#cloud-platform">Google IO 2012</a></li>
-<li>Big Query (<a href="https://developers.google.com/events/io/2012/sessions/gooio2012/312/">talk 1</a>), (<a href="https://developers.google.com/events/io/2012/sessions/gooio2012/307">talk 2</a>), (<a href="https://developers.google.com/bigquery/">doc</a>),
+<li><a href="https://www.youtube.com/watch?v=zQ5_47zy4bY">Google I/O 2012 - Optimizing Your Google App Engine App</a></li>
+<li><a href="https://developers.google.com/events/io/sessions/333307296">Google I/O 2013 - Building developers.google.com on App Engine</a></li>
+<li><a href="https://developers.google.com/events/io/2012/sessions#cloud-platform">Google I/O 2012</a></li>
+<li>Big Query (<a href="https://www.youtube.com/watch?v=GrD7ymUPt3M">GCPLive 2014</a>, <a href="https://www.youtube.com/watch?v=QI8623HlYd4">Google I/O 2012 talk</a>), (<a href="https://developers.google.com/bigquery/">doc</a>),
 (<a href="https://developers.google.com/bigquery/articles/datastoretobigquery">tutorial</a>)</li>
-<li>Google Compute Engine (<a href="https://developers.google.com/events/io/2012/sessions/gooio2012/302/">talk</a>), (<a href="https://cloud.google.com/products/compute-engine">doc</a>)</li>
+<li>Google Compute Engine (<a href="https://cloud.google.com/products/compute-engine">doc</a>)</li>
 <li>Google Cloud SQL (<a href="https://developers.google.com/cloud-sql/">doc</a>)</li>
 </ul></article>
  
@@ -532,8 +792,21 @@ includes:
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Homework submissions accepted till the end of the week (5.5.2013)</li>
-<li>Some already submited (not quite all)</li>
+<li>Homework submissions accepted till 19.5.2014</li>
+</ul>
+<h1>Evaluation</h1>
+<ul>
+<li>Should use at least 2 of the advanced datastore-based features<ul>
+<li>Transactions, consistency, sharding, cursors, special types of queries, asynchronous operations</li>
+</ul>
+</li>
+<li>Should use at least 2 service APIs<ul>
+<li>Memcache, Task Queues, Blobstore, Channels, Endpoints, BigQuery, ...</li>
+</ul>
+</li>
+<li>Send a description via email for confirmation</li>
+<li>Work in groups preferred</li>
+<li>Don't worry</li>
 </ul>
 <h1>Discussion</h1>
 <ul>
