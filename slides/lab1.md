@@ -35,8 +35,8 @@ content_class: smaller
 ![Cloud Computing](images/gcp.png)
 </center>
 
-- [GCP Live 2014](https://cloud.google.com/events/google-cloud-platform-live/)
-- *"What is Cloud Computing?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatiscc) 
+- [GCP Live 2014](https://cloud.google.com/events/google-cloud-platform-live/stream)
+ *"What is Cloud Computing?"* at [Google Training Tutorial](http://web.archive.org/web/20140706143751/https://developers.google.com/appengine/training/intro/whatiscc)
 
 ---
 
