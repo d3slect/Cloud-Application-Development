@@ -171,7 +171,7 @@ content_class: smaller
 #File types you will encounter
 
 - Python sources (`.py`)
-- YAML configuraiton files (`.yaml`)
+- YAML configuration files (`.yaml`)
 - Web sources (`.html`, `.css`, ...)
 
 #Recommended tools
