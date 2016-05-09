@@ -226,7 +226,7 @@ python google_appengine/dev_appserver.py helloworld/
 title: App Configuration
 content_class: smaller
 
-The configuraiton of a GAE app is in the `app.yaml` file
+The configuration of a GAE app is in the `app.yaml` file
 
 <pre class="prettyprint" data-lang="YAML">
 <b>application: helloworld
