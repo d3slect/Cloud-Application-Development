@@ -177,6 +177,7 @@ content_class: smaller
 #Recommended tools
 
 - Your favorite text editor (vim, ...)
+- Jetbrains PyCharm ([link](https://www.jetbrains.com/pycharm/))
 - IDLE: default Python editor ([link](http://docs.python.org/2/library/idle.html))
 - Aptana Studio: Eclipse-based IDE ([link](http://www.aptana.com/))
 - ...
