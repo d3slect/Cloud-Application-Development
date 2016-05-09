@@ -178,7 +178,7 @@ content_class: smaller
 
 - Your favorite text editor (vim, ...)
 - IDLE: default Python editor ([link](http://docs.python.org/2/library/idle.html))
-- Aptana Studio: Eclispe-based IDE ([link](http://www.aptana.com/))
+- Aptana Studio: Eclipse-based IDE ([link](http://www.aptana.com/))
 - ...
 
 ---
