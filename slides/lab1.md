@@ -90,8 +90,8 @@ content_class: smaller
 ![GAE Mobile App](images/gae-mobile.png)
 </center>
 
-<https://cloud.google.com/developers/articles/mobile-application-solutions>
-
+<https://cloud.google.com/developers/articles/mobile-application-solutions><br />
+<https://cloud.google.com/solutions/mobile/developing-mobile-games-on-google-app-engine-compute-engine/>
 
 ---
 
@@ -117,7 +117,7 @@ a total limit.</td>
     <td>Code & Static Data Storage <br />(includes all versions)</td>
     <td>First 1 GB <br /><strong>Note:</strong> Not a daily limit but
 a total limit.</td>
-    <td>$0.13 per GB per month</td>
+    <td>$0.026 per GB per month</td>
   </tr>
   <tr>
     <td>Stored Data <br />(billable)</td>
