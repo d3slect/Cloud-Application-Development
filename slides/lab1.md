@@ -55,8 +55,8 @@ content_class: smaller
 	- Other GCP Products (Compute Engine, Big Query, Endpoints, ...)
 	- Google Apps (own domain name, ...), Youtube, ...
 - Free quota 
-- Further reading
-	- *"What is (isn't) Google App Engine?"* at [Google Training Tutorial](https://developers.google.com/appengine/training/intro/whatisgae)
+<!-- - Further reading -->
+<!--	- *Google App Engine Documentation* at [Google Training Tutorial](https://cloud.google.com/appengine) -->
 
 ---
 
@@ -164,8 +164,8 @@ content_class: smaller
 #SDK 
 
 - [Doc](https://developers.google.com/appengine/docs/python/gettingstartedpython27/devenvironment), [Older tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
-- Python 2.7 ([link](http://www.python.org/getit/releases/2.7.3/)) 
-- GAE Python SDK ([link](https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python))
+- Python 2.7 ([link](https://www.python.org/downloads/release/python-2711/)) 
+- GAE Python SDK ([link](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python))
 - Make sure that the python and GAE SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
 
 #File types you will encounter
@@ -213,7 +213,7 @@ content_class: smaller
 - You should get the following structure ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#hello))
 	- `app.yaml` - configuration of the app
 	- `main.py` - implementation of the req. handler
-	- complete sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/helloworld)
+	- complete sources also available at [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/helloworld)
 - Test the app
 	- Run the development server and visit <http://localhost:8080/>
 	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#startdev)), or:
