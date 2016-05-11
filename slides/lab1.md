@@ -1,6 +1,6 @@
 title: Course Info
 
-<http://d3s.mff.cuni.cz/~keznikl/teaching/google-app-engine/>
+<https://github.com/d3slect/Cloud-Application-Development/>
 
 #Schedule
 
@@ -327,31 +327,31 @@ content_class: smaller
 - User authentication via Google Accounts
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers), 
-[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
+[github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
 )
 - Handling HTTP requests (guestbook posts)
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
-[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
+[github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 )
 - Storing persistent data in Datastore
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
-[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
+[github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 )
 	- we'll use the older/simpler DB API (the tutorial uses NDB)
 - Rendering HTML via templates (Jinja2 templating engine)
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), 
-[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
+[github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
 )
 - Serving static (CSS) files
 (
 [tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
-[github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
+[github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 )
 <p></p>
-- Sources also available at [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook)
+- Sources also available at [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/guestbook)
 
 ---
 
@@ -359,7 +359,7 @@ title: Using the Users Service
 content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers),
-sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
+sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
 - Users API ([doc](https://developers.google.com/appengine/docs/python/users/))
 	- Google authentication
 	- Access to basic Google user properties (nickname, email)
@@ -388,7 +388,7 @@ content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
 webapp2 framework [doc](http://webapp-improved.appspot.com/),
-sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
+sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 
 <pre class="prettyprint" data-lang="python">
 import webapp2
@@ -423,7 +423,7 @@ content_class: smaller
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
 Datastore [doc](https://developers.google.com/appengine/docs/python/datastore/), 
 [NDB doc](https://developers.google.com/appengine/docs/python/ndb/), 
-sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
+sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 
 #Modeling data
 
@@ -495,7 +495,7 @@ content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates),
 Jinja2 [doc](http://jinja.pocoo.org/docs/),
-sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
+sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
 
 <pre class="prettyprint" data-lang="yaml">
 libraries:
@@ -568,7 +568,7 @@ content_class: smaller
 
 - [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
 Python application configuration [doc](https://developers.google.com/appengine/docs/python/config/appconfig),
-sources on [github](https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
+sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 
 <pre class="prettyprint" data-lang="yaml">
 application: helloworld

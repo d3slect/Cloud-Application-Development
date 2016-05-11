@@ -91,8 +91,8 @@ URL: https://code.google.com/p/io-2012-slides
 <img alt="Cloud Computing" src="images/gcp.png" />
 </center></p>
 <ul>
-<li><a href="https://cloud.google.com/events/google-cloud-platform-live/">GCP Live 2014</a></li>
-<li><em>"What is Cloud Computing?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a> </li>
+<li><a href="https://cloud.google.com/events/google-cloud-platform-live/stream">GCP Live 2014</a>
+ <em>"What is Cloud Computing?"</em> at <a href="http://web.archive.org/web/20140706143751/https://developers.google.com/appengine/training/intro/whatiscc">Google Training Tutorial</a></li>
 </ul></article>
  
 </slide>
@@ -120,11 +120,9 @@ URL: https://code.google.com/p/io-2012-slides
 <li>Google Apps (own domain name, ...), Youtube, ...</li>
 </ul>
 </li>
-<li>Free quota </li>
-<li>Further reading<ul>
-<li><em>"What is (isn't) Google App Engine?"</em> at <a href="https://developers.google.com/appengine/training/intro/whatisgae">Google Training Tutorial</a></li>
-</ul>
-</li>
+<li>Free quota 
+<!-- - Further reading -->
+<!--    - *Google App Engine Documentation* at <a href="https://cloud.google.com/appengine">Google Training Tutorial</a> --></li>
 </ul></article>
  
 </slide>
@@ -166,7 +164,8 @@ URL: https://code.google.com/p/io-2012-slides
     <article class="smaller"><p><center>
 <img alt="GAE Mobile App" src="images/gae-mobile.png" />
 </center></p>
-<p><a href="https://cloud.google.com/developers/articles/mobile-application-solutions">https://cloud.google.com/developers/articles/mobile-application-solutions</a></p></article>
+<p><a href="https://cloud.google.com/developers/articles/mobile-application-solutions">https://cloud.google.com/developers/articles/mobile-application-solutions</a><br />
+<a href="https://cloud.google.com/solutions/mobile/developing-mobile-games-on-google-app-engine-compute-engine/">https://cloud.google.com/solutions/mobile/developing-mobile-games-on-google-app-engine-compute-engine/</a></p></article>
  
 </slide>
 
@@ -196,7 +195,7 @@ a total limit.</td>
     <td>Code & Static Data Storage <br />(includes all versions)</td>
     <td>First 1 GB <br /><strong>Note:</strong> Not a daily limit but
 a total limit.</td>
-    <td>$0.13 per GB per month</td>
+    <td>$0.026 per GB per month</td>
   </tr>
   <tr>
     <td>Stored Data <br />(billable)</td>
@@ -249,21 +248,22 @@ a total limit.</td>
     <article class="smaller"><h1>SDK</h1>
 <ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/devenvironment">Doc</a>, <a href="https://developers.google.com/appengine/training/intro/gettingstarted#install">Older tutorial</a></li>
-<li>Python 2.7 (<a href="http://www.python.org/getit/releases/2.7.3/">link</a>) </li>
-<li>GAE Python SDK (<a href="https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">link</a>)</li>
+<li>Python 2.7 (<a href="https://www.python.org/downloads/release/python-2711/">link</a>) </li>
+<li>GAE Python SDK (<a href="https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">link</a>)</li>
 <li>Make sure that the python and GAE SDK directories added to PATH (<a href="http://docs.python.org/2/using/windows.html#setting-envvars">link</a>).</li>
 </ul>
 <h1>File types you will encounter</h1>
 <ul>
 <li>Python sources (<code>.py</code>)</li>
-<li>YAML configuraiton files (<code>.yaml</code>)</li>
+<li>YAML configuration files (<code>.yaml</code>)</li>
 <li>Web sources (<code>.html</code>, <code>.css</code>, ...)</li>
 </ul>
 <h1>Recommended tools</h1>
 <ul>
 <li>Your favorite text editor (vim, ...)</li>
+<li>Jetbrains PyCharm (<a href="https://www.jetbrains.com/pycharm/">link</a>)</li>
 <li>IDLE: default Python editor (<a href="http://docs.python.org/2/library/idle.html">link</a>)</li>
-<li>Aptana Studio: Eclispe-based IDE (<a href="http://www.aptana.com/">link</a>)</li>
+<li>Aptana Studio: Eclipse-based IDE (<a href="http://www.aptana.com/">link</a>)</li>
 <li>...</li>
 </ul></article>
  
@@ -313,7 +313,7 @@ a total limit.</td>
 <li>You should get the following structure (<a href="https://developers.google.com/appengine/training/intro/gettingstarted#hello">tutorial</a>)<ul>
 <li><code>app.yaml</code> - configuration of the app</li>
 <li><code>main.py</code> - implementation of the req. handler</li>
-<li>complete sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/helloworld">github</a></li>
+<li>complete sources also available at <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/helloworld">github</a></li>
 </ul>
 </li>
 <li>Test the app<ul>
@@ -334,7 +334,7 @@ python google_appengine/dev_appserver.py helloworld/
       <h2>App Configuration</h2>
       <h3></h3>
     </hgroup>
-    <article class="smaller"><p>The configuraiton of a GAE app is in the <code>app.yaml</code> file</p>
+    <article class="smaller"><p>The configuration of a GAE app is in the <code>app.yaml</code> file</p>
 <pre class="prettyprint" data-lang="YAML">
 <b>application: helloworld
 version: 1
