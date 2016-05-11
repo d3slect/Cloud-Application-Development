@@ -49,7 +49,7 @@ URL: https://code.google.com/p/io-2012-slides
       <h2>Course Info</h2>
       <h3></h3>
     </hgroup>
-    <article ><p><a href="http://d3s.mff.cuni.cz/~keznikl/teaching/google-app-engine/">http://d3s.mff.cuni.cz/~keznikl/teaching/google-app-engine/</a></p>
+    <article ><p><a href="https://github.com/d3slect/Cloud-Application-Development/">https://github.com/d3slect/Cloud-Application-Development/</a></p>
 <h1>Schedule</h1>
 <ul>
 <li><strong>Lab 1</strong> Intro, SDK, Hello World</li>
@@ -468,17 +468,17 @@ python google_appengine/appcfg.py update helloworld/
 <li>User authentication via Google Accounts
 (
 <a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">tutorial</a>, 
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a>
+<a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a>
 )</li>
 <li>Handling HTTP requests (guestbook posts)
 (
 <a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">tutorial</a>,
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a>
+<a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a>
 )</li>
 <li>Storing persistent data in Datastore
 (
 <a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">tutorial</a>,
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a>
+<a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a>
 )<ul>
 <li>we'll use the older/simpler DB API (the tutorial uses NDB)</li>
 </ul>
@@ -486,15 +486,15 @@ python google_appengine/appcfg.py update helloworld/
 <li>Rendering HTML via templates (Jinja2 templating engine)
 (
 <a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">tutorial</a>, 
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a>
+<a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a>
 )</li>
 <li>Serving static (CSS) files
 (
 <a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">tutorial</a>,
-<a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a>
+<a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a>
 )
 <p></p></li>
-<li>Sources also available at <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/guestbook">github</a></li>
+<li>Sources also available at <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/guestbook">github</a></li>
 </ul></article>
  
 </slide>
@@ -507,7 +507,7 @@ python google_appengine/appcfg.py update helloworld/
     </hgroup>
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers">Tutorial</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a></li>
+sources on <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step1_users">github</a></li>
 <li>Users API (<a href="https://developers.google.com/appengine/docs/python/users/">doc</a>)<ul>
 <li>Google authentication</li>
 <li>Access to basic Google user properties (nickname, email)</li>
@@ -542,7 +542,7 @@ app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms">Tutorial</a>,
 webapp2 framework <a href="http://webapp-improved.appspot.com/">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a></li>
+sources on <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms">github</a></li>
 </ul>
 <pre class="prettyprint" data-lang="python">
 import webapp2
@@ -581,7 +581,7 @@ app = webapp2.WSGIApplication([<b>('/', MainPage)</b>,
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore">Tutorial</a>,
 Datastore <a href="https://developers.google.com/appengine/docs/python/datastore/">doc</a>, 
 <a href="https://developers.google.com/appengine/docs/python/ndb/">NDB doc</a>, 
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a></li>
+sources on <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore">github</a></li>
 </ul>
 <h1>Modeling data</h1>
 <pre class="prettyprint" data-lang="python">
@@ -657,7 +657,7 @@ greetings = q.fetch(10)
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates">Tutorial</a>,
 Jinja2 <a href="http://jinja.pocoo.org/docs/">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a></li>
+sources on <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates">github</a></li>
 </ul>
 <pre class="prettyprint" data-lang="yaml">
 libraries:
@@ -735,7 +735,7 @@ class MainPage(webapp2.RequestHandler):
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles">Tutorial</a>,
 Python application configuration <a href="https://developers.google.com/appengine/docs/python/config/appconfig">doc</a>,
-sources on <a href="https://github.com/keznikl/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a></li>
+sources on <a href="https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step5_static">github</a></li>
 </ul>
 <pre class="prettyprint" data-lang="yaml">
 application: helloworld
