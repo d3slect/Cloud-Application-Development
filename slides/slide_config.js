@@ -18,13 +18,22 @@ var SLIDE_CONFIG = {
   },
 
   // Author information
-  presenters: [{
+  
+  presenters: [/*{
     name: 'Jaroslav Keznikl',
     //company: 'Job Title, Google',
     //gplus: 'http://plus.google.com/1234567890',
     twitter: '@jkeznikl',
     www: 'http://d3s.mff.cuni.cz/~keznikl/',
-    github: 'https://github.com/keznikl/Cloud-Application-Development'
+    github: 'https://github.com/d3slect/Cloud-Application-Development'
+  },*/
+  {
+    name: 'Jiří Vinárek',
+    //company: 'Job Title, Google',
+    //gplus: 'http://plus.google.com/1234567890',
+    //twitter: '@jkeznikl',
+    www: 'http://d3s.mff.cuni.cz/~vinarek/',
+    //github: 'https://github.com/keznikl/Cloud-Application-Development'
   }]
 };
 
