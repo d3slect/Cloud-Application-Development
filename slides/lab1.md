@@ -7,10 +7,10 @@ title: Course Info
 - **Lab 1** Intro, SDK, Hello World
 - **Lab 2** Selection of services - APIs and internals
 - **Lab 3** Advanced concepts (scaling up, high-availability)
-- **Lab 4** Homework
-	- preferably Python (easier to use)
-	- individually or in small groups
-- **Lab 5** Homework cont.
+<!-- - **Lab 4** Homework -->
+<!--	- preferably Python (easier to use) -->
+<!--	- individually or in small groups -->
+<!--- **Lab 5** Homework cont. -->
 
 #Requirements
 
