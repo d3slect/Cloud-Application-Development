@@ -294,7 +294,7 @@ URL: https://code.google.com/p/io-2012-slides
     <article class="smaller"><ul>
 <li><a href="https://developers.google.com/appengine/docs/python/ndb/queries">Doc</a></li>
 <li>Each query includes:<ul>
-<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities#Python_Kinds_and_identifiers">Entity kind</a></li>
+<li><a href="https://developers.google.com/appengine/docs/python/datastore/entities#Python_Kinds_and_identifiers">Entity kind</a> (Exception: <a href="https://cloud.google.com/datastore/docs/concepts/queries#kindless_queries">kindless queries</a>)</li>
 <li>Zero or more filters (based on <a href="https://developers.google.com/appengine/docs/python/ndb/queries#filter_by_prop">property values</a>, keys, <a href="https://developers.google.com/appengine/docs/python/ndb/queries#ancestor">ancestors</a>)<ul>
 <li>Property queries may take one of the forms: ==, &lt;, &lt;=, ..., !=, IN</li>
 </ul>
@@ -398,7 +398,7 @@ SELECT * FROM Person WHERE last_name = :target_last_name
 <pre class="prettyprint" data-lang="Python">
 q = Person.query()
 ...
-for p in q.fetch(1000, <b>offset=100, limit=500, batch_size=50, dealine=10</b>):
+for p in q.fetch(1000, <b>offset=100, limit=500, batch_size=50, deadline=10</b>):
     ...
 </pre></article>
  
@@ -457,7 +457,7 @@ FlexibleEmployee.query(<b>ndb.GenericProperty('location')</b> == 'SF')
 </pre>
 
 <ul>
-<li>Kindles Query(<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Python_Kindless_queries">doc</a>)<ul>
+<li>Kindless Query(<a href="https://developers.google.com/appengine/docs/python/datastore/queries#Python_Kindless_queries">doc</a>)<ul>
 <li>For statistics etc.</li>
 <li>Cannot include filters or sort orders on property values</li>
 <li>Can have filter on keys/ancestor filter</li>

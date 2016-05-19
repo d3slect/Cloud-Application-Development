@@ -162,7 +162,7 @@ content_class: smaller
 
 - [Doc](https://developers.google.com/appengine/docs/python/ndb/queries)
 - Each query includes:
-	- [Entity kind](https://developers.google.com/appengine/docs/python/datastore/entities#Python_Kinds_and_identifiers)
+	- [Entity kind](https://developers.google.com/appengine/docs/python/datastore/entities#Python_Kinds_and_identifiers) (Exception: [kindless queries](https://cloud.google.com/datastore/docs/concepts/queries#kindless_queries))
 	- Zero or more filters (based on [property values](https://developers.google.com/appengine/docs/python/ndb/queries#filter_by_prop), keys, [ancestors](https://developers.google.com/appengine/docs/python/ndb/queries#ancestor))
 		- Property queries may take one of the forms: ==, <, <=, ..., !=, IN
 	- Zero or more [sort orders](https://developers.google.com/appengine/docs/python/ndb/queries#order)
@@ -233,7 +233,7 @@ content_class: smaller
 <pre class="prettyprint" data-lang="Python">
 q = Person.query()
 ...
-for p in q.fetch(1000, <b>offset=100, limit=500, batch_size=50, dealine=10</b>):
+for p in q.fetch(1000, <b>offset=100, limit=500, batch_size=50, deadline=10</b>):
     ...
 </pre>
 
@@ -275,7 +275,7 @@ content_class: smaller
 FlexibleEmployee.query(<b>ndb.GenericProperty('location')</b> == 'SF')
 </pre>
 
-- Kindles Query([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Python_Kindless_queries))
+- Kindless Query([doc](https://developers.google.com/appengine/docs/python/datastore/queries#Python_Kindless_queries))
 	- For statistics etc.
 	- Cannot include filters or sort orders on property values
 	- Can have filter on keys/ancestor filter
