@@ -586,7 +586,7 @@ class: segue dark nobackground
 title: Homeworks
 content_class: smaller
 
-- Homework submissions accepted till 19.5.2014
+- Homework submissions accepted till 8.6.2016
 
 #Evaluation
 
@@ -618,5 +618,5 @@ Please help us make it better!
 - What did you learn during lectures/homeworks?
 - Would you consider using GAE in the future?
 
-For offline discussion: <keznikl@d3s.mff.cuni.cz>
+For offline discussion: <vinarek@d3s.mff.cuni.cz>
 
