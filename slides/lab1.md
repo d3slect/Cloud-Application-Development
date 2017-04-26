@@ -7,6 +7,7 @@ title: Course Info
 - **Lab 1** Intro, SDK, Hello World
 - **Lab 2** Selection of services - APIs and internals
 - **Lab 3** Advanced concepts (scaling up, high-availability)
+- **Lab 4** Advanced concepts (cont.)
 <!-- - **Lab 4** Homework -->
 <!--	- preferably Python (easier to use) -->
 <!--	- individually or in small groups -->
@@ -164,9 +165,10 @@ content_class: smaller
 #SDK 
 
 - [Doc](https://developers.google.com/appengine/docs/python/gettingstartedpython27/devenvironment), [Older tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
-- Python 2.7 ([link](https://www.python.org/downloads/release/python-2711/)) 
-- GAE Python SDK ([link](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python))
-- Make sure that the python and GAE SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
+- Python 2.7 ([link](https://www.python.org/downloads/release/python-2713/))
+<!-- - GAE Python SDK ([link](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)) -->
+- Gogle Cloud SDK ([link](https://cloud.google.com/sdk/downloads))
+- Make sure that the python and Cloud SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
 
 #File types you will encounter
 
@@ -205,22 +207,27 @@ title: Hello World
 content_class: smaller
 
 - [Getting started guide at GAE docs](https://developers.google.com/appengine/docs/python/gettingstartedpython27/helloworld)
-- [Getting started tutorial at Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)
+<!--- [Getting started tutorial at Google Training](https://developers.google.com/appengine/training/intro/gettingstarted)-->
 <p></p>
-- Create a skeleton of a new Google Appengine app
-	- Choose an ID, e.g., `helloworld`
-	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#creating))
-- You should get the following structure ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#hello))
+<!--- Create a skeleton of a new Google Appengine app-->
+- Clone Cloud-Application-Development repository to your local machine
+<pre class="prettyprint" data-lang="cmd">
+git clone https://github.com/d3slect/Cloud-Application-Development.git
+</pre>
+- Go to the examples/helloworld directory
+<pre class="prettyprint" data-lang="cmd">
+cd Cloud-Application-Development/examples/helloworld
+</pre>
+- You should see the following structure:
 	- `app.yaml` - configuration of the app
 	- `main.py` - implementation of the req. handler
-	- complete sources also available at [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/helloworld)
+	- `index.yaml` - Datastore indexes
 - Test the app
-	- Run the development server and visit <http://localhost:8080/>
-	- Use the *Google App Engine Launcher* ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#startdev)), or:
-
+	- From within helloworld directory run:
 <pre class="prettyprint" data-lang="cmd">
-python google_appengine/dev_appserver.py helloworld/
+dev_appserver.py app.yaml
 </pre>
+    - Open [http://localhost:8080](http://localhost:8080)
 
 ---
 
@@ -230,8 +237,7 @@ content_class: smaller
 The configuration of a GAE app is in the `app.yaml` file
 
 <pre class="prettyprint" data-lang="YAML">
-<b>application: helloworld
-version: 1
+<b>
 runtime: python</b>27
 api_version: 1
 threadsafe: true
@@ -277,15 +283,15 @@ content_class: smaller
 
 *"Feed the Big Brother"*
 
-- Create the app in the GAE Administration Console ([link](https://appengine.google.com/))
-	- Choose the same ID you've selected before
+- Create the app in the Google Cloud Platform Console ([link](https://console.cloud.google.com/appengine))
+	- Note the ID of the created project
 - Upload the app ([tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/uploading), [doc](https://developers.google.com/appengine/docs/python/tools/uploadinganapp))
 	- You need to fill in your Google Account information
 	- You can upload different versions for the same app ID and select which one is used as the default ([doc](https://developers.google.com/appengine/docs/adminconsole/index))
-	- Use the *Google App Engine Launcher* "Deploy" button ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#upload)), or:
+	<!--- Use the *Google App Engine Launcher* "Deploy" button ([tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#upload)), or:-->
 	
 <pre class="prettyprint" data-lang="cmd">
-python google_appengine/appcfg.py update helloworld/
+gcloud app deploy --project your_app_id
 </pre>
 
 - Test the uploaded version
@@ -298,7 +304,7 @@ content_class: smaller
 
 - Development Console ([doc](https://developers.google.com/appengine/docs/python/tools/devserver#Python_The_Development_Console))
 	- Runs on <http://localhost:8000/>
-	- "SDK Console" button in the *Google App Engine Launcher*
+	<!--- "SDK Console" button in the *Google App Engine Launcher*-->
 	- Basic infromation about the app in the *development* environment
 	- Service usage/state overview (Datastore Viewer, Task Queues)
 	- Interactive Console 
@@ -322,32 +328,32 @@ class: segue dark nobackground
 title: Guestbook App
 content_class: smaller
 
-[Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/introduction)
+[Tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/creating-guestbook)
 
 - User authentication via Google Accounts
 (
-[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers), 
+[tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/authenticating-users), 
 [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
 )
 - Handling HTTP requests (guestbook posts)
 (
-[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
+[tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/handling-user-input-form),
 [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 )
 - Storing persistent data in Datastore
 (
-[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingdatastore),
+[tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/storing-data-datastore),
 [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step3_datastore)
 )
-	- we'll use the older/simpler DB API (the tutorial uses NDB)
+- we'll use the older/simpler DB API (the tutorial uses NDB)
 - Rendering HTML via templates (Jinja2 templating engine)
 (
-[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/templates), 
+[tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/generating-dynamic-content-templates), 
 [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step4_templates)
 )
 - Serving static (CSS) files
 (
-[tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/staticfiles),
+[tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/serving-static-files),
 [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 )
 <p></p>
@@ -358,7 +364,7 @@ content_class: smaller
 title: Using the Users Service
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/usingusers),
+- [Tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/authenticating-users),
 sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step1_users)
 - Users API ([doc](https://developers.google.com/appengine/docs/python/users/))
 	- Google authentication
@@ -386,7 +392,7 @@ app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
 title: Handling Forms
 content_class: smaller
 
-- [Tutorial](https://developers.google.com/appengine/docs/python/gettingstartedpython27/handlingforms),
+- [Tutorial](https://cloud.google.com/appengine/docs/standard/python/getting-started/handling-user-input-form),
 webapp2 framework [doc](http://webapp-improved.appspot.com/),
 sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step2_forms)
 
@@ -555,7 +561,7 @@ content_class: smaller
       &lt;input value="<b>{{ guestbook_name }}</b>" name="guestbook_name">
       &lt;input type="submit" value="switch">
     &lt;/form>
-    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>& !f!Glt/a>
+    &lta href="<b>{{ url }}</b>"><b>{{ url_linktext }}</b>&lt;/a>
   &lt/body>
 &lt/html>
 <b>{% endautoescape %}</b>
@@ -571,8 +577,6 @@ Python application configuration [doc](https://developers.google.com/appengine/d
 sources on [github](https://github.com/d3slect/Cloud-Application-Development/tree/master/examples/getting_started/step5_static)
 
 <pre class="prettyprint" data-lang="yaml">
-application: helloworld
-version: 1
 runtime: python27
 api_version: 1
 threadsafe: true
