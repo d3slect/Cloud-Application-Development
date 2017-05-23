@@ -596,7 +596,7 @@ def get_data():
     <b>if data is not None</b>:
         return data
     <b>else</b>:
-        data = self.<b>query_for_data()</b> !L!J
+        data = self.<b>query_for_data()</b>
         <b>memcache.add</b>('key', data, 60)
         return data
 </pre>
@@ -674,7 +674,7 @@ content_class: smaller
 	- The deferred library automatically stores the exceeding information into datastore (1MB limit)
 - Don't pass entities to deferred.defer since it can cause races (better to pass keys)
 - Failed tasks is always retried
-	- If you don't wont GAE to retry, either return normally or raise `deferred.PermanentTaskFailure`
+	- If you don't want GAE to retry, either return normally or raise `deferred.PermanentTaskFailure`
 - You can't call nested functions, methods of nested classes, lambda functions, static methods, **methods in a request handler module**
 - Use the deferred library if
 	- You want a simple way of delegating workload to background

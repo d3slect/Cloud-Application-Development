@@ -167,7 +167,7 @@ content_class: smaller
 - [Doc](https://developers.google.com/appengine/docs/python/gettingstartedpython27/devenvironment), [Older tutorial](https://developers.google.com/appengine/training/intro/gettingstarted#install)
 - Python 2.7 ([link](https://www.python.org/downloads/release/python-2713/))
 <!-- - GAE Python SDK ([link](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)) -->
-- Gogle Cloud SDK ([link](https://cloud.google.com/sdk/downloads))
+- Google Cloud SDK ([link](https://cloud.google.com/sdk/downloads))
 - Make sure that the python and Cloud SDK directories added to PATH ([link](http://docs.python.org/2/using/windows.html#setting-envvars)).
 
 #File types you will encounter

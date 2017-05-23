@@ -19,7 +19,7 @@ class: segue dark nobackground
 
 ---
 
-title: Modules
+title: Services (Modules)
 content_class: smaller
 
 - [doc](https://developers.google.com/appengine/docs/python/modules/)
@@ -27,10 +27,10 @@ content_class: smaller
 - Separate source code, configuration (security, libraries, versioning, ...), and URL
     - One 'default' - handles web requests
 - Multiple running instances -> **different scaling options**
-- Stateful services (e.g., Memcache, Datastore, and Task Queues) are shared by all the modules in an application
+- Stateful services (e.g., Memcache, Datastore, and Task Queues) are shared by all the services in an application
 
 <center>
-![ModulesOverview](https://developers.google.com/appengine/docs/images/modules_hierarchy.png)
+![ServicesOverview](https://cloud.google.com/appengine/docs/images/modules_hierarchy.svg)
 </center>
 
 ---
@@ -288,7 +288,7 @@ content_class: smaller
 <img alt="Map" src="images/mr-write.png"  style="float: right" />
 
 - Aggregates and stores the outputs produced in the reduce phase
-- Has to serialized to some extent
+- Has to be serialized to some extent
 - Various output formats
 	- GAE Datastore entities
 	- Files on a file system

@@ -910,7 +910,7 @@ def get_data():
     <b>if data is not None</b>:
         return data
     <b>else</b>:
-        data = self.<b>query_for_data()</b> !L!J
+        data = self.<b>query_for_data()</b>
         <b>memcache.add</b>('key', data, 60)
         return data
 </pre>
