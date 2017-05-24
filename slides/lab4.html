@@ -151,14 +151,86 @@ URL: https://code.google.com/p/io-2012-slides
 <slide  >
   
     <hgroup>
-      <h2>Application</h2>
+      <h2>Firebase Database III</h2>
       <h3></h3>
     </hgroup>
     <article class="smaller"><ul>
-<li>Based on Firebase Web Codelab<ul>
-<li><a href="https://codelabs.developers.google.com/codelabs/firebase-web">Firebase Web Codelab</a></li>
-<li><a href="https://codelabs.developers.google.com/codelabs/firebase-cloud-functions">Cloud Functions for Firebase</a></li>
+<li>
+<p>Offline</p>
+<ul>
+<li>SDK persists data to disk</li>
+<li>Data synchronized after re-connection</li>
 </ul>
+</li>
+<li>
+<p>Single JSON tree</p>
+<ul>
+<li>Database denormalization</li>
+</ul>
+</li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Firebase application (demo)</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Based on <a href="https://codelabs.developers.google.com/codelabs/firebase-web">Firebase Web Codelab</a>    </li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Cloud Functions for Firebase</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>"Glue" (connective layer) to connect cloud services<ul>
+<li>Not just FireBase</li>
+<li>Executed on the server, not visible by clients</li>
+</ul>
+</li>
+<li>JavaScript code, executes in Node.js environment</li>
+<li>Billed to the nearest 100ms</li>
+</ul>
+<p><center>
+<img src="images/connect-extend.png" alt="Cloud services connection" />
+</center> </p></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Firebase Cloud Functions for Firebase (demo)</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li>Based on <a href="https://codelabs.developers.google.com/codelabs/firebase-cloud-functions">Cloud Functions for Firebase codelab</a></li>
+</ul></article>
+ 
+</slide>
+
+<slide  >
+  
+    <hgroup>
+      <h2>Additional topics and resources</h2>
+      <h3></h3>
+    </hgroup>
+    <article class="smaller"><ul>
+<li><a href="https://www.youtube.com/watch?v=eWj6dxfN63g">Architecting for Data Contention in a Realtime World with Firebase (Google I/O '17)</a></li>
+<li><a href="https://firebase.google.com/docs/database/web/structure-data">How to structure data</a></li>
+<li>
+<p><a href="https://firebase.google.com/docs/database/web/offline-capabilities">Enabling offline capabilities in JS</a></p>
+</li>
+<li>
+<p><a href="https://github.com/firebase/firebase-intro-presentation">Intro to Firebase</a></p>
 </li>
 </ul></article>
  

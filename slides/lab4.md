@@ -69,9 +69,52 @@ content_class: smaller
 
 ---
 
-title: Application
+title: Firebase Database III
 content_class: smaller
 
-- Based on Firebase Web Codelab
-    - [Firebase Web Codelab](https://codelabs.developers.google.com/codelabs/firebase-web)
-    - [Cloud Functions for Firebase](https://codelabs.developers.google.com/codelabs/firebase-cloud-functions)
+- Offline
+    - SDK persists data to disk
+    - Data synchronized after re-connection
+
+- Single JSON tree
+    - Database denormalization
+
+---
+
+title: Firebase application (demo)
+content_class: smaller
+
+- Based on [Firebase Web Codelab](https://codelabs.developers.google.com/codelabs/firebase-web)    
+    
+---
+
+title: Cloud Functions for Firebase
+content_class: smaller
+
+- "Glue" (connective layer) to connect cloud services
+    - Not just FireBase
+    - Executed on the server, not visible by clients
+- JavaScript code, executes in Node.js environment
+- Billed to the nearest 100ms
+
+<center>
+<img src="images/connect-extend.png" alt="Cloud services connection" />
+</center> 
+
+---
+
+title: Firebase Cloud Functions for Firebase (demo)
+content_class: smaller
+
+- Based on [Cloud Functions for Firebase codelab](https://codelabs.developers.google.com/codelabs/firebase-cloud-functions)
+
+---
+
+title: Additional topics and resources
+content_class: smaller
+
+- [Architecting for Data Contention in a Realtime World with Firebase (Google I/O '17)](https://www.youtube.com/watch?v=eWj6dxfN63g)
+- [How to structure data](https://firebase.google.com/docs/database/web/structure-data)
+- [Enabling offline capabilities in JS](https://firebase.google.com/docs/database/web/offline-capabilities)
+
+- [Intro to Firebase](https://github.com/firebase/firebase-intro-presentation)
